@@ -1,0 +1,13 @@
+
+blockquote {
+    padding: 0 1em;
+    color: rgb(115,115,115);
+    border-left: .25em solid rgb(200,200,200);
+}
+
+
+.page-title {
+    margin-top: 2.0rem;
+    margin-bottom: 1.0rem;
+}
+
