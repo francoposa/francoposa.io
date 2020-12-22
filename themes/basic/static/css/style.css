@@ -28,13 +28,12 @@ blockquote {
     margin-bottom: 0.5rem;
 }
 
-.content > h1, .content > h2, .content > h3 {
-    padding-top: 1.0rem;
-    margin-bottom: 1.0rem;
+.border-bottom {
+    margin-bottom: 2rem;
 }
 
-.list-title {
-    padding-top: 2.0rem;
+.section-title {
+    margin-top: 1.0rem;
     margin-bottom: 1.0rem;
 }
 
