@@ -1,3 +1,7 @@
+body {
+    background-color:rgb(250,250,250);
+}
+
 h1, h2, h3, h4, h5, .h1, .h2, .h3, .h4, .h5 {
     font-family: Roboto, var(--bs-font-sans-serif);;
 }
@@ -15,17 +19,22 @@ blockquote {
     border-left: .25em solid rgb(200,200,200);
 }
 
-.content {
-    margin-top: 4rem;
+.container {
+    background-color:rgb(255,255,255);
+    padding: 1rem;
+}
+
+.main {
+    margin-bottom: 0.5rem;
 }
 
 .content > h1, .content > h2, .content > h3 {
-    margin-top: 2.0rem;
+    padding-top: 1.0rem;
     margin-bottom: 1.0rem;
 }
 
 .list-title {
-    margin-top: 2.0rem;
+    padding-top: 2.0rem;
     margin-bottom: 1.0rem;
 }
 
@@ -33,6 +42,6 @@ blockquote {
     text-decoration: underline;
 }
 
-.footer {
-    padding: 1rem;
+.footer > p {
+    margin-bottom: 0rem;
 }

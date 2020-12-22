@@ -1,10 +1,12 @@
 {{ define "main" }}
-<div class="container content col-10 offset-1">
-    <h1 class="text-center">{{ .Title }}</h1>
-    <p class="text-center lead">{{ .Page.Summary }}</p>
-    <p class="text-center lead">{{ .Site.Params.AuthorName }}</p>
+<div class="container main">
+    <div class="container content col-10 offset-1">
+        <h1 class="text-center">{{ .Title }}</h1>
+        <p class="text-center lead">{{ .Page.Summary }}</p>
+        <p class="text-center lead">{{ .Site.Params.AuthorName }}</p>
 
-    <div class="border-bottom"></div>
-    {{ .Content }}
+        <div class="border-bottom"></div>
+        {{ .Content }}
+    </div>
 </div>
 {{ end }}

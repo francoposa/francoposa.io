@@ -1,18 +1,20 @@
 {{ define "main" }}
-<div class="container content col-10 offset-1">
-    {{ range .Sections }}
-    <h2 class="list-title"><a class="text-decoration-none" href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
-    <div class="border-bottom"></div>
-    {{ range .Sections }}
-    <h3 class="list-title"><a class="text-decoration-none" href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
-    <ul>
-        {{ range .Pages}}
-        <li>
-            <h5><a href="{{ .RelPermalink }}">{{ .Title }}</a></h5>
-        </li>
+<div class="container main">
+    <div class="container content col-10 offset-1">
+        {{ range .Sections }}
+        <h2 class="list-title"><a class="text-decoration-none" href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+        <div class="border-bottom"></div>
+        {{ range .Sections }}
+        <h3 class="list-title"><a class="text-decoration-none" href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+        <ul>
+            {{ range .Pages}}
+            <li>
+                <h5><a href="{{ .RelPermalink }}">{{ .Title }}</a></h5>
+            </li>
+            {{ end }}
+        </ul>
         {{ end }}
-    </ul>
-    {{ end }}
-    {{ end }}
+        {{ end }}
+    </div>
 </div>
 {{ end }}
