@@ -2,3 +2,6 @@ baseURL = "https://francoposa.io"
 languageCode = "en-us"
 theme = "basic"
 title = "francoposa.io"
+
+[params]
+AuthorName = "Franco Posa"

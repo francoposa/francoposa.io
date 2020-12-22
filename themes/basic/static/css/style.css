@@ -1,3 +1,13 @@
+h1, h2, h3, h4, h5, .h1, .h2, .h3, .h4, .h5 {
+    font-family: Roboto, var(--bs-font-sans-serif);;
+}
+
+a, a:hover {
+    color: inherit;
+}
+a:active {
+   text-decoration: underline;
+}
 
 blockquote {
     padding: 0 1em;
@@ -5,9 +15,24 @@ blockquote {
     border-left: .25em solid rgb(200,200,200);
 }
 
+.content {
+    margin-top: 4rem;
+}
 
-.page-title {
+.content > h1, .content > h2, .content > h3 {
     margin-top: 2.0rem;
     margin-bottom: 1.0rem;
 }
 
+.list-title {
+    margin-top: 2.0rem;
+    margin-bottom: 1.0rem;
+}
+
+.content > a {
+    text-decoration: underline;
+}
+
+.footer {
+    padding: 1rem;
+}

@@ -1,1 +1,7 @@
-<p class="footer text-center">Copyright (c) {{ now.Format "2006"}} Franco Posa</p>
+<div class="container border-top footer">
+    <p class="text-center">
+        published {{ .Page.Date.Format "2006-01-02" }} &#183;
+        updated {{ .Page.Lastmod.Format "2006-01-02" }}
+    </p>
+    <p class="text-center">Copyright (c) {{ now.Format "2006"}} {{.Site.Params.AuthorName}}</p>
+</div>
