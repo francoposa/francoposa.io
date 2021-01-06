@@ -22,14 +22,14 @@ Configuration for specific programming languages and toolchains will be left for
 
 The following assumes you are using the MacOS built-in Terminal.app
 
-### Set up Terminal.app to use zsh
+### Set up Terminal.app to Use Zsh
 
 1. Open the Terminal application
 2. Open the Preferences pane using `Cmd +  ,` or by navigating to Terminal > Preferences in the menu bar
 3. In the General tab, note that "Default login shell" is selected. On MacOS Catalina, the default shell has been updated to `/bin/zsh`. On previous MacOS versions, you can enter `/bin/zsh` in the "Command (complete path)" option to switch from the default (`/bin/bash`) to `zsh`
 4. Use the Profiles tab to set any font, color, and cursor preferences you may have.
 
-### Your first entry into `.zshrc`
+### Your First Entry Into `.zshrc`
 
 Your zsh configuration will largely be managed in `.zshrc` file in your home directory. This file is executed as a shell script whenever you initiate a new zsh session.
 
@@ -38,7 +38,8 @@ The most basic use of your `.zshrc` and similar dotfiles is to set environment v
 To start, we are only going to have our `.zshrc` to do one thing: `echo $PATH`. As the system `PATH` is so crucial to command-line tooling, I prefer to be start every terminal session with a printout of the current `PATH`.
 
 **Option 1: Command Line**
-```
+
+```shell
 % echo "echo \$PATH" > ~/.zshrc
 ```
 
@@ -47,19 +48,21 @@ Note that the the `$` character needs to be escaped with a backslash so the actu
 **Option 2: A text editor**
 
 Assuming you do not already have your preferred text editor installed, you can use the TextEdit app that ships with MacOS as the default editor for text files. The `open` command will attempt to open a file with whichever app is the default for that file's type.
-```
+
+```shell
 % touch ~/.zshrc
 % open ~/.zshrc
 ```
 
 Add the line `echo $PATH` to the file and save.
 
-**Test it out**
+### Test it Out
 
 The `.zshrc` will be invoked when you open a new terminal session in a new Terminal tab (`Cmd + T`), a new window (`Cmd + N`), or by running the file using the `source` command.
 
 You should see the contents of your `PATH` printed out. Compare the output to directly invoking `echo $PATH` from your terminal.
-```
+
+```shell
 % source ~/.zshrc
 /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 % echo $PATH
@@ -80,7 +83,7 @@ A general-purpose text editor is essential to your development environment. I us
 
 ### Install Sublime Text editor & CLI
 
-```
+```shell
 brew cask install sublime-text
 ```
 
@@ -88,7 +91,7 @@ The brew install sets up the `subl` launcher command for you, so go ahead and tr
 
 ### Install Visual Studio Code editor & CLI
 
-```
+```shell
 brew cask install visual-studio-code
 ```
 

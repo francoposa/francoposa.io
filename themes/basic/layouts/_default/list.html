@@ -1,7 +1,7 @@
 {{ define "main" }}
 <div class="container main">
     <div class="container content col-10 offset-1">
-        <h1 class="section-title">{{ .Title }}</h1>
+        <h1 class="section-title"><a class="text-decoration-none" href="{{ .RelPermalink }}">{{ .Title }}</a></h1>
         {{if .Sections }}
         <!-- This is a list page for a Section containing Sections -->
         <div class="border-bottom"></div>

@@ -3,5 +3,9 @@ languageCode = "en-us"
 theme = "basic"
 title = "francoposa.io"
 
+[markup]
+[markup.highlight]
+style = "monokailight"
+
 [params]
 AuthorName = "Franco Posa"

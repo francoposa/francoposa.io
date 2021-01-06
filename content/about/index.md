@@ -3,8 +3,10 @@ title: About
 slug: about
 type: section
 layout: about
+date: 2020-02-02
+lastmod: 2021-01-06
 ---
-## About Me
+## Myself
 
 I am a software engineer with over four years of experience designing, writing, and testing software in Python & Golang.
 
@@ -19,7 +21,7 @@ I am biased towards minimalism and simplicity:
 In my spare time, I enjoy building a deep understanding of topics across all areas of software engineering.
 
 
-## About This Site
+## This Site
 
 As software engineers our careers are a never-ending journey of self-education, and we spend countless hours reading textbooks, documentation, guides, and forums. Content is often easy to come by, but truly excellent resources are rare and invaluable.
 

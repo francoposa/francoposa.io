@@ -1,5 +1,5 @@
 ---
-title: Development Setup & Configuration
+title: Resources
 date: 2020-02-02
 lastmod: 2021-01-06
 ---
