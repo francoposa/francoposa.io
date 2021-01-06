@@ -7,7 +7,7 @@
         {{ range .Sections }}
         <h3 class="section-title"><a class="text-decoration-none" href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
         <ul>
-            {{ range .Pages}}
+            {{ range sort .Pages ".Params.order_number"}}
             <li>
                 <h5><a href="{{ .RelPermalink }}">{{ .Title }}</a></h5>
             </li>
