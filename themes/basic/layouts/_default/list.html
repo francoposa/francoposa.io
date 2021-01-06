@@ -8,7 +8,7 @@
         {{ range .Sections }}
         <h2 class="section-title"><a class="text-decoration-none" href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
         <ul>
-            {{ range .Pages}}
+            {{ range sort .Pages ".Params.order_number"}}
             <li>
                 <h5><a href="{{ .RelPermalink }}">{{ .Title }}</a></h5>
                 <p>{{ .Summary }}</p>
@@ -20,7 +20,7 @@
         <!-- This is a list page for a Section containing only Pages -->
         <div class="border-bottom"></div>
         <ul>
-            {{ range .Pages}}
+            {{ range sort .Pages ".Params.order_number"}}
             <li>
                 <h5><a href="{{ .RelPermalink }}">{{ .Title }}</a></h5>
                 <p>{{ .Summary }}</p>
