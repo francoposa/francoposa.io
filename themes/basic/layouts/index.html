@@ -9,7 +9,7 @@
         <ul>
             {{ range sort .Pages ".Params.order_number"}}
             <li>
-                <h5><a href="{{ .RelPermalink }}">{{ .Title }}</a></h5>
+                <p><a href="{{ .RelPermalink }}">{{ .Title }}</a></p>
             </li>
             {{ end }}
         </ul>
