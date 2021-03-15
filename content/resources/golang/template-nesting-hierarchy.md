@@ -54,7 +54,7 @@ executing full Template collection:
 
 This looks good except that executing the full template collection does not output anything. This is because nowhere in our templates did we invoke a template outside of a template declaration.
 
-We can correct this (if desired) by invoking the `t3` template somewhere in our collection, outside of any other template definitions. We will pack the invocation {% raw %}`{{template "T3"}}`{% endraw %} in tight at the end to avoid any unwanted whitespace in our template.
+We can correct this (if desired) by invoking the `t3` template somewhere in our collection, outside of any other template definitions. We will pack the invocation `{{template "T3"}}` in tight at the end to avoid any unwanted whitespace in our template.
 
 ```golang
 // Example v1.1
