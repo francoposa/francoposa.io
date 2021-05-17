@@ -3,7 +3,7 @@ title: "Spark and PySpark Setup for MacOS"
 slug: spark-pyspark-setup-macos
 summary: "Spark and PySpark Environment Setup for MacOS"
 date: 2020-10-25
-lastmod: 2020-10-25
+lastmod: 2021-05-17
 order_number: 6
 ---
 
@@ -29,14 +29,23 @@ export SDKMAN_DIR="/Users/franco/.sdkman"
 [[ -s "/Users/franco/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/franco/.sdkman/bin/sdkman-init.sh"
 ```
 
+The SDKMAN initalization snippet seems to work fine even if it is not at the end of `.zshrc`.
+Without taking a closer at the contents of the init script, I assume the point is just to make sure that the JDKs/SDKs installed by SDKMAN remain ahead of all others in the `PATH`.
 I prefer to keep `echo $PATH` as the last line of my `.zshrc`.
 
-The SDKMAN initalization snippet seems to work fine even if it is not at the end of `.zshrc`. Without taking a closer at the contents of the init script, I assume the point is just to make sure that the JDKs/SDKs installed by SDKMAN remain ahead of all others in the `PATH`.
+### SDKMAN Shell AutoCompletion
 
+Optionally, install bash or zsh autocompletion as noted in the [docs](https://sdkman.io/usage#completion).
+Using the autocomplete is currently the only way to list which SDKs you have installed locally - see GitHub issue [here](https://github.com/sdkman/sdkman-cli/issues/466).
 
 ## 2. Install OpenJDK with SDKMAN
 
 ### Install Java
+
+The Scala binaries are [included with a Spark installation](https://stackoverflow.com/questions/27590474/how-can-spark-shell-work-without-installing-scala-beforehand), so we will not need to install Scala in addition to the JDK.
+
+The Scala docs have a [version compatibility table](https://docs.scala-lang.org/overviews/jdk-compatibility/overview.html#version-compatibility-table) for Java and Scala versions.
+This should not change very often, and generally you should not expect to have issues or need to upgrade if using an LTS version of Java - currently Java 8 and 11.
 
 SDKMAN will use current LTS release of the AdoptOpenJDK distribution by default.
 
@@ -62,15 +71,12 @@ OpenJDK Runtime Environment AdoptOpenJDK (build 11.0.9+11)
 OpenJDK 64-Bit Server VM AdoptOpenJDK (build 11.0.9+11, mixed mode)
 ```
 
-The Scala binaries are [included with a Spark installation](https://stackoverflow.com/questions/27590474/how-can-spark-shell-work-without-installing-scala-beforehand), so we will not need to install Scala in addition to the JDK.
-
 ## 3. Download and Install Spark from Apache.org
 
 ### Download Spark
 
-The Spark website, [spark.apache.org](https://spark.apache.org/downloads) will have pre-built
-binaries for all the currently-supported versions of Spark. Select and download the default
-(latest) version unless your Spark jobs need to be compatible with an earlier version.
+The Spark website, [spark.apache.org](https://spark.apache.org/downloads) will have pre-built binaries for all the currently-supported versions of Spark.
+Select and download the default (latest) version unless your Spark jobs need to be compatible with an earlier version.
 
 ### Install Spark
 
@@ -91,22 +97,24 @@ This is will unpack everything into a folder with the same name, minus the `.tgz
 
 #### Move Spark to the Install Location
 
-Copy or move the unzipped folder to the desired Spark instal location, such as `/usr/local/spark`.
+Copy or move the unzipped folder to the desired Spark install location.
+Including the version number in the install location allows us to maintain multiple Spark versions if desired.
 
 ```shell
-% mv spark-3.0.1-bin-hadoop2.7 /usr/local/spark  # May require sudo
+[~/Downloads]% mv spark-3.0.1-bin-hadoop2.7 /usr/local/spark-3.0.1  # May require sudo
 ```
 
-Finally, make your Spark install location available in your `PATH` by specifying
-it in your `.zshrc`:
+Symlink the versioned directory to a more convenient unversioned path.
 
 ```shell
-export PATH=$PATH:/usr/local/spark/bin
+% ln -s /usr/local/spark-3.0.1 /usr/local/spark  # May require sudo
 ```
 
 #### Confirm your `spark-shell` and `pyspark` commands map to the Spark install location:
 
 ```shell
+% export PATH=$PATH:/usr/local/spark/bin
+
 % which pyspark
 /usr/local/spark/bin/pyspark
 
@@ -114,16 +122,22 @@ export PATH=$PATH:/usr/local/spark/bin
 /usr/local/spark/bin/spark-shell
 ```
 
+If you want Spark to always be available globally, ensure `/usr/local/spark/bin` is added to your `PATH` in your `.zshrc`.
+
 ## 4. Make Global PySpark Available in Virtual Environments
 
-Depending on your virtual environment setup, having PySpark available globally on your Mac will not necessarily make it available in a given virtual environment. Thankfully, we can still utilize the global PySpark install
-into our environment by treating it as  [Pip "editable" dependency](https://pip.pypa.io/en/stable/reference/pip_install/#editable-installs).
+Depending on your virtual environment setup, having PySpark available globally on your Mac will not necessarily make it available in a given virtual environment.
+Instead, the global PySpark can be installed into a Python virtual environment as a [Pip editable dependency](https://pip.pypa.io/en/stable/reference/pip_install/#editable-installs).
 
 ```shell
 % pip install -e /usr/local/spark/python
 ```
 
-This will make the PySpark available in your virtual environment, but always using the code installed at
-`/usr/local/spark`.
-
+This will make the PySpark available in your virtual environment, but always referencing the code installed at `/usr/local/spark`.
 If you update the version of Spark at `/usr/local/spark`, your virtual environment will use the updated version.
+
+Alternatively, your virtual environment can reference a specific installed version instead of the symlink:
+
+```shell
+% pip install -e /usr/local/spark-3.0.1/python
+```
