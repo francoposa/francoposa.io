@@ -62,9 +62,7 @@ OpenJDK Runtime Environment AdoptOpenJDK (build 11.0.9+11)
 OpenJDK 64-Bit Server VM AdoptOpenJDK (build 11.0.9+11, mixed mode)
 ```
 
-The Scala binaries are [included with a Spark installation](https://stackoverflow.com/
-questions/27590474/how-can-spark-shell-work-without-installing-scala-beforehand),
-so we will not need to install Scala in addition to the JDK.
+The Scala binaries are [included with a Spark installation](https://stackoverflow.com/questions/27590474/how-can-spark-shell-work-without-installing-scala-beforehand), so we will not need to install Scala in addition to the JDK.
 
 ## 3. Download and Install Spark from Apache.org
 
