@@ -3,7 +3,7 @@ title: "Golang Templates Part 1: Concepts and Composition with Text Templates"
 slug: golang-templates-1
 summary: "Understanding Golang's template nesting and hierarchy with basic text templates"
 date: 2020-12-10
-lastmod: 2021-01-09
+lastmod: 2021-07-11
 order_number: 1
 ---
 
@@ -11,7 +11,9 @@ order_number: 1
 
 Go's templating system can be quite confusing and tricky at first.
 
-Defining, parsing, and rendering the templates you want is likely to be unintuitive for anyone coming from common templating libraries such as Jinja, Django Templates, or Liquid. These libraries have OOP-style template hierarchies where one template inherits from or extends another, forming a parent-child relationship. See [Jinja2's template inheritance docs](https://jinja.palletsprojects.com/en/2.11.x/templates/#template-inheritance) for a basic HTML example.
+Defining, parsing, and rendering the templates you want is likely to be unintuitive for anyone coming from common templating libraries such as Jinja, Django Templates, or Liquid.
+These libraries have OOP-style template hierarchies where one template inherits from or extends another, forming a clear parent-child relationship.
+See [Jinja2's template inheritance docs](https://jinja.palletsprojects.com/en/latest/templates/#template-inheritance) for a basic HTML example.
 
 To understand Go stdlib templates, we need to grasp two design decisions of the library:
 
@@ -28,7 +30,12 @@ Part 2 of this guide will extend these basics to more practical HTML examples.
 
 ### Using `define` and `template`
 
-In Go we declare templates with the `define` action and "invoke" or evaluate them with the `template` action. In the first version of example, we declare three templates:
+In Go we declare templates with the `define` action and "invoke" or evaluate them with the `template` action.
+
+The code for building and executing the template collections is contained in sections below - for now we just want to focus on understanding the outputs we can expect from given inputs.
+
+In the first version of our example, we declare three templates:
+
 * `T1`, containing the word "ONE"
 * `T2`, containing the word "TWO"
 * `T3`, which invokes `T1` and `T2` with a space in between to say "ONE TWO"
@@ -52,9 +59,11 @@ executing T3 Template: ONE TWO
 executing full Template collection: 
 ```
 
-This looks good except that executing the full template collection does not output anything. This is because nowhere in our templates did we invoke a template outside of a template declaration.
+This looks good, except that executing the full template collection does not output anything.
+This is because nowhere in our template collection did we invoke a template outside of a template declaration.
 
-We can correct this (if desired) by invoking the `t3` template somewhere in our collection, outside of any other template definitions. We will pack the invocation `{{template "T3"}}` in tight at the end to avoid any unwanted whitespace in our template.
+We can correct this (if desired) by invoking the `t3` template somewhere in our collection, outside of any other template definitions.
+We will pack the invocation `{{template "T3"}}` in tight at the end to avoid any unwanted whitespace in our template.
 
 ```golang
 // Example v1.1
@@ -80,7 +89,9 @@ We can clean up Example v1.1 with the `block` action, which combines the `define
 
 The `block` action requires a pipeline, but this example does not pass in any meaningful data when executing our template - you will notice the calls to `Execute` just provide an empty string to fill the `data` parameter.
 
-Pipelines provide ways to access and manipulate the data passed in. Since we are not using the data, it does not much matter which pipeline we choose here. We will just use the `.` pipeline, which just passes the provided data through to the template unmodified - a decent placeholder if you may want to pass data in later.
+Pipelines provide ways to access and manipulate the data passed in.
+Since we are not using the data in this example, it does not much matter which pipeline we choose here.
+We will just use the standard `.` pipeline, which just passes the provided data through to the template unmodified - a decent placeholder if you may want to pass data in later.
 
 ```golang
 // Example v1.2
@@ -100,9 +111,11 @@ executing full Template collection: ONE TWO
 
 ## Building a Template Collection
 
-As mentioned, Go's `Template` is a recursive data type, meaning that each instance is a collection made up of one or more `Template` instances. This structure is represented by the `parse.Tree` type, although in practice it acts as a graph rather than a tree.
+As mentioned, Go's `Template` is a recursive data type, meaning that each instance is a collection made up of one or more `Template` instances.
+This structure is represented by the `parse.Tree` type, although in practice it acts a bit more like a directed acyclic graph rather than a tree.
 
 In our example:
+
 * T1 is a `Template` instance
 * T2 is a `Template` instance
 * T3 is a `Template` instance that contains the T1 & T2 `Template` instances
