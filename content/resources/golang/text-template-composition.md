@@ -1,12 +1,11 @@
 ---
-title: "Golang Templates Part 1: Concepts and Composition with Text Templates"
+title: "Golang Templates Part 1: Concepts and Composition"
 slug: golang-templates-1
-summary: "Understanding Golang's template nesting and hierarchy with basic text templates"
+summary: "Understanding Golang Template Nesting and Hierarchy With Simple Text Templates"
 date: 2020-12-10
-lastmod: 2021-07-11
+lastmod: 2021-07-23
 order_number: 1
 ---
-
 ## Template Composition Concepts
 
 Go's templating system can be quite confusing and tricky at first.
@@ -18,9 +17,7 @@ See [Jinja2's template inheritance docs](https://jinja.palletsprojects.com/en/la
 To understand Go stdlib templates, we need to grasp two design decisions of the library:
 
 1. **Any template can embed any other template**
-
 2. **The `Template` type is a recursive collection of `Template` instances**
-
 
 We will illustrate these concepts with some basic text examples, modified from the Go `text/template` documentation to provide more insight into the inner workings of the library.
 
