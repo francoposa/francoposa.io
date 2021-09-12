@@ -11,7 +11,7 @@ order_number: 3
 
 ### Install OpenJDK
 
-With a preference towards FOSS, we are going to use OpenJDK and Oracle's Java SE JDK.
+With a preference towards FOSS, we are going to use OpenJDK over Oracle's Java SE JDK or other proprietary options.
 
 ```shell
 % brew install openjdk

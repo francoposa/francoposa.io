@@ -6,7 +6,6 @@ date: 2020-07-08
 lastmod: 2020-11-24
 order_number: 9
 ---
-
 ```shell
 # Show current directory in command prompt, truncating where it can
 # https://stackoverflow.com/questions/25090295/how-to-you-configure-the-command-prompt-in-linux-to-show-current-directory
