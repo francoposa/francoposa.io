@@ -40,7 +40,7 @@ we will gain some basic exposure to:
 * Linux/cloud server user management
 * Docker builds, Dockerfiles, and Docker/container repositories
 * Version-controlled Kubernetes deployment packaging with Helm
-* Domain & DNS configuration
+* Domain and DNS configuration
 
 <!---
 Practices and Preferences:
@@ -50,21 +50,29 @@ Practices and Preferences:
 Tools: Ansible, Helm, K3s, and DigitalOcean
 -->
 
-[DigitalOcean](https://www.digitalocean.com/)
+
+## Tool Selection
+
+### [DigitalOcean](https://www.digitalocean.com/)
 * Offers simple yet powerful cloud computing products and interfaces
 * Second-to-none [documentation](https://docs.digitalocean.com),
 [tutorials](https://www.digitalocean.com/community/tutorials), and other resources
 
 
-[Ansible](https://docs.ansible.com/ansible/latest/)
+### [Ansible](https://docs.ansible.com/ansible/latest/)
 * Automates everything you could want to do in infrastructure and operations.
-* Combination imperative & declarative approach
-* Power & Flexibility introduces complexity  - many, many ways to do the same thing
+* Combination imperative and declarative approach
+* Power and Flexibility introduces complexity  - many, many ways to do the same thing
 
 
-[K3s](https://rancher.com/docs/k3s/latest/en/)
+### [K3s](https://rancher.com/docs/k3s/latest/en/)
 * Lightweight Kubernetes distribution for resource-constrained environments like our small DigitalOcean droplets
 * Launcher script handles the complexity of initial installation, configuration, and startup
 * Batteries included - packaged with tools and utilities for Kubernetes functions such as network ingress and load balancing.
 These components are essential for proper operation but tough to absorb for a newcomer to Kubernetes and networking in general.
 
+### [Helm](https://helm.sh/docs/)
+* Application packaging and deployment management for Kubernetes
+* Declare Kubernetes applications in code with templated, composable Helm Charts
+* Package Kubernetes applications to share publicly or within an organization
+* Deploy, upgrade, and delete Kubernetes applications with a declarative CLI
