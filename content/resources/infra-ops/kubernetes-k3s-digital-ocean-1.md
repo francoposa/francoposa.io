@@ -6,7 +6,10 @@ date: 2021-07-27
 lastmod: 2021-07-27
 order_number: 2
 ---
-## 1. Create a DigitalOcean Droplet
+
+**This document is a work in progress**
+
+## 1. Create a DigitalOcean Server
 
 As the documentation states:
 
@@ -16,9 +19,15 @@ As the documentation states:
 > infrastructure.
 
 With that in mind, follow the [Create Droplet Quickstart](https://docs.digitalocean.com/products/droplets/quickstart/).
-The size of the droplet does not matter much for this tutorial - the $5 droplet option is plenty for any testing or learning scenario, and k3s is intended to run in resource-constrained environments.
+The size of the droplet does not matter much for this tutorial;
+the $5 droplet option is plenty for any testing or learning scenario,
+and k3s is intended to run in resource-constrained environments.
 
+Be sure to select an SSH key for the droplet.
+Ansible and similar tools use SSH keys by default.
+SSH passwords are generally considered less secure than SSH keys,
+and we will disable SSH password login on our servers as part of the
+recommended initial configuration process.
 
-
-
+## 2. Configure Server User Access
 
