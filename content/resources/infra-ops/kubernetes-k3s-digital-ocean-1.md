@@ -29,5 +29,11 @@ SSH passwords are generally considered less secure than SSH keys,
 and we will disable SSH password login on our servers as part of the
 recommended initial configuration process.
 
-## 2. Configure Server User Access
+**Note:** Creating a droplet can be automated with Ansible,
+the DigitalOcean CLI, or any number of related tools,
+but the DigitalOcean web interface is dead simple to use,
+so it's an ideal way to get us up and running without much hassle.
+
+
+## 2. Configure Server User Access with Ansible
 
