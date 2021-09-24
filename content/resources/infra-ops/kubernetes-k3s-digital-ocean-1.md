@@ -41,7 +41,7 @@ We need to specify our Ansible "inventory" -
 the hosts or groups of hosts to run Ansible tasks against.
 See the [Ansible docs on specifying inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) for more.
 
-We will specify two different entries for the same host.
+We will specify two different entries for the same host:
 one for the initial server setup done with the root user,
 and another for all subsequent tasks, using a new user
 created and configured for our purposes.
@@ -54,17 +54,19 @@ as `./cloud-infra/digital-ocean/ansible/hosts.yaml`:
 ```yaml
 ---
 all:
-  hosts:
-    master-roots:
-      demo-master-root:
-        ansible_host: 143.244.209.125
-        ansible_user: root
-        ansible_ssh_private_key_file: ~/.ssh/id_rsa_infra_ops
+  children:
+    master_roots:
+      hosts:
+        demo_master_root:
+          ansible_host: 143.244.209.125
+          ansible_user: root
+          ansible_ssh_private_key_file: ~/.ssh/id_rsa_infra_ops
     masters:
-      demo-master:
-        ansible_host: 143.244.209.125
-        ansible_user: infraops
-        ansible_ssh_private_key_file: ~/.ssh/id_rsa_infra_ops
+      hosts:
+        demo_master:
+          ansible_host: 143.244.209.125
+          ansible_user: infraops
+          ansible_ssh_private_key_file: ~/.ssh/id_rsa_infra_ops
 ```
 
 The IP address is just the IP of your DigitalOcean Droplet.
