@@ -33,7 +33,7 @@ With this site I hope to provide high-quality, useful, and accessible software e
 
 * Style: Bootstrap 5
 
-* Hosting: Digital Ocean App Platform
+* Hosting: DigitalOcean App Platform
 
 * DNS & CDN: Cloudflare
 

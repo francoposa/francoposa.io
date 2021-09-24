@@ -35,5 +35,40 @@ but the DigitalOcean web interface is dead simple to use,
 so it's an ideal way to get us up and running without much hassle.
 
 
-## 2. Configure Server User Access with Ansible
+## 2. Specify Ansible Host Inventory
 
+We need to specify our Ansible "inventory" -
+the hosts or groups of hosts to run Ansible tasks against.
+See the [Ansible docs on specifying inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) for more.
+
+We will specify two different entries for the same host.
+one for the initial server setup done with the root user,
+and another for all subsequent tasks, using a new user
+created and configured for our purposes.
+
+Create the `hosts` file where it can be easily referenced from the command line.
+From the root of my repository, my working directory while running Ansible tasks
+is `./cloud-infra/digital-ocean/ansible/`, so I create the hosts file
+as `./cloud-infra/digital-ocean/ansible/hosts.yaml`:
+
+```yaml
+---
+all:
+  hosts:
+    master-roots:
+      demo-master-root:
+        ansible_host: 143.244.209.125
+        ansible_user: root
+        ansible_ssh_private_key_file: ~/.ssh/id_rsa_infra_ops
+    masters:
+      demo-master:
+        ansible_host: 143.244.209.125
+        ansible_user: infraops
+        ansible_ssh_private_key_file: ~/.ssh/id_rsa_infra_ops
+```
+
+The IP address is just the IP of your DigitalOcean Droplet.
+The IP I have used here is actually a [Floating IP](https://docs.digitalocean.com/products/networking/floating-ips/)
+that I re-use so I do not have to always change my hosts file for a new droplet.
+
+## 3. Configure Server User Access with Ansible
