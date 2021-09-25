@@ -18,7 +18,7 @@ As the documentation states:
 > you can use, either standalone or as part of a larger, cloud-based
 > infrastructure.
 
-With that in mind, follow the [Create Droplet Quickstart](https://docs.digitalocean.com/products/droplets/quickstart/).
+Follow the [Create Droplet Quickstart](https://docs.digitalocean.com/products/droplets/quickstart/).
 The size of the droplet does not matter much for this tutorial;
 the $5 droplet option is plenty for any testing or learning scenario,
 and k3s is intended to run in resource-constrained environments.
@@ -46,12 +46,11 @@ one for the initial server setup done with the root user,
 and another for all subsequent tasks, using a new user
 created and configured for our purposes.
 
-Create the `hosts` file where it can be easily referenced from the command line.
-From the root of my repository, my working directory while running Ansible tasks
-is `./cloud-infra/digital-ocean/ansible/`, so I create the hosts file
-as `./cloud-infra/digital-ocean/ansible/hosts.yaml`:
+Create the Ansible inventory file where it can be easily referenced from the command line.
 
 ```yaml
+---
+# ./hosts.yaml
 ---
 all:
   children:
@@ -74,3 +73,75 @@ The IP I have used here is actually a [Floating IP](https://docs.digitalocean.co
 that I re-use so I do not have to always change my hosts file for a new droplet.
 
 ## 3. Configure Server User Access with Ansible
+
+1. Create a separate user with SSH access for our Infra Ops automation and administration purposes
+    * Grant the user passwordless sudo, required for Ansible automation of any step requiring sudo privileges
+2. Configure the host for a secure SSH setup on the host:
+    * Disable SSH password login for users with empty/blank passwords
+    * Disable SSH password login for all users
+    * Disable all SSH login for the root user
+
+```yaml
+---
+# ./initial-host-setup.yaml
+---
+# References
+
+# Digital Ocean recommended droplet setup script:
+# - https://docs.digitalocean.com/droplets/tutorials/recommended-setup
+# Digital Ocean tutorial on installing kubernetes with Ansible:
+#  - https://www.digitalocean.com/community/tutorials/how-to-create-a-kubernetes-cluster-using-kubeadm-on-debian-9
+# Ansible Galaxy (Community) recipe for securing ssh:
+# - https://github.com/vitalk/ansible-secure-ssh
+---
+- hosts: master_roots
+  become: 'yes'
+  tasks:
+    - name: create the 'infraops' user
+      user:
+        state: present
+        name: infraops
+        password_lock: 'yes'
+        groups: sudo
+        append: 'yes'
+        createhome: 'yes'
+        shell: /bin/bash
+
+    - name: add authorized keys for the infraops user
+      authorized_key: 'user=infraops key="{{item}}"'
+      with_file:
+        '{{ hostvars[inventory_hostname].ansible_ssh_private_key_file }}.pub'
+
+    - name: allow infraops user to have passwordless sudo
+      lineinfile:
+        dest: /etc/sudoers
+        line: 'infraops ALL=(ALL) NOPASSWD: ALL'
+        validate: visudo -cf %s
+
+    - name: disable empty password login for all users
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: '^#?PermitEmptyPasswords'
+        line: PermitEmptyPasswords no
+      notify: restart sshd
+
+    - name: disable password login for all users
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: '^(#\s*)?PasswordAuthentication '
+        line: PasswordAuthentication no
+      notify: restart sshd
+
+    - name: Disable remote root user login
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: '^#?PermitRootLogin'
+        line: 'PermitRootLogin no'
+      notify: restart sshd
+
+  handlers:
+    - name: restart sshd
+      service:
+        name: sshd
+        state: restarted
+```
