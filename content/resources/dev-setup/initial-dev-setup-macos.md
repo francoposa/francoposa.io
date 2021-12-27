@@ -89,7 +89,7 @@ You can override this behavior by specifying the full path instead of just the n
 That is, you can run `/bin/zsh` to get the specific version you want even though it has lower precedence.
 
 To start, we are only going to have our `.zshrc` execute one command: `echo $PATH`.
-As the system `PATH` is so crucial to command line tooling, I prefer to be start every terminal session with a printout of the current `PATH`.
+As the system `PATH` is so crucial to command-line tooling, I prefer to be start every terminal session with a printout of the current `PATH`.
 
 **Option 1: Command Line**
 
