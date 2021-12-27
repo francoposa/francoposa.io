@@ -25,7 +25,7 @@ Configuration for specific programming languages and toolchains will be left for
 Without going into too much detail, Zsh is a command-line shell very similar to the ubiquitous Bash, with additional quality-of-life features which can make it more suitable for daily interactive terminal usage.
 Zsh is not 100% compatible with Bash, but for standard interactive command-line usage, you may never notice the incompatibilities between the two.
 
-In any case, Apple has begun to enable Zsh as the default shell for new Mac user accounts, and Zsh has gained popularity across the board.
+In any case, Apple has begun to enable Zsh as the default shell for new MacOS user accounts, and Zsh has gained popularity across the board.
 Zsh-specific documentation, guides, and forum answers have become nearly as common as Bash.
 
 While I prefer to keep my shell configuration simple, Zsh also has a large ecosystem of plugins to add additional features and convenience to your interactive shell experience.
@@ -48,7 +48,7 @@ On MacOS Catalina, the default shell has been updated to `/bin/zsh`. On previous
 #### Option 2: The Command Line
 
 1. Open the Terminal application, or another terminal emulator if you have one installed
-2. Run `% echo $SHELL` to see the default shell for your user.
+2. Run `echo $SHELL` to see the default shell for your user.
 If the output is `/bin/zsh` or anything else ending in `zsh`, then you are already set.
 If the output is `/bin/bash` or anything else *not* ending in `zsh` then continue to the next step.
 3. Ensure you know the location of Zsh on your machine by running `which zsh`.
