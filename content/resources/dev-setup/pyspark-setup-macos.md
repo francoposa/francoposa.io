@@ -1,11 +1,27 @@
 ---
 title: "Spark and PySpark Setup for MacOS"
 slug: spark-pyspark-setup-macos
-summary: "Spark and PySpark Environment Setup for MacOS"
+summary: "Optimized Spark and PySpark Environment Setup for MacOS"
 date: 2020-10-25
-lastmod: 2021-05-17
+lastmod: 2021-12-30
 order_number: 6
 ---
+
+## Optimized PySpark Installation
+
+This guide focuses on a specific method to install PySpark into your local development environment, which may or may not be suitable for your needs.
+There are plenty of other installation guides for the more straightforward approach, which is to install PySpark separately into each Python virtual environment you use for local development.
+
+The standard method of installing a full PySpark instance into each Python virtual environment has a few drawbacks:
+
+1. The significant size of a PySpark installation is duplicated in several places on your machine
+2. If your workflow includes frequent rebuilds of your Python virtual environment, repeatedly downloading and installing PySpark can be overly time-consuming
+
+Instead, we can install a single global version of PySpark for each Spark version we use.
+Using pip's "editable" install mode, the individual Python virtual environments can reference the global installation.
+This eliminates both issues: PySpark is not duplicated into each environment, and there is no need to download and install PySpark each time a Python virtual environment is rebuilt.
+
+These same optimizations can be applied to Docker builds as well.
 
 ## 1. Install SDKMAN
 
