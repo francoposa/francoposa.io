@@ -17,12 +17,17 @@ order_number: 2
 Add the following to your `.zshrc`:
 
 ```shell
+# GOLANG
+# assuming brew install, should be no need to add the Go install location to PATH
+# brew installs to /usr/local/bin, which should also already be in PATH on MacOS
+
 # This is the default, but prefer explicit over implicit
 export GOPATH=$HOME/go
 
 # Make your binary executables available anywhere on the machine 
 export PATH=$PATH:$GOPATH/bin
 ```
+
 ## 2. Create your Workspace
 This does not have to be in your home folder, just make sure it matches what you put in GOPATH
 
