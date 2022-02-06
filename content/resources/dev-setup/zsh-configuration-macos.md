@@ -4,7 +4,7 @@ slug: zsh-configuration-linux-macos
 summary: "Configuration for Zsh supporting development in Python and Golang on Linux and MacOS"
 date: 2020-07-08
 lastmod: 2022-02-05
-order_number: 9
+order_number: 8
 ---
 ```shell
 # Show current directory in command prompt, truncating where it can

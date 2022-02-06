@@ -4,7 +4,7 @@ slug: visual-studio-code-configuration
 summary: "Recommended configuration for a general-purpose dev environment in VS Code"
 date: 2020-05-07
 lastmod: 2021-01-09
-order_number: 8
+order_number: 7
 ---
 
 ## The Basics: Essential Configuration for VS Code
