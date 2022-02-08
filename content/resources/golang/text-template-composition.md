@@ -10,7 +10,7 @@ order_number: 1
 
 Go's templating system can be quite confusing and tricky at first.
 
-Defining, parsing, and rendering the templates you want is likely to be unintuitive for anyone coming from common templating libraries such as Jinja, Django Templates, or Liquid.
+Defining, parsing, and rendering the templates may be unintuitive for anyone coming from common templating libraries such as Jinja, Django Templates, or Liquid.
 These libraries have OOP-style template hierarchies where one template inherits from or extends another, forming a clear parent-child relationship.
 See [Jinja2's template inheritance docs](https://jinja.palletsprojects.com/en/latest/templates/#template-inheritance) for a basic HTML example.
 
