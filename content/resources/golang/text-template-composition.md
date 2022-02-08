@@ -3,7 +3,7 @@ title: "Golang Templates Part 1: Concepts and Composition"
 slug: golang-templates-1
 summary: "Understanding Golang Template Nesting and Hierarchy With Simple Text Templates"
 date: 2020-12-10
-lastmod: 2021-07-23
+lastmod: 2022-02-08
 order_number: 1
 ---
 ## Template Composition Concepts
@@ -22,6 +22,37 @@ To understand Go stdlib templates, we need to grasp two design decisions of the 
 We will illustrate these concepts with some basic text examples, modified from the Go `text/template` documentation to provide more insight into the inner workings of the library.
 
 Part 2 of this guide will extend these basics to more practical HTML examples.
+
+## The Template Data Structure
+
+As mentioned, Go's `Template` is a recursive data type.
+Each `Template` instance is itself a collection made up of one or more `Template` instances.
+This structure is represented internally by the `parse.Tree` type.
+
+In this data structure, a child template can be embedded into multiple parent templates.
+The `template` libraries handle this internally by copying the child templates.
+
+Introducing cycles into this structure (i.e. `T1` embeds `T2`, which in turn embeds `T1`), is forbidden and will result in errors when building the template collection.
+
+In our following examples:
+
+* T1 is a `Template` instance
+* T2 is a `Template` instance
+* T3 is a `Template` instance which embeds the T1 & T2 `Template` instances
+* The top-level collection, named "tmplEx1", is a `Template` instance that contains the T1, T2, and T3 `Template` instances
+
+A rough representation of this template tree might look like this:
+
+```text
+tmplEx1
+    ├── T1
+    ├── T2
+    └── T3
+        ├── T1
+        └── T2
+```
+
+From this collection, we will be able to execute any of the individual templates defined in the collection, or the full collection (really the root of the template tree) at once.
 
 ## Declaring and Invoking Templates
 
@@ -108,17 +139,7 @@ executing full Template collection: ONE TWO
 
 ## Building a Template Collection
 
-As mentioned, Go's `Template` is a recursive data type, meaning that each instance is a collection made up of one or more `Template` instances.
-This structure is represented by the `parse.Tree` type, although in practice it acts a bit more like a directed acyclic graph rather than a tree.
-
-In our example:
-
-* T1 is a `Template` instance
-* T2 is a `Template` instance
-* T3 is a `Template` instance that contains the T1 & T2 `Template` instances
-* The top-level collection, named "tmplEx1" from our call to `New`, is a `Template` instance that contains the T1, T2, and T3 `Template` instances
-
-A rough representation of this template tree might look like this:
+Recall that our template tree looks approximately like this:
 
 ```text
 tmplEx1
@@ -128,10 +149,13 @@ tmplEx1
         ├── T1
         └── T2
 ```
+When building the template collection, you do not need to worry about parsing the templates in reference order.
+Go's `template` packages allow you to add template `T3` to the collection before the others.
 
-From this collection, we will be able to execute any of the individual templates defined in the collection, or the whole collection (really the root of the template tree) at once.
+This is a flexible approach, as the necessary templates could theoretically be created and added to the collection at anytime in the application lifecycle.
+It also removes the burden from the user of building the collection by walking the tree in the correct order.
 
-Templates are generally going to be built on application startup, which is why we are okay with using `template.Must` to panic if there are any issues with parsing and building the template collection.
+Templates are generally built on application startup, which is why we use `template.Must` to panic if there are any issues with parsing and building the template collection.
 
 ```golang
 // instantiate new template.Template collection
