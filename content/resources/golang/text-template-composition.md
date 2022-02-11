@@ -8,11 +8,12 @@ order_number: 1
 ---
 ## Template Composition Concepts
 
-Go's templating system can be quite confusing and tricky at first.
+Go takes a unique approach to defining, loading, and rendering text and HTML templates.
 
-Defining, parsing, and rendering the templates may be unintuitive for anyone coming from common templating libraries such as Jinja, Django Templates, or Liquid.
-These libraries have OOP-style template hierarchies where one template inherits from or extends another, forming a clear parent-child relationship.
+Common templating libraries such as Jinja, Django Templates, or Liquid have OOP-style template hierarchies where one template inherits from or extends another, forming a clear parent-child relationship.
 See [Jinja2's template inheritance docs](https://jinja.palletsprojects.com/en/latest/templates/#template-inheritance) for a basic HTML example.
+
+While the Go template philosophy requires a different mental model, it is quite straightforward and flexible once we push past the initial learning curve.
 
 To understand Go stdlib templates, we need to grasp two design decisions of the library:
 
@@ -60,7 +61,8 @@ From this collection, we will be able to execute any of the individual templates
 
 In Go we declare templates with the `define` action and "invoke" or evaluate them with the `template` action.
 
-The code for building and executing the template collections is contained in sections below - for now we just want to focus on understanding the outputs we can expect from given inputs.
+The code for building and executing the template collections is contained in sections below.
+For now, we will just focus on understanding the outputs we can expect from given inputs.
 
 In the first version of our example, we declare three templates:
 
@@ -78,7 +80,7 @@ t2 := `{{define "T2"}}TWO{{end}}`
 t3 := `{{define "T3"}}{{template "T1"}} {{template "T2"}}{{end}}`
 ```
 
-This will give us the output:
+Rendering these templates with some helpful print statements will give us the following output:
 
 ```shell
 executing T1 Template: ONE
@@ -100,7 +102,7 @@ We will pack the invocation `{{template "T3"}}` in tight at the end to avoid any
 t3 := `{{define "T3"}}{{template "T1"}} {{template "T2"}}{{end}}{{template "T3"}}`
 ```
 
-Now we would get the desired output:
+Now we will get the desired output:
 
 ```shell
 executing T1 Template: ONE
@@ -117,9 +119,11 @@ We can clean up Example v1.1 with the `block` action, which combines the `define
 
 The `block` action requires a pipeline, but this example does not pass in any meaningful data when executing our template - you will notice the calls to `Execute` just provide an empty string to fill the `data` parameter.
 
-Pipelines provide ways to access and manipulate the data passed in.
-Since we are not using the data in this example, it does not much matter which pipeline we choose here.
-We will just use the standard `.` pipeline, which just passes the provided data through to the template unmodified - a decent placeholder if you may want to pass data in later.
+Pipelines provide ways to access and manipulate the Go data structures which can be passed into templates.
+Beyond this, pipelines are a topic in and of themselves which will put off in favor of grasping the basic usage of the template package.
+
+We are not concerned with passing any data into the templates in this example.
+We will just use the standard "dot" (`.`) pipeline, which passes the provided data through to the template unmodified.
 
 ```golang
 // Example v1.2
