@@ -1,6 +1,6 @@
 ---
-title: "Kubernetes with K3s and DigitalOcean Intro"
-slug: kubernetes-k3s-digital-ocean-0
+title: "Kubernetes with K3s, Ansible, and DigitalOcean Intro"
+slug: kubernetes-k3s-ansible-digital-ocean-0
 summary: "Goals, Tool Selection, and Setup"
 date: 2021-07-27
 lastmod: 2022-02-05
@@ -76,6 +76,7 @@ Tools: Ansible, Helm, K3s, and DigitalOcean
 * Installer/launcher script handles the complexity of initial installation, configuration, and startup
 * Batteries included - packaged with tools and utilities for Kubernetes functions such as network ingress and load balancing.
   * These components are essential for proper operation but tough to absorb for a newcomer to Kubernetes and networking in general.
+* Compatible with standard kubernetes tooling, including `kubectl`
 
 ### [Helm](https://helm.sh/docs/)
 * Application packaging and deployment management for Kubernetes
