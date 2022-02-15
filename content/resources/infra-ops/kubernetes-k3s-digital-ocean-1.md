@@ -13,10 +13,13 @@ order_number: 2
 
 ### Register SSH Keys to Your DigitalOcean Account
 
-Follow DigitalOcean documentation to
+[Generate an SSH keypair](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/create-with-openssh/) and
+[upload the SSH public key to DigitalOcean](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/to-account/).
 
-1. [Generate an SSH keypair](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/create-with-openssh/)
-2. [Upload the SSH public key to DigitalOcean](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/to-account/)
+### Create a DigitalOcean API Token
+
+[Create a Personal Access Token](https://docs.digitalocean.com/reference/api/create-personal-access-token/).
+Give the token the `write` scope in order to be able to create, update, and delete cloud resources in your account.
 
 ### Install Ansible
 
@@ -90,6 +93,42 @@ To install a particular version of the collection:
 > top of virtualized hardware. Each Droplet you create is a new server
 > you can use, either standalone or as part of a larger, cloud-based
 > infrastructure.
+
+We can create a DigitalOcean server with the Ansible [`community.digitalocean.digital_ocean_droplet`](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_droplet_module.html) module.
+
+```yaml
+# ./cloud-infra/ansible/inventory/mgmt/digitalocean-demo-create.yaml
+---
+- hosts: localhost
+  tasks:
+    - name: create a new droplet in project "demo"
+      community.digitalocean.digital_ocean_droplet:
+        state: active
+        name: debian-s-1vcpu-1gb-sfo3-01
+        unique_name: true
+        project: demo
+        tags:
+          - demo
+        image: debian-11-x64
+        size: s-1vcpu-1gb
+        region: sfo3
+        ssh_keys:
+          - "51:fa:98:d5:a9:1b:6e:95:cb:c9:df:24:01:53:aa:48"  # id_rsa_infra_ops
+        user_data: "{{ lookup('ansible.builtin.file', '../../../cloud-init.sh') }}"
+        oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
+
+```
+
+Take note of a few important fields:
+
+* `oauth_token`: set the `DO_API_TOKEN` environment variable before running this playbook
+* `state: active`: we want our droplet to be created and powered on
+  * take note of how this field interacts with `unique_name` and `name`
+* `unique_name: true`: makes this playbook idempotent
+  * running this playbook multiple times will not create more than one droplet as long the `name` field matches an existing droplet
+  * if the droplet exists but is powered off, running this playbook will ensure it is powered on, due to the `state: active` configuration
+* etc TODO
+
 
 [//]: # (Follow the [Create Droplet Quickstart]&#40;https://docs.digitalocean.com/products/droplets/quickstart/&#41;.)
 
