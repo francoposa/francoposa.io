@@ -16,6 +16,11 @@ order_number: 2
 [Generate an SSH keypair](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/create-with-openssh/) and
 [upload the SSH public key to DigitalOcean](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/to-account/).
 
+Note that many newer distro images have deprecated RSA key access in favor of the more modern Edwards-curve signature algorithms.
+
+MD5 fingerprints of the SSH public keys will be used by the DigitalOcean API to identify the SSH keys in your account.
+Fingerprints can be generated with `ssh-keygen -l -E md5 -f [public key file]` as described [here](https://superuser.com/questions/421997/what-is-a-ssh-key-fingerprint-and-how-is-it-generated).
+
 ### Create a DigitalOcean API Token
 
 [Create a Personal Access Token](https://docs.digitalocean.com/reference/api/create-personal-access-token/).
@@ -104,16 +109,18 @@ We can create a DigitalOcean server with the Ansible [`community.digitalocean.di
     - name: create a new droplet in project "demo"
       community.digitalocean.digital_ocean_droplet:
         state: active
-        name: debian-s-1vcpu-1gb-sfo3-01
+        name: debian-s-1vcpu-2gb-sfo3-01
         unique_name: true
         project: demo
         tags:
           - demo
+          - k3s-demo
+          - k3s-demo-master
         image: debian-11-x64
-        size: s-1vcpu-1gb
+        size: s-1vcpu-2gb
         region: sfo3
         ssh_keys:
-          - "51:fa:98:d5:a9:1b:6e:95:cb:c9:df:24:01:53:aa:48"  # id_rsa_infra_ops
+          - "59:01:94:df:80:a9:97:3e:78:00:85:66:05:06:c7:42"
         user_data: "{{ lookup('ansible.builtin.file', '../../../cloud-init.sh') }}"
         oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
 
@@ -127,240 +134,15 @@ Take note of a few important fields:
 * `unique_name: true`: makes this playbook idempotent
   * running this playbook multiple times will not create more than one droplet as long the `name` field matches an existing droplet
   * if the droplet exists but is powered off, running this playbook will ensure it is powered on, due to the `state: active` configuration
-* etc TODO
+* `tags`: DigitalOcean resource tags will be used for creating Ansible host groups with the DigitalOcean Ansible collection's dynamic inventory plugin
+* `image`, `size`, and `region`: [slugs.do-api.dev](https://slugs.do-api.dev/) is an unofficial (sometimes outdated) list of API slugs for available Droplet sizes, Linux distro images, and regions.
+Current slugs are also available directly from the DigitalOcean CLI:
+  * `doctl compute size list`
+  * `doctl compute image list-distribution`
+  * `doctl compute region list`
+* `ssh_keys`: md5 fingerprints of the SSH keys which can access the Droplet
+* `user_data`: TODO
 
+etc TODO
 
-[//]: # (Follow the [Create Droplet Quickstart]&#40;https://docs.digitalocean.com/products/droplets/quickstart/&#41;.)
 
-[//]: # (The size of the droplet does not matter much for this tutorial;)
-
-[//]: # (the $5 droplet option is plenty for any testing or learning scenario,)
-
-[//]: # (and k3s is intended to run in resource-constrained environments.)
-
-[//]: # ()
-[//]: # (Be sure to select an SSH key for the droplet.)
-
-[//]: # (Ansible and similar tools use SSH keys by default.)
-
-[//]: # (SSH passwords are generally considered less secure than SSH keys,)
-
-[//]: # (and we will disable SSH password login on our servers as part of the)
-
-[//]: # (recommended initial configuration process.)
-
-[//]: # ()
-[//]: # (**Note:** Creating a droplet can be automated with Ansible,)
-
-[//]: # (the DigitalOcean CLI, or any number of related tools,)
-
-[//]: # (but the DigitalOcean web interface is dead simple to use,)
-
-[//]: # (so it's an ideal way to get us up and running without much hassle.)
-
-[//]: # ()
-[//]: # ()
-[//]: # (## 2. Specify Ansible Host Inventory)
-
-[//]: # ()
-[//]: # (We need to specify our Ansible "inventory" -)
-
-[//]: # (the hosts or groups of hosts to run Ansible tasks against.)
-
-[//]: # (See the [Ansible docs on specifying inventory]&#40;https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html&#41; for more.)
-
-[//]: # ()
-[//]: # (We will specify two different entries for the same host:)
-
-[//]: # (one for the initial server setup done with the root user,)
-
-[//]: # (and another for all subsequent tasks, using a new user)
-
-[//]: # (created and configured for our purposes.)
-
-[//]: # ()
-[//]: # (Create the Ansible inventory file where it can be easily referenced from the command line.)
-
-[//]: # ()
-[//]: # (```yaml)
-
-[//]: # (---)
-
-[//]: # (# ./hosts.yaml)
-
-[//]: # (---)
-
-[//]: # (all:)
-
-[//]: # (  children:)
-
-[//]: # (    master_roots:)
-
-[//]: # (      hosts:)
-
-[//]: # (        demo_master_root:)
-
-[//]: # (          ansible_host: 143.244.209.125)
-
-[//]: # (          ansible_user: root)
-
-[//]: # (          ansible_ssh_private_key_file: ~/.ssh/id_rsa_infra_ops)
-
-[//]: # (    masters:)
-
-[//]: # (      hosts:)
-
-[//]: # (        demo_master:)
-
-[//]: # (          ansible_host: 143.244.209.125)
-
-[//]: # (          ansible_user: infraops)
-
-[//]: # (          ansible_ssh_private_key_file: ~/.ssh/id_rsa_infra_ops)
-
-[//]: # (```)
-
-[//]: # ()
-[//]: # (The IP address is just the IP of your DigitalOcean Droplet.)
-
-[//]: # (The IP I have used here is actually a [Floating IP]&#40;https://docs.digitalocean.com/products/networking/floating-ips/&#41;)
-
-[//]: # (that I re-use so I do not have to always change my hosts file for a new droplet.)
-
-[//]: # ()
-[//]: # (## 3. Configure Server User Access with Ansible)
-
-[//]: # ()
-[//]: # (1. Create a separate user with SSH access for our Infra Ops automation and administration purposes)
-
-[//]: # (    * Grant the user passwordless sudo, required for Ansible automation of any step requiring sudo privileges)
-
-[//]: # (2. Configure the host for a secure SSH setup on the host:)
-
-[//]: # (    * Disable SSH password login for users with empty/blank passwords)
-
-[//]: # (    * Disable SSH password login for all users)
-
-[//]: # (    * Disable all SSH login for the root user)
-
-[//]: # ()
-[//]: # (```yaml)
-
-[//]: # (---)
-
-[//]: # (# ./initial-host-setup.yaml)
-
-[//]: # (---)
-
-[//]: # (# References)
-
-[//]: # ()
-[//]: # (# Digital Ocean recommended droplet setup script:)
-
-[//]: # (# - https://docs.digitalocean.com/droplets/tutorials/recommended-setup)
-
-[//]: # (# Digital Ocean tutorial on installing kubernetes with Ansible:)
-
-[//]: # (#  - https://www.digitalocean.com/community/tutorials/how-to-create-a-kubernetes-cluster-using-kubeadm-on-debian-9)
-
-[//]: # (# Ansible Galaxy &#40;Community&#41; recipe for securing ssh:)
-
-[//]: # (# - https://github.com/vitalk/ansible-secure-ssh)
-
-[//]: # (---)
-
-[//]: # (- hosts: master_roots)
-
-[//]: # (  become: 'yes')
-
-[//]: # (  tasks:)
-
-[//]: # (    - name: create the 'infraops' user)
-
-[//]: # (      user:)
-
-[//]: # (        state: present)
-
-[//]: # (        name: infraops)
-
-[//]: # (        password_lock: 'yes')
-
-[//]: # (        groups: sudo)
-
-[//]: # (        append: 'yes')
-
-[//]: # (        createhome: 'yes')
-
-[//]: # (        shell: /bin/bash)
-
-[//]: # ()
-[//]: # (    - name: add authorized keys for the infraops user)
-
-[//]: # (      authorized_key: 'user=infraops key="{{item}}"')
-
-[//]: # (      with_file:)
-
-[//]: # (        '{{ hostvars[inventory_hostname].ansible_ssh_private_key_file }}.pub')
-
-[//]: # ()
-[//]: # (    - name: allow infraops user to have passwordless sudo)
-
-[//]: # (      lineinfile:)
-
-[//]: # (        dest: /etc/sudoers)
-
-[//]: # (        line: 'infraops ALL=&#40;ALL&#41; NOPASSWD: ALL')
-
-[//]: # (        validate: visudo -cf %s)
-
-[//]: # ()
-[//]: # (    - name: disable empty password login for all users)
-
-[//]: # (      lineinfile:)
-
-[//]: # (        dest: /etc/ssh/sshd_config)
-
-[//]: # (        regexp: '^#?PermitEmptyPasswords')
-
-[//]: # (        line: PermitEmptyPasswords no)
-
-[//]: # (      notify: restart sshd)
-
-[//]: # ()
-[//]: # (    - name: disable password login for all users)
-
-[//]: # (      lineinfile:)
-
-[//]: # (        dest: /etc/ssh/sshd_config)
-
-[//]: # (        regexp: '^&#40;#\s*&#41;?PasswordAuthentication ')
-
-[//]: # (        line: PasswordAuthentication no)
-
-[//]: # (      notify: restart sshd)
-
-[//]: # ()
-[//]: # (    - name: Disable remote root user login)
-
-[//]: # (      lineinfile:)
-
-[//]: # (        dest: /etc/ssh/sshd_config)
-
-[//]: # (        regexp: '^#?PermitRootLogin')
-
-[//]: # (        line: 'PermitRootLogin no')
-
-[//]: # (      notify: restart sshd)
-
-[//]: # ()
-[//]: # (  handlers:)
-
-[//]: # (    - name: restart sshd)
-
-[//]: # (      service:)
-
-[//]: # (        name: sshd)
-
-[//]: # (        state: restarted)
-
-[//]: # (```)
