@@ -145,9 +145,9 @@ Current slugs are also available directly from the DigitalOcean CLI:
 [Cloud Init](https://cloudinit.readthedocs.io/en/latest/index.html) is a standardized approach to configuring cloud compute instances.
 On first boot, the configuration can set up user accounts, apply networking rules, install packages and much more.
 
-To keep things simple and familiar, we will stick to just using the [User-Data script format](https://cloudinit.readthedocs.io/en/latest/index.html),
-which allows us to run arbitrary shell scripts.
-Sticking to shell script format allows us to run and test locally if needed without knowing anything else about Cloud Init.
+To keep things simple and familiar, we only utilize [User-Data script format](https://cloudinit.readthedocs.io/en/latest/index.html),
+which allows Cloud Init to run arbitrary shell scripts during the VM initialization.
+Sticking to the shell script format allows us to run and test locally if needed without knowing anything else about Cloud Init.
 
 I use the following script, adapted from both DigitalOcean's [Recommended Droplet Setup](https://docs.digitalocean.com/tutorials/recommended-droplet-setup/) guide,
 and a community [Ansible Secure SSH collection](https://github.com/vitalk/ansible-secure-ssh):
@@ -169,7 +169,8 @@ if [ -f "/etc/redhat-release" ]; then
 fi
 
 # Create SSH directory for sudo non-root user and move keys over
-# authorized keys will already be present for root user from the DigitalOcean droplet create options
+# authorized keys will already be present for root user
+# as specified in the DigitalOcean droplet create options
 home_directory="$(eval echo ~${USERNAME})"
 mkdir --parents "${home_directory}/.ssh"
 cp /root/.ssh/authorized_keys "${home_directory}/.ssh"
