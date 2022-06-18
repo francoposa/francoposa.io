@@ -126,8 +126,6 @@ We can create a DigitalOcean server with the Ansible [`community.digitalocean.di
 
 ```
 
-Take note of a few important fields:
-
 * `oauth_token`: set the `DO_API_TOKEN` environment variable before running this playbook
 * `state: active`: we want our droplet to be created and powered on
   * take note of how this field interacts with `unique_name` and `name`
@@ -141,7 +139,60 @@ Current slugs are also available directly from the DigitalOcean CLI:
   * `doctl compute image list-distribution`
   * `doctl compute region list`
 * `ssh_keys`: md5 fingerprints of the SSH keys which can access the Droplet
-* `user_data`: TODO
+* `user_data`: User Data script for Cloud-Init-compatible distros - see below for details
+
+### Cloud Init and User Data
+[Cloud Init](https://cloudinit.readthedocs.io/en/latest/index.html) is a standardized approach to configuring cloud compute instances.
+On first boot, the configuration can set up user accounts, apply networking rules, install packages and much more.
+
+To keep things simple and familiar, we will stick to just using the [User-Data script format](https://cloudinit.readthedocs.io/en/latest/index.html),
+which allows us to run arbitrary shell scripts.
+Sticking to shell script format allows us to run and test locally if needed without knowing anything else about Cloud Init.
+
+I use the following script, adapted from both DigitalOcean's [Recommended Droplet Setup](https://docs.digitalocean.com/tutorials/recommended-droplet-setup/) guide,
+and a community [Ansible Secure SSH collection](https://github.com/vitalk/ansible-secure-ssh):
+
+```shell
+#!/usr/bin/env bash
+set -euo pipefail
+
+USERNAME=infra_ops # Customize the sudo non-root username here
+
+# Create user
+if [ -f "/etc/debian_version" ]; then
+  # Debian-based distros use the `sudo` group
+  useradd --create-home --shell "/bin/bash" --groups sudo "${USERNAME}"
+fi
+if [ -f "/etc/redhat-release" ]; then
+  # RHEL-based distros use the `wheel` group
+  useradd --create-home --shell "/bin/bash" --groups wheel "${USERNAME}"
+fi
+
+# Create SSH directory for sudo non-root user and move keys over
+# authorized keys will already be present for root user from the DigitalOcean droplet create options
+home_directory="$(eval echo ~${USERNAME})"
+mkdir --parents "${home_directory}/.ssh"
+cp /root/.ssh/authorized_keys "${home_directory}/.ssh"
+chmod 0700 "${home_directory}/.ssh"
+chmod 0600 "${home_directory}/.ssh/authorized_keys"
+chown --recursive "${USERNAME}":"${USERNAME}" "${home_directory}/.ssh"
+
+# Allow user to have passwordless sudo
+printf "\n%s ALL=(ALL) NOPASSWD: ALL" "${USERNAME}" >> /etc/sudoers
+
+# Disable SSH login with empty password for all users
+# Should be obviated by the next step, but still prefer to have both
+sed --in-place 's/^PermitEmptyPasswords.*/PermitEmptyPasswords no/g' /etc/ssh/sshd_config
+
+# Disable SSH login with password for all users
+sed --in-place 's/^PasswordAuthentication.*/PasswordAuthentication no/g' /etc/ssh/sshd_config
+
+# Disable root SSH login
+sed --in-place 's/^PermitRootLogin.*/PermitRootLogin no/g' /etc/ssh/sshd_config
+
+
+if sshd -t -q; then systemctl restart sshd; fi
+```
 
 etc TODO
 
