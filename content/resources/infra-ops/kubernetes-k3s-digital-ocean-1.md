@@ -99,14 +99,22 @@ To install a particular version of the collection:
 > you can use, either standalone or as part of a larger, cloud-based
 > infrastructure.
 
-We can create a DigitalOcean server with the Ansible [`community.digitalocean.digital_ocean_droplet`](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_droplet_module.html) module.
+We can create a DigitalOcean VM with the Ansible [`community.digitalocean.digital_ocean_droplet`](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_droplet_module.html) module.
+By default, the Ansible module waits for the VM to be fully active before returning success.
+
+```shell
+% export DO_API_TOKEN=dop_v1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+% ansible-playbook ./cloud-infra/ansible/inventory/mgmt/digitalocean-demo-create.yaml
+```
+
+*./cloud-infra/ansible/inventory/mgmt/digitalocean-demo-create.yaml:*
 
 ```yaml
-# ./cloud-infra/ansible/inventory/mgmt/digitalocean-demo-create.yaml
 ---
 - hosts: localhost
   tasks:
-    - name: create a new droplet in project "demo"
+    - name: create k3s master node droplet in project "demo"
       community.digitalocean.digital_ocean_droplet:
         state: active
         name: debian-s-1vcpu-2gb-sfo3-01
@@ -120,25 +128,38 @@ We can create a DigitalOcean server with the Ansible [`community.digitalocean.di
         size: s-1vcpu-2gb
         region: sfo3
         ssh_keys:
-          - "59:01:94:df:80:a9:97:3e:78:00:85:66:05:06:c7:42"
+          - "59:01:94:df:80:a9:97:3e:78:00:85:66:05:06:c7:42"  # id_ed25519_infra_ops
         user_data: "{{ lookup('ansible.builtin.file', '../../../cloud-init.sh') }}"
         oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
+      register: k3s_demo_master
 
+    - name: show k3s master node droplet info
+      ansible.builtin.debug:
+        msg: |
+          droplet first public ipv4 address: {{
+            (
+              k3s_demo_master.data.droplet.networks.v4
+              | selectattr('type','eq','public')
+              | map(attribute='ip_address')
+              | first
+            )
+          }}
 ```
 
-* `oauth_token`: set the `DO_API_TOKEN` environment variable before running this playbook
-* `state: active`: we want our droplet to be created and powered on
+Take note of some parameters of the DigitalOcean Droplet Ansible module:
+
+* `state: active`: create the droplet and power it on
   * take note of how this field interacts with `unique_name` and `name`
 * `unique_name: true`: makes this playbook idempotent
   * running this playbook multiple times will not create more than one droplet as long the `name` field matches an existing droplet
   * if the droplet exists but is powered off, running this playbook will ensure it is powered on, due to the `state: active` configuration
-* `tags`: DigitalOcean resource tags will be used for creating Ansible host groups with the DigitalOcean Ansible collection's dynamic inventory plugin
-* `image`, `size`, and `region`: [slugs.do-api.dev](https://slugs.do-api.dev/) is an unofficial (sometimes outdated) list of API slugs for available Droplet sizes, Linux distro images, and regions.
+* `tags`: DigitalOcean resource tags will be used for creating Ansible host groups
+* `image`, `size`, and `region`: see [slugs.do-api.dev](https://slugs.do-api.dev/) for an unofficial (sometimes outdated) list of API slugs for available Droplet sizes, Linux distro images, and regions.
 Current slugs are also available directly from the DigitalOcean CLI:
   * `doctl compute size list`
   * `doctl compute image list-distribution`
   * `doctl compute region list`
-* `ssh_keys`: md5 fingerprints of the SSH keys which can access the Droplet
+* `ssh_keys`: md5 fingerprints of the SSH keys which can access the droplet
 * `user_data`: User Data script for Cloud-Init-compatible distros - see below for details
 
 ### Cloud Init and User Data
@@ -195,6 +216,27 @@ sed --in-place 's/^PermitRootLogin.*/PermitRootLogin no/g' /etc/ssh/sshd_config
 if sshd -t -q; then systemctl restart sshd; fi
 ```
 
+## 2. Confirm SSH Access to the Server
+
+Before we can do any actual work *on* the droplet, we need SSH access.
+
+Ensure the SSH key -
+one of the keys which was registered to the droplet upon creation -
+is registered with the SSH agent.
+Ansible will also use the local SSH agent for access to the server inventory.
+
+```shell
+% ssh-add ~/.ssh/id_ed25519_infra_ops
+```
+
+Test SSH access with the droplet IP address
+(printed from the debug task in the playbook or visible in the DigitalOcean web UI)
+and the non-root user created with the Cloud Init User Data script.
+
+```shell
+% ssh infra_ops@137.184.94.4
+Warning: Permanently added '137.184.94.4' (ED25519) to the list of known hosts.
+infra_ops@debian-s-1vcpu-2gb-sfo3-01:~$
+```
+
 etc TODO
-
-
