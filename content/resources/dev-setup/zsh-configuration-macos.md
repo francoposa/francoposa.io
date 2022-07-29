@@ -20,6 +20,9 @@ export PS1="[%32<...<%~%<<] %% "
 #bindkey "\e\e[D" backward-word # ⌥←
 #bindkey "\e\e[C" forward-word # ⌥→
 ## kitty
+#bindkey "\e[1;3D" backward-word # ⌥←
+#bindkey "\e[1;3C" forward-word # ⌥→
+
 case "$OSTYPE" in
    linux*)
       bindkey "\e[1;5D" backward-word # ⌥←
@@ -62,6 +65,30 @@ setopt HIST_BEEP                 # Beep when accessing nonexistent history.
 # https://github.com/kovidgoyal/kitty/issues/713
 alias ssh="kitty +kitten ssh"
 
+# LS COMMAND ALIASES
+alias ll="ls -alh"
+
+# COPY COMMAND ALIAS
+case "$OSTYPE" in
+   linux*)
+      alias copy="wl-copy"
+      ;;
+   darwin*)
+      alias copy="pbcopy"
+      ;;
+esac
+
+
+# OPEN COMMAND ALIAS
+case "$OSTYPE" in
+   linux*)
+      alias start="xdg-open"
+      alias open="xdg-open"
+      ;;
+   darwin*)
+      alias start="open"
+      ;;
+esac
 # VIM/VIMX ALIAS
 # on Fedora, you need package vim-x11 to get clipboard support
 case "$OSTYPE" in
@@ -73,24 +100,13 @@ esac
 # NVIM ALIAS
 alias nv=nvim
 
-# Set global editor
+# GLOBAL EDITOR
 export VISUAL=nvim
 export EDITOR="$VISUAL"
 
-# Platform-independent `open` command
-case "$OSTYPE" in
-   linux*)
-      alias start="xdg-open"
-      alias open="xdg-open"
-      ;;
-   darwin*)
-      alias start="open"
-      ;;
-esac
 
 
 # HOMEBREW place installed tools at beginning of PATH
-# MacOS built-in curl and git are super old and missing newer features
 export PATH="/usr/local/opt/curl/bin:$PATH"
 export PATH="/usr/local/opt/git/bin:$PATH"
 
@@ -120,22 +136,21 @@ pyenv virtualenvwrapper
 
 # POETRY
 # From new install-poetry installer installer instructions
-export PATH="/Users/franco/.local/bin:$PATH"
+case "$OSTYPE" in
+   linux*)
+      export PATH="/home/franco/.local/bin:$PATH"
+      ;;
+   darwin*)
+      export PATH="/Users/franco/.local/bin:$PATH"
+      ;;
+esac
 
 # RUST-CARGO
 # This gets put in ~/.profile by the installer, but moved it here
 export PATH="$HOME/.cargo/bin:$PATH"
 
 # GOLANG
-case "$OSTYPE" in
-   linux*)
-      export PATH=$PATH:/usr/local/go/bin
-      ;;
-   darwin*)
-      # assuming brew install, should be no need to do anything here
-      # brew installs to /usr/local/bin, which should also already be in PATH on MacOS
-      ;;
-esac
+export PATH=$PATH:/usr/local/go/bin
 
 # This is the default, but prefer explicit over implicit
 export GOPATH=$HOME/go
@@ -150,7 +165,7 @@ export PATH=$PATH:$GOPATH/bin
 export SDKMAN_DIR="/Users/franco/.sdkman"
 [[ -s "/Users/franco/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/franco/.sdkman/bin/sdkman-init.sh"
 
-neofetch
+macchina --theme Beryllium
 
 echo $PATH
 ```
