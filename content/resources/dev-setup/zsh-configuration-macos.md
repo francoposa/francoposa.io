@@ -3,7 +3,7 @@ title: "Zsh Configuration for Linux and MacOS"
 slug: zsh-configuration-linux-macos
 summary: "Configuration for Zsh supporting development in Python and Golang on Linux and MacOS"
 date: 2020-07-08
-lastmod: 2022-02-05
+lastmod: 2022-06-29
 order_number: 8
 ---
 ```shell
