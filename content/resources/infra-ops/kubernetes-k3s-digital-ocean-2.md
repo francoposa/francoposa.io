@@ -2,8 +2,8 @@
 title: "Kubernetes with K3s, Ansible, and DigitalOcean Part 2"
 slug: kubernetes-k3s-ansible-digital-ocean-2
 summary: "Using DigitalOcean Servers as Ansible Dynamic Inventory"
-date: 2021-07-27
-lastmod: 2022-06-30
+date: 2022-07-30
+lastmod: 2022-07-30
 order_number: 2
 ---
 

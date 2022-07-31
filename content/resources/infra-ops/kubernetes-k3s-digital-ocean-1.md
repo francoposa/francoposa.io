@@ -3,7 +3,7 @@ title: "Kubernetes with K3s, Ansible, and DigitalOcean Part 1"
 slug: kubernetes-k3s-ansible-digital-ocean-1
 summary: "Creating DigitalOcean Server Inventory with Ansible"
 date: 2021-07-27
-lastmod: 2022-06-30
+lastmod: 2022-07-30
 order_number: 2
 ---
 
