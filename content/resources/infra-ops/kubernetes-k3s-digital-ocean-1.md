@@ -3,11 +3,9 @@ title: "Kubernetes with K3s, Ansible, and DigitalOcean Part 1"
 slug: kubernetes-k3s-ansible-digital-ocean-1
 summary: "Creating DigitalOcean Server Inventory with Ansible"
 date: 2021-07-27
-lastmod: 2022-06-17
+lastmod: 2022-06-30
 order_number: 2
 ---
-
-**This document is a work in progress**
 
 ## 0. Prerequisites
 
@@ -238,5 +236,3 @@ and the non-root user created with the Cloud Init User Data script.
 Warning: Permanently added '137.184.94.4' (ED25519) to the list of known hosts.
 infra_ops@debian-s-1vcpu-2gb-sfo3-01:~$
 ```
-
-etc TODO
