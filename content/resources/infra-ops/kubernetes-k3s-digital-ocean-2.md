@@ -13,12 +13,14 @@ order_number: 2
 
 ### Hosts, Host Groups, and Host Variables
 
+#### Hosts
+
 Ansible works by running playbook tasks against an "inventory" of hosts.
 
 To Ansible, a host is pretty much anything with an IP address that runs a standard operating system:
 a cloud or local VM, a bare metal server, a Docker container, etc.
 
-The two basic components of inventory are **host groups** and **host variables**.
+Hosts are assigned to **host groups** and hosts have **host variables**.
 
 #### Host Groups
 
@@ -29,11 +31,20 @@ Every host in an inventory belongs to at least two groups.
     1. one or more groups assigned to it using static or dynamic inventory, or
     2. the `ungrouped` group for hosts
 
-Every host `localhost`)
+#### Host Variables
 
-> There are two default groups: all and ungrouped.
-> The all group contains every host.
-> The ungrouped group contains all hosts that don’t have another group aside from all. Every host will always belong to at least 2 groups (all and ungrouped or all and some other group). Though all and ungrouped are always present, they can be implicit and not appear in group listings like group_names.
+Host variables are attributes assigned to a host.
+While host variables can be any arbitrarily nested key-value structure, there are specific variables which define how Ansible connects to and behaves when operating on hosts;
+how to set up the connection, which user to run as on the host, which shell to use, etc.
+
+The full list of these "behavioral inventory parameters" is [here](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#connecting-to-hosts-behavioral-inventory-parameters).
+For now, we will only need two:
+   * `ansible_host` - the resolvable DNS name or IP address of a host to connect to
+   * `ansible_user` - the username to use when connecting to the host
+
+### Declaring Static Inventory
+
+...
 
 
 You may have noticed warnings printed when running the droplet creation playbook:
