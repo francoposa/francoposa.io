@@ -3,8 +3,8 @@ title: "Kubernetes with K3s, Ansible, and DigitalOcean Part 2"
 slug: kubernetes-k3s-ansible-digital-ocean-2
 summary: "Using DigitalOcean Servers as Ansible Dynamic Inventory"
 date: 2022-07-30
-lastmod: 2022-07-30
-order_number: 2
+lastmod: 2022-08-07
+order_number: 3
 ---
 
 **This document is a work in progress**
@@ -44,8 +44,49 @@ For now, we will only need two:
 
 ### Declaring Static Inventory
 
-...
+The simplest way to build Ansible inventory is by hardcoding the hosts, groups, and variables into static files.
+While we will ultimately move on to using dynamic inventory, we can take a look at how we would represent our inventory in a static file first.
 
+#### Declaring Static Host Groups
+
+When we created our VM with the DigitalOcean Ansible module in Part 1, we assigned three tags with the intention of using them later as the Ansible host groups:
+* `demo-k8s-master`: the master node of our kubernetes cluster, as there are certain k8s operations that will only be run on the master node
+* `demo-k8s`: all nodes of our kubernetes cluster; for now this does not matter much as we are spinning up a single node cluster
+* `demo`: the DigitalOcean dynamic inventory does not let us use the DigitalOcean "project" as a host group, so we can additionally add the project name as a tag if desired
+
+#### Assigning Static Host Variables
+
+The VM we created in Part 1 was assigned a random public IPv4 address from DigitalOcean's public IP space.
+As we did not do any extra steps such as assigning a static reserved IP or domain name, this random IP address will be what we use to connect to the host.
+
+#### DigitalOcean Static Inventory Example
+
+*./cloud-infra/ansible/inventory/sources/digitalocean-static.yaml:*
+
+```yaml
+---
+demo:  # host group
+   hosts:
+      # host alias or name, the same as the Droplet name in DigitalOcean
+      debian-s-1vcpu-2gb-sfo3-01:
+         # key-value pairs nested below the host are host variables
+         ansible_host: 143.198.67.106
+         # admin user created on first Droplet startup via user-data script
+         # use root if you skipped the user setup via cloud-init step
+         ansible_user: infra_ops
+k3s-demo:  # another host group
+   hosts:
+      # repeat host name with empty map to inherit existing host variables
+      debian-s-1vcpu-2gb-sfo3-01: {}
+k3s-demo-master:  # another host group
+   hosts:
+      # repeat host name with empty map to inherit existing host variables
+      debian-s-1vcpu-2gb-sfo3-01: {}
+```
+
+
+...
+...
 
 You may have noticed warnings printed when running the droplet creation playbook:
 
