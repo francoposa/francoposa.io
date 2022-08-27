@@ -22,6 +22,8 @@ Settings can be most easily and completely configured by editing the `settings.j
     // General VSCode stuff to get out of the way
     // Don't let Microsoft creep on your usage
     "telemetry.enableTelemetry": false,
+    "telemetry.enableCrashReporter": false,
+    "telemetry.telemetryLevel": "off"
     // Don't open the VSCode Welcome page on startup
     "workbench.startupEditor": "newUntitledFile",
     // I find that it's a little too easy to accidentally drag
