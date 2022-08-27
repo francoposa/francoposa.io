@@ -3,7 +3,7 @@ title: "Visual Studio Code Settings and Configuration"
 slug: visual-studio-code-configuration
 summary: "Recommended configuration for a general-purpose dev environment in VS Code"
 date: 2020-05-07
-lastmod: 2021-01-09
+lastmod: 2022-08-27
 order_number: 7
 ---
 
