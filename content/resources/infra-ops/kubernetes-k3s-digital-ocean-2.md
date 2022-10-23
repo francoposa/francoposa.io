@@ -3,7 +3,7 @@ title: "Kubernetes with K3s, Ansible, and DigitalOcean Part 2"
 slug: kubernetes-k3s-ansible-digital-ocean-2
 summary: "Using DigitalOcean Servers as Ansible Dynamic Inventory"
 date: 2022-07-30
-lastmod: 2022-08-07
+lastmod: 2022-10-22
 order_number: 3
 ---
 
@@ -42,10 +42,10 @@ For now, we will only need two:
    * `ansible_host` - the resolvable DNS name or IP address of a host to connect to
    * `ansible_user` - the username to use when connecting to the host
 
-### Declaring Static Inventory
+## 2. Declaring Static Inventory
 
 The simplest way to build Ansible inventory is by hardcoding the hosts, groups, and variables into static files.
-While we will ultimately move on to using dynamic inventory, we can take a look at how we would represent our inventory in a static file first.
+While we will ultimately move on to using dynamic inventory, we can first take a look at how we would represent our inventory in a static configuration.
 
 #### Declaring Static Host Groups
 
@@ -57,11 +57,11 @@ When we created our VM with the DigitalOcean Ansible module in Part 1, we assign
 #### Assigning Static Host Variables
 
 The VM we created in Part 1 was assigned a random public IPv4 address from DigitalOcean's public IP space.
-As we did not do any extra steps such as assigning a static reserved IP or domain name, this random IP address will be what we use to connect to the host.
+As we did not do any extra steps such as assigning a static reserved IP or domain name, this IP will be what we use to connect to the host.
 
-#### DigitalOcean Static Inventory Example
+#### DigitalOcean Static Inventory
 
-*./cloud-infra/ansible/inventory/sources/digitalocean-static.yaml:*
+As an example, we can see what our static inventory definition would look like in order to provide the same functionality of the dynamic inventory plugin:
 
 ```yaml
 ---
@@ -70,7 +70,7 @@ demo:  # host group
       # host alias or name, the same as the Droplet name in DigitalOcean
       debian-s-1vcpu-2gb-sfo3-01:
          # key-value pairs nested below the host are host variables
-         ansible_host: 143.198.67.106
+         ansible_host: 143.198.76.8
          # admin user created on first Droplet startup via user-data script
          # use root if you skipped the user setup via cloud-init step
          ansible_user: infra_ops
@@ -84,30 +84,99 @@ k3s-demo-master:  # another host group
       debian-s-1vcpu-2gb-sfo3-01: {}
 ```
 
+We can see that even with just a single host, the static configuration can be a pain.
+Hosts must be re-declared in each group they belong to, any any changes to the host alias or host variables may have to be duplicated across several sections.
 
-...
-...
+Further, as we are dynamically provisioning infrastructure with a cloud provider, we generally do not have a way to know the host IPs ahead of time.
 
-You may have noticed warnings printed when running the droplet creation playbook:
+## 3. Using Dynamic Inventory Plugins
 
-```shell
-[WARNING]: No inventory was parsed, only implicit localhost is available
-[WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit localhost does not match 'all'
+Ansible supports [dynamic inventory plugins](https://docs.ansible.com/ansible/latest/user_guide/intro_dynamic_inventory.html), which interface with a cloud provider, local hypervisor stack, or other host-management solutions in order to map the current state of your hosts into Ansible's inventory format.
+
+The [DigitalOcean inventory plugin](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digitalocean_inventory.html#ansible-collections-community-digitalocean-digitalocean-inventory) comes bundled with a full Ansible installation, or can be installed with `ansible-galaxy`.
+
+We can use a simplified version of the plugin config example in the DigitalOcean inventory plugin docs:
+
+*./cloud-infra/ansible/inventory/sources/digitalocean.yaml:*
+
+```yaml
+---
+plugin: community.digitalocean.digitalocean
+api_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
+attributes:
+# which fields provided by the inventory plugin do we want to use
+   - name
+   - tags
+   - networks
+keyed_groups:
+# which attributes do we want to use to map hosts into groups
+# the default var_prefix for this plugin is `do_`
+# so the `tags` attribute becomes `do_tags`
+   - key: do_tags
+leading_separator: no  # no leading underscore in front of host group name
+compose:
+# compose uses Jinja expressions to process attributes into Ansible variables
+# we need to parse the `networks` attribute, which is prefixed to be `do_networks`
+# into a resolvable `ansible_host` variable.
+   ansible_host: do_networks.v4 | selectattr('type','eq','public')
+      | map(attribute='ip_address') | first
 ```
 
-These warnings hint at the two main aspects of using inventory with Ansible:
+We can check the dynamic inventory output with a graph view of just the hosts:
 
-1. Providing inventory to the `ansible-playbook` command
-2. Indicating in a playbook which hosts in the inventory to run the tasks against
+```shell
+% ansible-inventory -i ./ansible/inventory/sources --graph  # add --vars to see all host variables
+```
 
-Since we did neither in our first command, Ansible fell back to the default implicit "localhost".
-The playbook to create a DigitalOcean droplet was just run on our local machine.
+```shell
+@all:
+  |--@demo:
+  |  |--debian-s-1vcpu-2gb-sfo3-01
+  |--@k3s-demo:
+  |  |--debian-s-1vcpu-2gb-sfo3-01
+  |--@k3s-demo-master:
+  |  |--debian-s-1vcpu-2gb-sfo3-01
+  |--@ungrouped:
+```
 
-The simplest way to build Ansible inventory is by hardcoding the IPs or hosts into static files, as described in
-However, as we are dynamically provisioning infrastructure with a cloud provider, we generally do not have a way to know the host IPs ahead of time.
+or a full view in the same format as a static inventory file:
 
-This is a common use case for Ansible, which is supported with [dynamic inventory plugins](https://docs.ansible.com/ansible/latest/user_guide/intro_dynamic_inventory.html).
-Essentially, plugins will interface with a cloud provider, local hypervisor stack, or other
+```shell
+% ansible-inventory -i ./ansible/inventory/sources --list --yaml
+```
 
+```yaml
+all:
+  children:
+    demo:
+      hosts:
+        debian-s-1vcpu-2gb-sfo3-01:
+          ansible_host: 143.198.76.8
+          do_name: debian-s-1vcpu-2gb-sfo3-01
+          do_networks:
+            v4:
+            - gateway: 143.198.64.1
+              ip_address: 143.198.76.8
+              netmask: 255.255.240.0
+              type: public
+            - gateway: 10.124.0.1
+              ip_address: 10.124.0.2
+              netmask: 255.255.240.0
+              type: private
+            v6: []
+          do_tags:
+          - demo
+          - k3s-demo
+          - k3s-demo-master
+    k3s-demo:
+      hosts:
+        debian-s-1vcpu-2gb-sfo3-01: {}
+    k3s-demo-master:
+      hosts:
+        debian-s-1vcpu-2gb-sfo3-01: {}
+    ungrouped: {}
+```
 
-etc TODO
+We can ignore the `[WARNING]: Invalid characters were found in group names`.
+Ansible prefers the host groups to be valid python identifiers (no hyphens), but it will not affect anything.
+The Ansible team [received significant pushback](https://github.com/ansible/ansible/issues/56930) on this change, and have promised this warning will never turn into an error.
