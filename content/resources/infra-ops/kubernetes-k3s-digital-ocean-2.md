@@ -3,7 +3,7 @@ title: "Kubernetes with K3s, Ansible, and DigitalOcean Part 2"
 slug: kubernetes-k3s-ansible-digital-ocean-2
 summary: "Using DigitalOcean Servers as Ansible Dynamic Inventory"
 date: 2022-07-30
-lastmod: 2022-10-22
+lastmod: 2022-10-23
 order_number: 3
 ---
 
@@ -29,7 +29,7 @@ Every host in an inventory belongs to at least two groups.
 1. Every host belongs to the `all` group, except the implicit `localhost` used when no host is specified.
 2. Every host also belongs to either:
     1. one or more groups assigned to it using static or dynamic inventory, or
-    2. the `ungrouped` group for hosts
+    2. the `ungrouped` group for hosts not explicitly assigned any other group
 
 #### Host Variables
 
@@ -49,7 +49,7 @@ While we will ultimately move on to using dynamic inventory, we can first take a
 
 #### Declaring Static Host Groups
 
-When we created our VM with the DigitalOcean Ansible module in Part 1, we assigned three tags with the intention of using them later as the Ansible host groups:
+When we created our VM with the DigitalOcean Ansible module in [Part 1](/resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-1/), we assigned three tags with the intention of using them later as the Ansible host groups:
 * `demo-k8s-master`: the master node of our kubernetes cluster, as there are certain k8s operations that will only be run on the master node
 * `demo-k8s`: all nodes of our kubernetes cluster; for now this does not matter much as we are spinning up a single node cluster
 * `demo`: the DigitalOcean dynamic inventory does not let us use the DigitalOcean "project" as a host group, so we can additionally add the project name as a tag if desired
@@ -61,7 +61,7 @@ As we did not do any extra steps such as assigning a static reserved IP or domai
 
 #### DigitalOcean Static Inventory
 
-As an example, we can see what our static inventory definition would look like in order to provide the same functionality of the dynamic inventory plugin:
+As an example, we can see what our static inventory definition would look like in order to provide the same functionality as the dynamic inventory plugin:
 
 ```yaml
 ---
@@ -72,7 +72,7 @@ demo:  # host group
          # key-value pairs nested below the host are host variables
          ansible_host: 143.198.76.8
          # admin user created on first Droplet startup via user-data script
-         # use root if you skipped the user setup via cloud-init step
+         # use `root` if you skipped the user setup via cloud-init step
          ansible_user: infra_ops
 k3s-demo:  # another host group
    hosts:
@@ -85,7 +85,7 @@ k3s-demo-master:  # another host group
 ```
 
 We can see that even with just a single host, the static configuration can be a pain.
-Hosts must be re-declared in each group they belong to, any any changes to the host alias or host variables may have to be duplicated across several sections.
+Hosts must be re-declared in each group they belong to, and any changes to the host alias or host variables may have to be duplicated across several sections.
 
 Further, as we are dynamically provisioning infrastructure with a cloud provider, we generally do not have a way to know the host IPs ahead of time.
 
@@ -178,5 +178,37 @@ all:
 ```
 
 We can ignore the `[WARNING]: Invalid characters were found in group names`.
-Ansible prefers the host groups to be valid python identifiers (no hyphens), but it will not affect anything.
-The Ansible team [received significant pushback](https://github.com/ansible/ansible/issues/56930) on this change, and have promised this warning will never turn into an error.
+Ansible prefers the host groups to be valid Python identifiers (no hyphens), but it will not affect anything.
+The Ansible team [received significant pushback](https://github.com/ansible/ansible/issues/56930) on this change, and have stated that this warning will never turn into an error.
+
+## 4. Assigning Host Group Variables to Dynamic Inventory
+
+Ansible provides plenty of guidance on how to [manage multiple inventory sources](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#using-multiple-inventory-sources).
+For further details on more complex configurations follow the links in that section titled _Variable precedence: Where should I put a variable?_ and _How variables are merged_.
+
+For now, we just want to do something simple: apply the `USERNAME` we put in the [Cloud Init script from Part 1](/resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-1/#cloud-init-and-user-data) as the `ansible_user` across all hosts.
+This will prevent us from having to re-declare the `ansible_user` or any other common host variables in every playbook.
+
+We can add the following to `[inventory directory]/group_vars/all.yaml`, or `demo.yaml`, or whichever host group we want to target.
+
+```yaml
+---
+ansible_user: infra_ops
+```
+
+Now if we run `ansible-inventory -i ./ansible/inventory/sources --list --yaml` again, you will see the `ansible_user` variable applied to the host.
+
+At this point, our inventory directory looks like this:
+
+```shell
+% tree ./ansible/inventory -L 3
+./ansible/inventory
+├── mgmt
+│   └── digitalocean-demo-create.yaml
+└── sources
+    ├── digitalocean.yaml
+    └── group_vars
+        └── demo.yaml
+```
+
+It is not required by any Ansible conventions or structure to keep inventory creation playbooks (`mgmt/digitalocean-demo-create.yaml`) near the inventory `sources`, but I find it convenient to group such closely related data together.
