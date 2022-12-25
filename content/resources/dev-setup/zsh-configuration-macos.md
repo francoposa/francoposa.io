@@ -89,13 +89,6 @@ case "$OSTYPE" in
       alias start="open"
       ;;
 esac
-# VIM/VIMX ALIAS
-# on Fedora, you need package vim-x11 to get clipboard support
-case "$OSTYPE" in
-   linux*)
-      alias vim="vimx"
-      ;;
-esac
 
 # NVIM ALIAS
 alias nv=nvim
@@ -165,7 +158,13 @@ export PATH=$PATH:$GOPATH/bin
 export SDKMAN_DIR="/Users/franco/.sdkman"
 [[ -s "/Users/franco/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/franco/.sdkman/bin/sdkman-init.sh"
 
-macchina --theme Beryllium
 
 echo $PATH
+
+echo
+
+export PF_INFO="title os host kernel uptime memory shell editor palette"
+export PF_COL3=2
+
+pfetch
 ```
