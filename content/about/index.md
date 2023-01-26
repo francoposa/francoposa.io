@@ -4,13 +4,18 @@ slug: about
 type: section
 layout: about
 date: 2020-02-02
-lastmod: 2021-01-06
+lastmod: 2023-01-26
 ---
 ## Myself
 
-I am a software engineer with over four years of experience designing, writing, and testing software in Python & Golang.
+I am a software engineer with over six years of experience designing, writing, and testing software across many interesting areas of software engineering:
 
-I love to design, build, and refactor. I am passionate about clean architecture, clean code, and idiomatic best practices.
+* cloud: block device, backup, and snapshot cloud storage products
+* telecom: voice call routing optimization for UCaaS providers
+* big data: batch and event-driven data platforms serving AI/ML models
+
+I love to design, build, and refactor.
+I am passionate about clean architecture, clean code, and idiomatic best practices.
 
 I am biased towards minimalism and simplicity:
 
@@ -18,8 +23,7 @@ I am biased towards minimalism and simplicity:
 
 > "There should be one -- and preferably only one -- obvious way to do it." - _The Zen of Python_
 
-In my spare time, I enjoy building a deep understanding of topics across all areas of software engineering.
-
+I enjoy building a deep understanding of topics across all areas of software engineering.
 
 ## This Site
 
