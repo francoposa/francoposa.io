@@ -3,7 +3,7 @@ title: "Zsh Configuration for Linux and MacOS"
 slug: zsh-configuration-linux-macos
 summary: "Configuration for Zsh supporting development in Python and Golang on Linux and MacOS"
 date: 2020-07-08
-lastmod: 2022-06-29
+lastmod: 2022-12-25
 order_number: 8
 ---
 ```shell
@@ -115,7 +115,7 @@ export NVM_DIR="$HOME/.nvm"
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init --path)"
-export PYENV_VERSION=3.8.12
+export PYENV_VERSION=3.10.6
 if command -v pyenv 1>/dev/null 2>&1; then
   eval "$(pyenv init -)"
   # eval "$(pyenv virtualenv-init -)" # PYENV-VIRTUALENV - not using currently, in favor of pyenv-virtualenvwrapper
