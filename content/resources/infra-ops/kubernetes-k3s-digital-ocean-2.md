@@ -3,7 +3,7 @@ title: "Kubernetes with K3s, Ansible, and DigitalOcean Part 2"
 slug: kubernetes-k3s-ansible-digital-ocean-2
 summary: "Using DigitalOcean Servers as Ansible Dynamic Inventory"
 date: 2022-07-30
-lastmod: 2022-10-23
+lastmod: 2023-02-05
 order_number: 3
 ---
 
@@ -125,7 +125,7 @@ compose:
 We can check the dynamic inventory output with a graph view of just the hosts:
 
 ```shell
-% ansible-inventory -i ./ansible/inventory/sources --graph  # add --vars to see all host variables
+% ansible-inventory -i ./cloud-infra/ansible/inventory/sources --graph  # add --vars to see all host variables
 ```
 
 ```shell
@@ -142,7 +142,7 @@ We can check the dynamic inventory output with a graph view of just the hosts:
 or a full view in the same format as a static inventory file:
 
 ```shell
-% ansible-inventory -i ./ansible/inventory/sources --list --yaml
+% ansible-inventory -i ./cloud-infra/ansible/inventory/sources --list --yaml
 ```
 
 ```yaml
@@ -152,22 +152,7 @@ all:
       hosts:
         debian-s-1vcpu-2gb-sfo3-01:
           ansible_host: 143.198.76.8
-          do_name: debian-s-1vcpu-2gb-sfo3-01
-          do_networks:
-            v4:
-            - gateway: 143.198.64.1
-              ip_address: 143.198.76.8
-              netmask: 255.255.240.0
-              type: public
-            - gateway: 10.124.0.1
-              ip_address: 10.124.0.2
-              netmask: 255.255.240.0
-              type: private
-            v6: []
-          do_tags:
-          - demo
-          - k3s-demo
-          - k3s-demo-master
+          # ...etc...
     k3s-demo:
       hosts:
         debian-s-1vcpu-2gb-sfo3-01: {}
@@ -196,19 +181,17 @@ We can add the following to `[inventory directory]/group_vars/all.yaml`, or `dem
 ansible_user: infra_ops
 ```
 
-Now if we run `ansible-inventory -i ./ansible/inventory/sources --list --yaml` again, you will see the `ansible_user` variable applied to the host.
+Now if we run `ansible-inventory -i ./cloud-infra/ansible/inventory/sources --list --yaml` again, you will see the `ansible_user` variable applied to the host.
 
-At this point, our inventory directory looks like this:
-
-```shell
-% tree ./ansible/inventory -L 3
-./ansible/inventory
-├── mgmt
-│   └── digitalocean-demo-create.yaml
-└── sources
-    ├── digitalocean.yaml
-    └── group_vars
-        └── demo.yaml
+```yaml
+all:
+   children:
+      demo:
+         hosts:
+            debian-s-1vcpu-2gb-sfo3-01:
+               ansible_host: 143.198.52.107
+               ansible_user: infra_ops
+               do_name: debian-s-1vcpu-2gb-sfo3-01
+...etc
 ```
 
-It is not required by any Ansible conventions or structure to keep inventory creation playbooks (`mgmt/digitalocean-demo-create.yaml`) near the inventory `sources`, but I find it convenient to group such closely related data together.
