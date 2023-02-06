@@ -126,7 +126,7 @@ By default, the Ansible module waits for the VM to be fully active before return
         size: s-1vcpu-2gb
         region: sfo3
         ssh_keys:
-          - "59:01:94:df:80:a9:97:3e:78:00:85:66:05:06:c7:42"  # id_ed25519_infra_ops
+          - "59:01:94:df:80:a9:97:3e:78:00:85:66:05:06:c7:42" # id_ed25519_infra_ops
         user_data: "{{ lookup('ansible.builtin.file', '../../../cloud-init.sh') }}"
         oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
       register: k3s_demo_master
