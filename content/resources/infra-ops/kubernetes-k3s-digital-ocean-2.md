@@ -206,13 +206,13 @@ all:
 ---
 - hosts: k3s-demo-master
   tasks:
-     - name: cat hostname
-       shell: |
-          cat /etc/hostname
-       register: cat_hostname
+    - name: cat hostname
+      shell: |
+        cat /etc/hostname
+      register: cat_hostname
 
-     - name: show cat hostname output
-       ansible.builtin.debug:
-          msg: |
-             {{ cat_hostname.stdout_lines }}
+    - name: show cat hostname output
+      ansible.builtin.debug:
+        msg: |
+          {{ cat_hostname.stdout_lines }}
 ```
