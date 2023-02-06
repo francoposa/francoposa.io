@@ -7,8 +7,6 @@ lastmod: 2023-02-05
 order_number: 3
 ---
 
-**This document is a work in progress**
-
 ## 1. Ansible Inventory Basics
 
 ### Hosts, Host Groups, and Host Variables
