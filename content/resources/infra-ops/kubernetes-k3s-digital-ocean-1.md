@@ -152,6 +152,9 @@ Take note of some parameters of the DigitalOcean Droplet Ansible module:
   * running this playbook multiple times will not create more than one droplet as long the `name` field matches an existing droplet
   * if the droplet exists but is powered off, running this playbook will ensure it is powered on, due to the `state: active` configuration
 * `tags`: DigitalOcean resource tags will be used for creating Ansible host groups
+  * `demo`: the DigitalOcean dynamic inventory plugin does not let us use the DigitalOcean "project" as a host group, so we can add the project name as a tag if desired
+  * `k3s-demo-master`: the master node of our cluster; certain k8s operations are only run on the master node
+  * `k3s-demo`: all nodes of our cluster; for now we are only spinning up a single node cluster
 * `image`, `size`, and `region`: see [slugs.do-api.dev](https://slugs.do-api.dev/) for an unofficial (sometimes outdated) list of API slugs for available Droplet sizes, Linux distro images, and regions.
 Current slugs are also available directly from the DigitalOcean CLI:
   * `doctl compute size list`

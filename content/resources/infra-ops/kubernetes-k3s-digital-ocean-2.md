@@ -49,19 +49,18 @@ While we will ultimately move on to using dynamic inventory, we can first take a
 
 #### Declaring Static Host Groups
 
-When we created our VM with the DigitalOcean Ansible module in [Part 1](/resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-1/), we assigned three tags with the intention of using them later as the Ansible host groups:
-* `demo-k8s-master`: the master node of our kubernetes cluster, as there are certain k8s operations that will only be run on the master node
-* `demo-k8s`: all nodes of our kubernetes cluster; for now this does not matter much as we are spinning up a single node cluster
-* `demo`: the DigitalOcean dynamic inventory does not let us use the DigitalOcean "project" as a host group, so we can additionally add the project name as a tag if desired
+When we created our VM with the DigitalOcean Ansible module in [Part 1](/resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-1/), we assigned three tags with the intention of using them later as the Ansible host groups.
+Our single host is in all three groups we created: `k3s-demo-master` for the master node, `k3s demo`, used for all nodes in the cluster, and `demo` for all resources in the "demo" project of the DigitalOcean account.
 
 #### Assigning Static Host Variables
 
-The VM we created in Part 1 was assigned a random public IPv4 address from DigitalOcean's public IP space.
-As we did not do any extra steps such as assigning a static reserved IP or domain name, this IP will be what we use to connect to the host.
+* `ansible_host` - the public IPv4 address assigned to the VM on creation from DigitalOcean's public IP space.
+* `ansible_user` - the `USERNAME` from the [Cloud Init script from Part 1](/resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-1/#cloud-init-and-user-data).
+  * use DigitalOcean's default `root` user if you skipped the user setup via cloud-init step
 
 #### DigitalOcean Static Inventory
 
-As an example, we can see what our static inventory definition would look like in order to provide the same functionality as the dynamic inventory plugin:
+A bare-bones static inventory definition to assign our host to three host groups would look like below:
 
 ```yaml
 ---
@@ -71,8 +70,6 @@ demo:  # host group
       debian-s-1vcpu-2gb-sfo3-01:
          # key-value pairs nested below the host are host variables
          ansible_host: 143.198.76.8
-         # admin user created on first Droplet startup via user-data script
-         # use `root` if you skipped the user setup via cloud-init step
          ansible_user: infra_ops
 k3s-demo:  # another host group
    hosts:
@@ -84,7 +81,7 @@ k3s-demo-master:  # another host group
       debian-s-1vcpu-2gb-sfo3-01: {}
 ```
 
-We can see that even with just a single host, the static configuration can be a pain.
+We can see that even with just a single host, the static configuration can be tedious.
 Hosts must be re-declared in each group they belong to, and any changes to the host alias or host variables may have to be duplicated across several sections.
 
 Further, as we are dynamically provisioning infrastructure with a cloud provider, we generally do not have a way to know the host IPs ahead of time.
@@ -152,7 +149,7 @@ all:
       hosts:
         debian-s-1vcpu-2gb-sfo3-01:
           ansible_host: 143.198.76.8
-          # ...etc...
+          # ...
     k3s-demo:
       hosts:
         debian-s-1vcpu-2gb-sfo3-01: {}
@@ -192,6 +189,32 @@ all:
                ansible_host: 143.198.52.107
                ansible_user: infra_ops
                do_name: debian-s-1vcpu-2gb-sfo3-01
-...etc
+...
 ```
 
+## 5. Running an Ansible Playbook with Dynamic Inventory
+
+```shell
+% export DO_API_TOKEN=dop_v1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+% ansible-playbook \
+  --inventory ./cloud-infra/ansible/inventory/sources \
+  ./cloud-infra/ansible/inventory/mgmt/digitalocean-demo-shell-example.yaml
+```
+
+*./cloud-infra/ansible/inventory/mgmt/digitalocean-demo-shell-example.yaml:*
+
+```yaml
+---
+- hosts: k3s-demo-master
+  tasks:
+     - name: cat hostname
+       shell: |
+          cat /etc/hostname
+       register: cat_hostname
+
+     - name: show cat hostname output
+       ansible.builtin.debug:
+          msg: |
+             {{ cat_hostname.stdout_lines }}
+```
