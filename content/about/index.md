@@ -19,7 +19,7 @@ I am passionate about clean architecture, clean code, and idiomatic best practic
 
 I am biased towards minimalism and simplicity:
 
-> "Write programs that do one thing and do it well" - _The Unix Philosphy_
+> "Write programs that do one thing and do it well" - _The Unix Philosophy_
 
 > "There should be one -- and preferably only one -- obvious way to do it." - _The Zen of Python_
 
