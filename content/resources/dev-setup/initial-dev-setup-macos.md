@@ -3,7 +3,6 @@ title: "Initial Dev Setup for MacOS"
 slug: initial-dev-setup-macos
 summary: "General development environment setup for MacOS: Zsh, Homebrew, Sublime Text, and VS Code"
 date: 2020-02-02
-lastmod: 2021-12-127
 order_number: 1
 ---
 ## The Very Basics

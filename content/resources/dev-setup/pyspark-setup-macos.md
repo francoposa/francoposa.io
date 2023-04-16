@@ -3,7 +3,6 @@ title: "Spark and PySpark Setup for MacOS"
 slug: spark-pyspark-setup-macos
 summary: "Optimized Spark and PySpark Environment Setup for MacOS"
 date: 2020-10-25
-lastmod: 2021-12-30
 order_number: 5
 ---
 

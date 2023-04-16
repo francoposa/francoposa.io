@@ -3,7 +3,6 @@ title: "Postgres Dev Setup for MacOS"
 slug: postgres-setup-macos
 summary: "PostgreSQL setup & default 'postgres' user configuration for MacOS"
 date: 2020-03-29
-lastmod: 2020-10-18
 order_number: 6
 ---
 

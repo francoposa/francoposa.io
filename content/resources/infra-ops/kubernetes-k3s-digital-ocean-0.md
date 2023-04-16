@@ -3,7 +3,6 @@ title: "Kubernetes with K3s, Ansible, and DigitalOcean Intro"
 slug: kubernetes-k3s-ansible-digital-ocean-0
 summary: "Goals, Tool Selection, and Setup"
 date: 2021-07-27
-lastmod: 2022-02-05
 order_number: 1
 ---
 

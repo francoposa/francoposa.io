@@ -4,7 +4,6 @@ slug: about
 type: section
 layout: about
 date: 2020-02-02
-lastmod: 2023-01-26
 ---
 ## Myself
 

@@ -3,7 +3,6 @@ title: "Python Setup for MacOS Part 1: Pyenv + Virtualenvwrapper"
 slug: python-setup-macos-1
 summary: "Worry-free Python development environment setup for MacOS"
 date: 2020-02-24
-lastmod: 2020-02-24
 order_number: 4
 ---
 

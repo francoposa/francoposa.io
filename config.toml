@@ -3,6 +3,8 @@ languageCode = "en-us"
 theme = "basic"
 title = "francoposa.io"
 
+enableGitInfo = true
+
 [markup]
 [markup.highlight]
 style = "monokailight"

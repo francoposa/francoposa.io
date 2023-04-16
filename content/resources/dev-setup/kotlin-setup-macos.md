@@ -3,7 +3,6 @@ title: "Kotlin Setup for MacOS"
 slug: kotlin-setup-macos
 summary: "Kotlin development environment setup with SDKMAN and Intellij IDEA for MacOS"
 date: 2020-06-30
-lastmod: 2020-06-30
 order_number: 3
 ---
 
