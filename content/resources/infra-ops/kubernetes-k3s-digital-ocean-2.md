@@ -8,6 +8,8 @@ order_number: 3
 
 ## 1. Ansible Inventory Basics
 
+If you are familiar with Ansible inventory, jump to [Using Dynamic Inventory Plugins]({{< relref "#3-using-dynamic-inventory-plugins" >}})
+
 ### Hosts, Host Groups, and Host Variables
 
 #### Hosts
@@ -185,8 +187,7 @@ all:
             debian-s-1vcpu-2gb-sfo3-01:
                ansible_host: 143.198.52.107
                ansible_user: infra_ops
-               do_name: debian-s-1vcpu-2gb-sfo3-01
-...
+              # ...
 ```
 
 ## 5. Running an Ansible Playbook with Dynamic Inventory
