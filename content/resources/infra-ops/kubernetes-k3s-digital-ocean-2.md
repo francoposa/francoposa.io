@@ -121,7 +121,7 @@ compose:
 We can check the dynamic inventory output with a graph view of just the hosts:
 
 ```shell
-% ansible-inventory -i ./cloud-infra/ansible/inventory/sources --graph  # add --vars to see all host variables
+% ansible-inventory -i ./cloud-infra/ansible/inventory/sources/digitalocean.yaml --graph  # add --vars to see all host variables
 ```
 
 ```shell
@@ -138,7 +138,7 @@ We can check the dynamic inventory output with a graph view of just the hosts:
 or a full view in the same format as a static inventory file:
 
 ```shell
-% ansible-inventory -i ./cloud-infra/ansible/inventory/sources --list --yaml
+% ansible-inventory -i ./cloud-infra/ansible/inventory/sources/digitalocean.yaml --list --yaml
 ```
 
 ```yaml
@@ -177,7 +177,7 @@ We can add the following to `[inventory directory]/group_vars/all.yaml`, or `dem
 ansible_user: infra_ops
 ```
 
-Now if we run `ansible-inventory -i ./cloud-infra/ansible/inventory/sources --list --yaml` again, you will see the `ansible_user` variable applied to the host.
+Now if we run `ansible-inventory -i ./cloud-infra/ansible/inventory/sources/digitalocean.yaml --list --yaml` again, you will see the `ansible_user` variable applied to the host.
 
 ```yaml
 all:
@@ -196,7 +196,7 @@ all:
 % export DO_API_TOKEN=dop_v1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 % ansible-playbook \
-  --inventory ./cloud-infra/ansible/inventory/sources \
+  --inventory ./cloud-infra/ansible/inventory/sources/digitalocean.yaml \
   ./cloud-infra/ansible/inventory/mgmt/digitalocean-demo-shell-example.yaml
 ```
 

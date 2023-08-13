@@ -121,7 +121,7 @@ By default, the Ansible module waits for the VM to be fully active before return
           - demo
           - k3s-demo
           - k3s-demo-master
-        image: debian-11-x64
+        image: debian-12-x64
         size: s-1vcpu-2gb
         region: sfo3
         ssh_keys:
