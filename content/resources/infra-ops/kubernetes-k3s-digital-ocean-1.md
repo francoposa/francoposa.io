@@ -1,7 +1,9 @@
 ---
-title: "Kubernetes with K3s, Ansible, and DigitalOcean Part 1"
-slug: kubernetes-k3s-ansible-digital-ocean-1
-summary: "Creating DigitalOcean Server Inventory with Ansible"
+title: "Zero to Production with Kubernetes, Part 1: Creating a DigitalOcean Server with Ansible"
+summary: "Ansible, Ansible Collections, DigitalOcean VMs, and Initial Server Configuration"
+slug: zero-to-production-with-kubernetes-1
+aliases:
+  - /resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-1/
 date: 2021-07-27
 order_number: 2
 ---
@@ -45,8 +47,8 @@ name = "learn-infra-ops"
 version = "0.1.0a0"
 
 [tool.poetry.dependencies]
-python = "^3.8"
-ansible = "5.*"
+python = "^3.10"
+ansible = "7.*"
 
 [tool.poetry.dev-dependencies]
 yamllint = "1.*"

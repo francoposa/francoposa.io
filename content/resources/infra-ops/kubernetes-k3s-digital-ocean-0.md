@@ -1,7 +1,9 @@
 ---
-title: "Kubernetes with K3s, Ansible, and DigitalOcean Intro"
-slug: kubernetes-k3s-ansible-digital-ocean-0
-summary: "Goals, Tool Selection, and Setup"
+title: "Zero to Production with Kubernetes, Part 0: Goals and Tool Selection"
+summary: "DigitalOcean Droplets, Ansible, K3s, and Helm"
+slug: zero-to-production-with-kubernetes-0
+aliases:
+  - /resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-0/
 date: 2021-07-27
 order_number: 1
 ---
