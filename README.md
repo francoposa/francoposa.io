@@ -1,1 +1,1 @@
-# [francoposa.io](https://www.francoposa.io)
+# [francoposa.io](https://francoposa.io)

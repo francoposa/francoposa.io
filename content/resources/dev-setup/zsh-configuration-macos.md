@@ -3,7 +3,7 @@ title: "Zsh Configuration for Linux and MacOS"
 slug: zsh-configuration-linux-macos
 summary: "Configuration for Zsh supporting development in Python and Golang on Linux and MacOS"
 date: 2020-07-08
-order_number: 8
+order_number: 1
 ---
 ```shell
 # Show current directory in command prompt, truncating where it can
@@ -50,7 +50,7 @@ SAVEHIST=10000000
 setopt BANG_HIST                 # Treat the '!' character specially during expansion.
 setopt EXTENDED_HISTORY          # Write the history file in the ":start:elapsed;command" format.
 setopt INC_APPEND_HISTORY        # Write to the history file immediately, not when the shell exits.
-setopt SHARE_HISTORY             # Share history between all sessions.
+# setopt SHARE_HISTORY             # Share history between all sessions.
 setopt HIST_EXPIRE_DUPS_FIRST    # Expire duplicate entries first when trimming history.
 setopt HIST_IGNORE_DUPS          # Don't record an entry that was just recorded again.
 setopt HIST_IGNORE_ALL_DUPS      # Delete old recorded entry if new entry is a duplicate.
@@ -60,6 +60,9 @@ setopt HIST_SAVE_NO_DUPS         # Don't write duplicate entries in the history 
 setopt HIST_REDUCE_BLANKS        # Remove superfluous blanks before recording entry.
 setopt HIST_VERIFY               # Don't execute immediately upon history expansion.
 setopt HIST_BEEP                 # Beep when accessing nonexistent history.
+
+# PYTHON3 ALIAS
+alias python="python3"
 
 # https://github.com/kovidgoyal/kitty/issues/713
 alias ssh="kitty +kitten ssh"
@@ -96,14 +99,16 @@ alias nv=nvim
 export VISUAL=nvim
 export EDITOR="$VISUAL"
 
-
-
 # HOMEBREW place installed tools at beginning of PATH
 export PATH="/usr/local/opt/curl/bin:$PATH"
 export PATH="/usr/local/opt/git/bin:$PATH"
 
 # RIPGREP
 export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
+
+# DOCKER
+# newer docker compose is a subcommand of docker, not a separate command
+alias docker-compose="docker compose"
 
 # NVM & NPM - commented out when not in use as this initialization step is slow on my poor little Macbook Air
 export NVM_DIR="$HOME/.nvm"
@@ -114,7 +119,7 @@ export NVM_DIR="$HOME/.nvm"
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init --path)"
-export PYENV_VERSION=3.10.6
+export PYENV_VERSION=3.10.8
 if command -v pyenv 1>/dev/null 2>&1; then
   eval "$(pyenv init -)"
   # eval "$(pyenv virtualenv-init -)" # PYENV-VIRTUALENV - not using currently, in favor of pyenv-virtualenvwrapper
@@ -156,7 +161,6 @@ export PATH=$PATH:$GOPATH/bin
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="/Users/franco/.sdkman"
 [[ -s "/Users/franco/.sdkman/bin/sdkman-init.sh" ]] && source "/Users/franco/.sdkman/bin/sdkman-init.sh"
-
 
 echo $PATH
 

@@ -3,7 +3,7 @@ title: "Postgres Dev Setup for MacOS"
 slug: postgres-setup-macos
 summary: "PostgreSQL setup & default 'postgres' user configuration for MacOS"
 date: 2020-03-29
-order_number: 6
+order_number: 7
 ---
 
 ## Why Install with `postgres` as the Default User?
