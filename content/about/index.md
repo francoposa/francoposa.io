@@ -32,7 +32,7 @@ With this site I hope to provide high-quality, useful, and accessible software e
 
 * Style: Tailwind CSS
 
-* Hosting: DigitalOcean App Platform
+* Hosting: GitHub Pages
 
 * DNS & CDN: Cloudflare
 
