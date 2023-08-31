@@ -8,8 +8,6 @@ date: 2021-07-27
 order_number: 1
 ---
 
-**This document is a work in progress**
-
 ## Goals
 
 ### 1. Ship Software!

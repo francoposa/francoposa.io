@@ -8,8 +8,6 @@ date: 2023-04-16
 order_number: 4
 ---
 
-**This document is a work in progress**
-
 ## 1. Prepare K3s Configuration
 
 K3s can be configured with command-line arguments, environment variables, and a [config file](https://docs.k3s.io/installation/configuration#configuration-file).

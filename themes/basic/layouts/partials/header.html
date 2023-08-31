@@ -1,20 +1,18 @@
-<div class="container" style="margin-bottom: 0.5rem; padding: 1.5rem 1.0rem 0.75rem 1.0rem;">
-    <div class="row" style="line-height: 2.5em; font-family: 'Courier Prime'; ">
-        <div class="col-md-4 col-xs-12 fs-3 text-center">
-            <a class="text-decoration-none" href="/">francoposa.io</a>
+<div class="container py-4 pl-0 bg-white font-mono">
+    <div class="flex flex-row flex-wrap items-center pt-2">
+        <div class="lg:basis-2/6 md:basis-2/6 basis-full pl-6 text-3xl text-center">
+            <a href="/">francoposa.io</a>
         </div>
-        <div class="col-md-2 col-xs-0 fs-5 text-center"></div>
-        <div class="col-md-2 col-xs-6 fs-5 text-center">
-            <a class="{{- if and (not .IsHome) (in .Permalink "projects") -}}text-decoration-underline{{- else -}}text-decoration-none{{- end -}}"
-                href="/">projects</a>
+        <div class="lg:basis-1/6 md:basis-0 basis-0 flex-auto text-xl text-center"></div>
+        <div class="lg:basis-1/6 md:basis-1/6 basis-full text-xl text-center ">
+
+            <a class='{{- if and (not .IsHome) (in .Permalink "projects") -}}text-decoration-underline{{- else -}}text-decoration-none{{- end -}}' href="/">projects</a>
         </div>
-        <div class="col-md-2 col-xs-6 fs-5 text-center">
-            <a class="{{- if and (not .IsHome) (in .Permalink "resources") -}}text-decoration-underline{{- else -}}text-decoration-none{{- end -}}"
-                href="/resources">resources</a>
+        <div class="lg:basis-1/6 md:basis-1/6 basis-full flex-auto text-xl text-center ">
+            <a class='{{- if and (not .IsHome) (in .Permalink "resources") -}}text-decoration-underline{{- else -}}text-decoration-none{{- end -}}' href="/resources">resources</a>
         </div>
-        <div class="col-md-2 col-xs-6 fs-5 text-center">
-            <a class="{{- if and (not .IsHome) (in .Permalink "about") -}}text-decoration-underline{{- else -}}text-decoration-none{{- end -}}"
-                href="/about">about</a>
+        <div class="lg:basis-1/6 md:basis-1/6 basis-full flex-auto text-xl text-center md:pr-6">
+            <a class='{{- if and (not .IsHome) (in .Permalink "about") -}}text-decoration-underline{{- else -}}text-decoration-none{{- end -}}' href="/about">about</a>
         </div>
     </div>
 </div>

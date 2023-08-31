@@ -1,8 +1,6 @@
 {{ define "main" }}
-<div class="container main">
-    <div class="container content">
-        <h1 class="text-center">{{ .Title }}</h1>
-        {{ .Content }}
-    </div>
+<div class="container content my-2 px-8 py-4 bg-white">
+    <h1 class=" header">{{ .Title }}</h1>
+    {{ .Content }}
 </div>
 {{ end }}

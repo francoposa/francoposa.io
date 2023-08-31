@@ -7,11 +7,7 @@ date: 2020-02-02
 ---
 ## Myself
 
-I am a software engineer with over six years of experience designing, writing, and testing software across many interesting areas of software engineering:
-
-* cloud: block device, backup, and snapshot cloud storage products
-* telecom: voice call routing optimization for UCaaS providers
-* big data: batch and event-driven data platforms serving AI/ML models
+I am a software engineer with over six years of experience designing, writing, and testing software across many areas of software engineering, including cloud storage, distributed databases, telecom routing, and big data pipelines.
 
 I love to design, build, and refactor.
 I am passionate about clean architecture, clean code, and idiomatic best practices.
@@ -34,7 +30,7 @@ With this site I hope to provide high-quality, useful, and accessible software e
 
 * Content: Hugo static site generator
 
-* Style: Bootstrap 5
+* Style: Tailwind CSS
 
 * Hosting: DigitalOcean App Platform
 

@@ -39,7 +39,7 @@ yamllint=1.*
 
 For `poetry` users, `pyproject.toml`:
 
-```
+```toml
 [tool.poetry]
 authors = ["francoposa <franco@francoposa.io>"]
 description = ""

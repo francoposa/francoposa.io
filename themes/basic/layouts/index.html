@@ -1,20 +1,22 @@
 {{ define "main" }}
-<div class="container main">
-    <div class="container content">
+<div class="container content my-2 px-8 py-4 bg-white">
+    {{ range sort .Sections ".Params.order_number" }}
+    <h2 class="header text-3xl my-3">
+        <a class="text-decoration-none" href="{{ .RelPermalink }}">{{ .Title }}</a>
+    </h2>
+    <hr>
         {{ range sort .Sections ".Params.order_number" }}
-        <h2 class="section-title"><a class="text-decoration-none" href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
-        <div class="border-bottom"></div>
-        {{ range sort .Sections ".Params.order_number" }}
-        <h3 class="section-title"><a class="text-decoration-none" href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
-        <ul>
+        <h3 class="header text-2xl my-3">
+            <a class="text-decoration-none" href="{{ .RelPermalink }}">{{ .Title }}</a>
+        </h3>
+        <ul class="list-disc pl-8">
             {{ range sort .Pages ".Params.order_number"}}
             <li>
-                <p><a href="{{ .RelPermalink }}">{{ .Title }}</a></p>
+                <p class="my-2"><a class="" href="{{ .RelPermalink }}">{{ .Title }}</a></p>
             </li>
             {{ end }}
         </ul>
         {{ end }}
-        {{ end }}
-    </div>
+    {{ end }}
 </div>
 {{ end }}

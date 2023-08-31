@@ -1,12 +1,9 @@
 {{ define "main" }}
-<div class="container main">
-    <div class="container content">
-        <h1 class="text-center">{{ .Title }}</h1>
-        <p class="text-center fs-5">{{ .Page.Summary }}</p>
-        <p class="text-center">{{ .Site.Params.AuthorName }}</p>
-
-        <div class="border-bottom"></div>
-        {{ .Content }}
-    </div>
+<div class="container content my-2 px-8 py-4 bg-white">
+    <h1 class="mt-8 mb-2 text-4xl text-center">{{ .Title }}</h1>
+    <p class="mt-2 mb-2 text-center text-xl">{{ .Page.Summary }}</p>
+    <p class="mt-2 mb-2 text-center text-md">{{ .Site.Params.AuthorName }}</p>
+    <hr>
+    {{ .Content }}
 </div>
 {{ end }}

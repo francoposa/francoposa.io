@@ -1,54 +1,48 @@
-body {
-    background-color:rgb(250,250,250);
-    max-width: 50rem;
-    margin: 0 auto;
-}
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime&family=Open+Sans&display=swap');
 
-h1, h2, h3, h4, h5, .h1, .h2, .h3, .h4, .h5 {
-    font-family: 'Open Sans', var(--bs-font-sans-serif);
-    margin-top: 1.75rem;
-    margin-bottom: 0.75rem;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-a, a:hover {
-    color: inherit;
-}
 a:hover {
-   text-decoration: underline !important;
+    @apply underline;
 }
 
 blockquote {
-    padding: 0 1em;
+    @apply mb-4;
+    @apply px-4;
     color: rgb(115,115,115);
     border-left: .25em solid rgb(200,200,200);
 }
 
-.container {
-    background-color:rgb(255,255,255);
-    padding: 1rem;
+.content > h1, h2, h3, h4, h5 {
+    @apply mt-6;
+    @apply mb-4;
 }
 
-.main {
-    margin-bottom: 0.5rem;
+.content > h1 {
+    @apply text-4xl;
 }
 
-.border-bottom {
-    margin-bottom: 2rem;
+.content > h2 {
+    @apply text-3xl;
 }
 
-.section-title {
-    margin-top: 1.0rem;
-    margin-bottom: 1.0rem;
+.content > h3 {
+    @apply text-2xl;
 }
 
-.content > a {
-    text-decoration: underline;
+.content > p {
+    @apply mb-4;
 }
 
-.footer > p {
-    margin-bottom: 0rem;
+.content > ul {
+    @apply mb-4;
+    @apply pl-8;
+    @apply list-disc;
 }
 
-pre {
-    padding: 1rem;
+.content > div > pre {
+    @apply mb-4;
+    @apply p-4;
 }
