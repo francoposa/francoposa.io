@@ -51,14 +51,12 @@ Practices and Preferences:
 Tools: Ansible, Helm, K3s, and DigitalOcean
 -->
 
-
 ## Tool Selection
 
-### [DigitalOcean](https://www.digitalocean.com/)
-* Simple, powerful cloud computing products and interfaces
-* Second-to-none [documentation](https://docs.digitalocean.com),
-[tutorials](https://www.digitalocean.com/community/tutorials), and other resources
-
+### [DigitalOcean](https://digitalocean.com/)
+* Simple, affordable cloud computing products and interfaces
+  * importantly, the DigitalOcean "Droplet" cloud server comes with a public IPv4 address by default
+* Integrations with common Infrastructure-as-Code tools: Ansible, Terraform, Pulumi, Crossplane, etc.
 
 ### [Ansible](https://docs.ansible.com/ansible/latest/)
 * Automation of infrastructure provisioning and operations.
@@ -66,7 +64,7 @@ Tools: Ansible, Helm, K3s, and DigitalOcean
 * Combined imperative and declarative approach
 * Powerful and flexible
   * Power and flexibility come with associated tradeoffs.
-  In the case of Ansible, there can be many, many ways to do the same thing
+  In the case of Ansible, there can be many ways to do the same thing
   * We will make an effort to use approaches that are cross-platform and require minimal customization and configuration
 
 
