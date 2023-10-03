@@ -12,7 +12,7 @@ order_number: 1
 
 ### 1. Ship Software!
 
-We want to give ourselves the ability to take an app from running on our computer to running on a public cloud server.
+We want to give ourselves the ability to take an app from running on our local machine to running on a public cloud server.
 
 Further, we want this deployment process to be simple, automated, repeatable, and not to involve significant customization.
 That is, the process, tools, and configuration used to deploy one application should be easily transferable to a second, third, or hundredth application.

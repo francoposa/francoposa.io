@@ -161,7 +161,7 @@ I have captured my basic VS Code setup in the [Visual Studio Code Settings and C
 ## Bonus: Install the Hack Font
 
 Hack is by far my favorite monospaced font for text editors, and IDEs,
-and installing it is the first step I take on any new dev computer.
+and installing it is the first step I take on any new dev machine.
 
 Hack can be downloaded [here](https://sourcefoundry.org/hack/). Use Finder to unzip the .ttf files, open them, and click "Install Font"
 
