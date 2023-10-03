@@ -2,7 +2,7 @@
 title: "Git Good, Part 1: Initial Configuration and Creating Repositories"
 slug: git-basics-1
 summary: "Config, Init, Commit, and Push"
-date: 2020-12-10
+date: 2023-10-02
 order_number: 1
 ---
 
