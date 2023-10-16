@@ -1,7 +1,7 @@
 ---
 title: "Git Good, Part 1: Initial Configuration and Creating Repositories"
 slug: git-basics-1
-summary: "Config, Init, Commit, and Push"
+summary: "Config, Init, and Commit"
 date: 2023-10-02
 order_number: 1
 ---
@@ -71,3 +71,53 @@ Most new Git repos now start with `main` as the default branch and many older Gi
 ```
 
 ## 2. Initialize a Git Repository
+
+Initialize a Git repository in an existing (preferably empty) directory:
+
+```shell
+[~/repos] % mkdir git-demo-repo
+[~/repos] % cd git-demo-repo
+[~/repos/git-demo-repo] % git init
+Initialized empty Git repository in /home/franco/repos/git-demo-repo/.git/
+```
+
+or have Git create the directory for you:
+
+```shell
+[~/repos] % git init git-demo-repo
+Initialized empty Git repository in /home/franco/repos/git-demo-repo/.git/
+```
+
+Git will initialize all of the files used to do its magic in the `.git` subdirectory:
+
+```shell
+[~/repos/git-demo-repo] % ls .git/
+branches  config  description  HEAD  hooks  info  objects  refs
+```
+
+You can check out the local config settings for the repo:
+
+```shell
+[~/repos/git-demo-repo] % cat .git/config
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+```
+
+And run `git config --list --show-origin` to see both the local Git config
+and any global Git config not overwritten by the local options for the repo:
+
+```shell
+file:/home/franco/.gitconfig    user.name=francoposa
+file:/home/franco/.gitconfig    user.email=franco@francoposa.io
+file:/home/franco/.gitconfig    init.defaultbranch=main
+file:/home/franco/.gitconfig    pull.rebase=true
+file:/home/franco/.gitconfig    push.autosetupremote=true
+file:.git/config        core.repositoryformatversion=0
+file:.git/config        core.filemode=true
+file:.git/config        core.bare=false
+file:.git/config        core.logallrefupdates=true
+lines 1-9/9 (END)
+```
