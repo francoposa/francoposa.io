@@ -6,6 +6,10 @@ date: 2023-10-02
 order_number: 1
 ---
 
+##
+
+**This document is a work in progress**
+
 ## 0. Prerequisites
 
 * the `git` command-line tool installed on your machine
@@ -88,7 +92,7 @@ or have Git create the directory for you:
 Initialized empty Git repository in /home/franco/repos/git-demo-repo/.git/
 ```
 
-Git will initialize all of the files used to do its magic in the `.git` subdirectory:
+Git will initialize all the files used to do its magic in the `.git` subdirectory:
 
 ```shell
 [~/repos/git-demo-repo] % ls .git/
