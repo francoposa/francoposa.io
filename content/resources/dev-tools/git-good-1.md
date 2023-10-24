@@ -54,12 +54,14 @@ Commonly, these are your full name or username and email associated with your ac
 % git config --global user.email franco@francoposa.io
 ```
 
+The changes will be saved in the global git config file.
+
 You may confirm these changes several different ways, including:
 * another call to `git confit --global --list`
-* manually viewing the global git config with `cat`, `less`, or your preferred text editor
-* opening the global git config with the system default text editor with `git config --global --edit`
+* manually viewing the global git config file with `cat`, `less`, or your preferred text editor
+* opening the global git config file with the system default text editor with `git config --global --edit`
 
-#### Bonus: Set Your Default Branch Name to `main`
+**Bonus: Set Your Default Branch Name to `main`**
 
 While Git was never intended to have a single "default" branch, usage of Git has largely settled on
 having one branch serve as the master record or source of truth for the state of the repository (or "repo").
@@ -110,8 +112,8 @@ You can check out the local config settings for the repo:
 	logallrefupdates = true
 ```
 
-And run `git config --list --show-origin` to see both the local Git config
-and any global Git config not overwritten by the local options for the repo:
+Run `git config --list --show-origin` - note that we left off the `--global` flag this time.
+This shows the Git config in effect for the current repository, a merging of the global with the local config.
 
 ```shell
 file:/home/franco/.gitconfig    user.name=francoposa
@@ -124,4 +126,11 @@ file:.git/config        core.filemode=true
 file:.git/config        core.bare=false
 file:.git/config        core.logallrefupdates=true
 lines 1-9/9 (END)
+```
+
+Local Git config options will override the global options when using Git within the configured repository.
+If you need to work on a project with different configuration than you would normally use, override that option just for the current repository:
+
+```shell
+[~/repos/git-demo-repo] % git config pull.rebase false  # no --global flag
 ```
