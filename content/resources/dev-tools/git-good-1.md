@@ -16,17 +16,17 @@ order_number: 1
 * an SSH keypair generated and registered to your local ssh daemon
 * a GitHub account or other remote git server with the SSH public key registered
 
-## 1. Initial Global Git Configuration
+## 1. Initialize Global Git Configuration
 
-### Viewing Existing Configuration, If Any
+### View Existing Global Git Configuration
 
 The "global" Git config for a given user on a system is generally stored either in
 `.gitconfig` or in `.config/git/config` under the user's home directory.
 
-Run `% git config --global --list --show-origin` to show any existing git config you may have,
+Run `git config --global --list --show-origin` to show any existing git config you may have,
 including the origin of the configuration, which is usually just the path to the relevant config file.
 
-A scrollable paging program in your terminal will open to show the values; just press `q` to exit.  
+A scrollable paging program in your terminal will open to show the config; just press `q` to exit.
 
 ```shell
 file:/home/franco/.gitconfig    user.name=francoposa
@@ -42,9 +42,9 @@ fatal: unable to read config file '/home/franco/.gitconfig': No such file or dir
 lines 1-1/1 (END)
 ```
 
-Not to worry, we will be setting up our config next.
+The configuration file will be created when you set the first config options.
 
-### Basic Global Git Configuration Values
+### Set Basic Global Git Configuration Options
 
 Our first concern is to set the git user name and email, which are attached to all git "commits", or recorded changes.
 Commonly, these are your full name or username and email associated with your account on GitHub or other remote git server.
@@ -61,7 +61,7 @@ You may confirm these changes several different ways, including:
 * manually viewing the global git config file with `cat`, `less`, or your preferred text editor
 * opening the global git config file with the system default text editor with `git config --global --edit`
 
-**Bonus: Set Your Default Branch Name to `main`**
+**Bonus: Set the Default Branch Name to `main`**
 
 While Git was never intended to have a single "default" branch, usage of Git has largely settled on
 having one branch serve as the master record or source of truth for the state of the repository (or "repo").
@@ -100,6 +100,7 @@ Git will initialize all the files used to do its magic in the `.git` subdirector
 [~/repos/git-demo-repo] % ls .git/
 branches  config  description  HEAD  hooks  info  objects  refs
 ```
+### View Repository Git Configuration
 
 You can check out the local config settings for the repo:
 
