@@ -135,3 +135,134 @@ If you need to work on a project with different configuration than you would nor
 ```shell
 [~/repos/git-demo-repo] % git config pull.rebase false  # no --global flag
 ```
+
+## Commit to a Git Repository
+
+At this point, we still have nothing in the Git repo besides the `.git` directory.
+
+Check git status to confirm:
+
+```shell
+[~/repos/git-demo-repo] % git status
+On branch main
+
+No commits yet
+
+nothing to commit (create/copy files and use "git add" to track)
+```
+
+Changes to a Git repository can be discarded without any record of their existence until they are _committed_.
+Each _commit_ in a Git history is simply a record of what is different from the state of the repository at the previous commit.
+These commits are also relatively interchangeably referred to as changesets, deltas, or patches.
+
+### Create the First Changes
+
+It is standard for a repo to have a markdown file in the root directory titled `README.md`,
+containing information that pertains to the project, as whole.
+The README generally starts with the repo or project name as the first line,
+formatted as a title or h1 header with a preceding `#`
+
+Create this file in your editor:
+
+```markdown
+# git-demo-repo
+```
+
+Check your Git status again:
+
+```shell
+[~/repos/git-demo-repo] % git status
+On branch main
+
+No commits yet
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	README.md
+
+nothing added to commit but untracked files present (use "git add" to track)
+```
+
+Now Git is aware that something is in the repository, but it is not yet actively tracking changes to it.
+You can add any amount of changes to the README, and still all Git will know is that there is some untracked file named `README.md` sitting there.
+If you delete the file, the changes will be gone forever.
+
+We can change this by adding the file to Git's index, then checking the status again:
+
+```shell
+[~/repos/git-demo-repo] % git add README.md
+[~/repos/git-demo-repo] % git status
+On branch main
+
+No commits yet
+
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
+	new file:   README.md
+```
+
+Now we have not committed our change yet, but Git is tracking the changes to the file.
+Changes and files that have been added but not yet committed are said to be **staged** changes.
+
+Change the file, say we decide we want to use are more proper project name instead of the hyphenated, lowercase repo name.
+Remove the text `git-demo-repo` and replace it with `Git Demo Repository`.
+
+Check Git status again:
+```shell
+[~/repos/git-demo-repo] % git status
+On branch main
+
+No commits yet
+
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
+	new file:   README.md
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	modified:   README.md
+```
+
+So nothing has been committed, but Git is tracking `README.md`, and it are aware that
+something has changed since the README was last added or staged.
+
+Check what has changed (hit q to exit the diff viewer Git will open in the terminal):
+
+```shell
+[~/repos/git-demo-repo] % git diff
+
+diff --git a/README.md b/README.md
+index 5676235..8f8bd34 100644
+--- a/README.md
++++ b/README.md
+@@ -1 +1 @@
+-# git-demo-repo
++# Git Demo Repository
+lines 1-7/7 (END)
+```
+
+With color-coded output and the +/- signs prefixing each line,
+Git shows us the difference between the staged changes and the unstaged changes.
+
+If we stage the latest changes, Git no longer outputs a diff:
+
+```shell
+[~/repos/git-demo-repo] % git add README.md
+[~/repos/git-demo-repo] % git status
+On branch main
+
+No commits yet
+
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
+	new file:   README.md
+
+[~/repos/git-demo-repo] % git diff  # again, press q to exit the diff viewer
+
+byte 0/0 (END)
+```
+
+If we have nothing further to change, we are ready to submit this changeset to the Git history
+
+### Record the First Commit
