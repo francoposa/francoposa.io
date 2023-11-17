@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Courier+Prime&family=Open+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime&family=Open+Sans:wght@400;500;600;700&display=swap');
 
 /*
 ! tailwindcss v3.3.3 | MIT License | https://tailwindcss.com
@@ -46,7 +46,7 @@ html {
   -o-tab-size: 4;
      tab-size: 4;
   /* 3 */
-  font-family: Open Sans, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   /* 4 */
   font-feature-settings: normal;
   /* 5 */
@@ -886,7 +886,8 @@ blockquote{
   border-left: .25em solid rgb(200,200,200);
 }
 
-.content > h1, h2, h3, h4, h5{
+.content > h1, h2, h3, h4, h5 {
+  font-family: 'Open Sans', system-ui, sans-serif;
   margin-top: 1.5rem;
   margin-bottom: 1rem;
 }
@@ -894,16 +895,27 @@ blockquote{
 .content > h1{
   font-size: 2.25rem;
   line-height: 2.5rem;
+  font-weight: 500;
 }
 
 .content > h2{
   font-size: 1.875rem;
   line-height: 2.25rem;
+  font-weight: 500;
 }
 
 .content > h3{
   font-size: 1.5rem;
   line-height: 2rem;
+  font-weight: 500;
+}
+
+.content > h4{
+  font-weight: 500;
+}
+
+.content > h5{
+  font-weight: 500;
 }
 
 .content > p{
