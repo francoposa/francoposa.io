@@ -1,7 +1,7 @@
 ---
-title: "Git Good, Part 1: Initial Configuration and Creating Repositories"
+title: "Git Good, Part 1: Configuration, Creating Repositories, and Committing Changes"
 slug: git-basics-1
-summary: "Config, Init, and Commit"
+summary: "Git Config, Init, Add, and Commit"
 date: 2023-10-02
 order_number: 1
 ---
@@ -13,8 +13,6 @@ order_number: 1
 ## 0. Prerequisites
 
 * the `git` command-line tool installed on your machine
-* an SSH keypair generated and registered to your local ssh daemon
-* a GitHub account or other remote git server with the SSH public key registered
 
 ## 1. Initialize Global Git Configuration
 
@@ -23,26 +21,29 @@ order_number: 1
 The "global" Git config for a given user on a system is generally stored either in
 `.gitconfig` or in `.config/git/config` under the user's home directory.
 
-Run `git config --global --list --show-origin` to show any existing git config you may have,
+Run `git config --global --list --show-origin` to show any existing Git config we may have,
 including the origin of the configuration, which is usually just the path to the relevant config file.
 
-A scrollable paging program in your terminal will open to show the config; just press `q` to exit.
+A scrollable paging program in your terminal will open to show the config:
 
 ```shell
+[~/repos/git-demo-repo] % git config --global --list --show-origin  # press q to exit the viewer
+
 file:/home/franco/.gitconfig    user.name=francoposa
 file:/home/franco/.gitconfig    user.email=franco@francoposa.io
 file:/home/franco/.gitconfig    init.defaultbranch=main
+file:/home/franco/.gitconfig    pull.rebase=true
 file:/home/franco/.gitconfig    push.autosetupremote=true
 lines 1-4/4 (END)
 ```
 
-If you do not have any existing git configuration, you may see:
+If we do not have any existing git configuration, we may see:
 ```shell
 fatal: unable to read config file '/home/franco/.gitconfig': No such file or directory
 lines 1-1/1 (END)
 ```
 
-The configuration file will be created when you set the first config options.
+The configuration file will be created when we set the first config options.
 
 ### Set Basic Global Git Configuration Options
 
@@ -54,12 +55,12 @@ Commonly, these are your full name or username and email associated with your ac
 % git config --global user.email franco@francoposa.io
 ```
 
-The changes will be saved in the global git config file.
+The changes will be saved in the global Git config file.
 
-You may confirm these changes several different ways, including:
+We can confirm these changes several different ways, including:
 * another call to `git confit --global --list`
-* manually viewing the global git config file with `cat`, `less`, or your preferred text editor
-* opening the global git config file with the system default text editor with `git config --global --edit`
+* manually viewing the global Git config file with `cat`, `less`, or your preferred text editor
+* opening the global Git config file with the system default text editor with `git config --global --edit`
 
 **Bonus: Set the Default Branch Name to `main`**
 
@@ -87,22 +88,26 @@ Initialize a Git repository in an existing (preferably empty) directory:
 Initialized empty Git repository in /home/franco/repos/git-demo-repo/.git/
 ```
 
-or have Git create the directory for you:
+or have Git create the directory:
 
 ```shell
 [~/repos] % git init git-demo-repo
 Initialized empty Git repository in /home/franco/repos/git-demo-repo/.git/
 ```
 
-Git will initialize all the files used to do its magic in the `.git` subdirectory:
+Git maintains all the data essential to its operations in the `.git` subdirectory:
 
 ```shell
 [~/repos/git-demo-repo] % ls .git/
 branches  config  description  HEAD  hooks  info  objects  refs
 ```
+
+Deleting or altering a `.git` directory which does not have a remote copy or backup
+can result in the loss of all metadata and history of the repository.
+
 ### View Repository Git Configuration
 
-You can check out the local config settings for the repo:
+The `.git/config` file holds the local config settings for the repo:
 
 ```shell
 [~/repos/git-demo-repo] % cat .git/config
@@ -113,7 +118,7 @@ You can check out the local config settings for the repo:
 	logallrefupdates = true
 ```
 
-Run `git config --list --show-origin` - note that we left off the `--global` flag this time.
+Run `git config --list --show-origin` - note the `--global` flag is not used this time.
 This shows the Git config in effect for the current repository, a merging of the global with the local config.
 
 ```shell
@@ -130,7 +135,8 @@ lines 1-9/9 (END)
 ```
 
 Local Git config options will override the global options when using Git within the configured repository.
-If you need to work on a project with different configuration than you would normally use, override that option just for the current repository:
+If a project requires different configuration than your global defaults,
+we can override that option just for the current repository:
 
 ```shell
 [~/repos/git-demo-repo] % git config pull.rebase false  # no --global flag
@@ -138,9 +144,9 @@ If you need to work on a project with different configuration than you would nor
 
 ## Commit to a Git Repository
 
-At this point, we still have nothing in the Git repo besides the `.git` directory.
+At this point, the Git repo should be empty (except for the `.git` directory).
 
-Check git status to confirm:
+Check Git status to confirm:
 
 ```shell
 [~/repos/git-demo-repo] % git status
@@ -184,8 +190,8 @@ nothing added to commit but untracked files present (use "git add" to track)
 ```
 
 Now Git is aware that something is in the repository, but it is not yet actively tracking changes to it.
-You can add any amount of changes to the README, and still all Git will know is that there is some untracked file named `README.md` sitting there.
-If you delete the file, the changes will be gone forever.
+We can add any amount of changes to the README, and still all Git will know is that there is some untracked file named `README.md` sitting there.
+If we delete the file, the changes will be gone forever.
 
 We can change this by adding the file to Git's index, then checking the status again:
 
@@ -227,10 +233,10 @@ Changes not staged for commit:
 So nothing has been committed, but Git is tracking `README.md`, and it are aware that
 something has changed since the README was last added or staged.
 
-Check what has changed (hit q to exit the diff viewer Git will open in the terminal):
+Use Git's diff command to review what has changed:
 
 ```shell
-[~/repos/git-demo-repo] % git diff
+[~/repos/git-demo-repo] % git diff  # press q to exit the viewer
 
 diff --git a/README.md b/README.md
 index 5676235..8f8bd34 100644
@@ -258,7 +264,7 @@ Changes to be committed:
   (use "git rm --cached <file>..." to unstage)
 	new file:   README.md
 
-[~/repos/git-demo-repo] % git diff  # again, press q to exit the diff viewer
+[~/repos/git-demo-repo] % git diff  # press q to exit the viewer
 
 byte 0/0 (END)
 ```
@@ -266,3 +272,39 @@ byte 0/0 (END)
 If we have nothing further to change, we are ready to submit this changeset to the Git history
 
 ### Record the First Commit
+
+#### Git Commit
+
+The primary requirement for a Git commit is that it has a commit message.
+While this can be overridden, it is not recommended.
+
+The easiest way to provide a commit message is via the Git commit command's `--message/-m` option:
+
+```shell
+[~/repos/git-demo-repo] % git commit -m "initial commit"
+[main (root-commit) e1fd443] initial commit
+ 1 file changed, 1 insertion(+)
+ create mode 100644 README.md
+```
+
+When a commit messages is not provided via the `--message/-m` option,
+Git will prompt for a message by opening the system default terminal text editor.
+For most Linux and Mac users, this is likely to be the notoriously-non-beginner-friendly
+Vi or Vim editors - so you may want to learn the very basics of Vim in short order.
+
+### View the Change Log
+
+#### Git Log
+
+```shell
+[~/repos/git-demo-repo] % git log  # press q to exit the viewer
+
+commit e1fd443f48ac0f4729fdf6cc931fb941bdda0bf8 (HEAD -> main)
+Author: francoposa <franco@francoposa.io>
+Date:   Tue Nov 21 17:20:01 2023 -0600
+
+    initial commit
+lines 1-5/5 (END)
+```
+
+Voilà!
