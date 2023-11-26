@@ -939,6 +939,7 @@ blockquote{
 .content > div > pre{
   margin-bottom: 1rem;
   padding: 1rem;
+  white-space: pre-wrap;
 }
 
 @media (min-width: 768px){
