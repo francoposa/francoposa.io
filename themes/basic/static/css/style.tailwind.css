@@ -894,49 +894,52 @@ blockquote{
   border-left: .25em solid rgb(200,200,200);
 }
 
-.content > h1, h2, h3, h4, h5 {
+h1, h2, h3, h4, h5 {
   font-family: 'Open Sans', system-ui, sans-serif;
   margin-top: 1.5rem;
   margin-bottom: 1rem;
 }
 
-.content > h1{
+h1{
   font-size: 2.25rem;
   line-height: 2.5rem;
   font-weight: 500;
 }
 
-.content > h2{
+h2{
   font-size: 1.875rem;
   line-height: 2.25rem;
   font-weight: 500;
 }
 
-.content > h3{
+h3{
   font-size: 1.5rem;
   line-height: 2rem;
   font-weight: 500;
 }
 
-.content > h4{
+h4{
   font-weight: 500;
 }
 
-.content > h5{
+h5{
   font-weight: 500;
 }
 
-.content > p{
+.content p{
   margin-bottom: 1rem;
 }
 
-.content > ul{
-  margin-bottom: 1rem;
+.content a{
+  text-decoration-line: underline;
+}
+
+.content ul{
   padding-left: 2rem;
   list-style-type: disc;
 }
 
-.content > div > pre{
+.content pre{
   margin-bottom: 1rem;
   padding: 1rem;
   white-space: pre-wrap;

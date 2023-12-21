@@ -15,46 +15,49 @@ blockquote {
     border-left: .25em solid rgb(200,200,200);
 }
 
-.content > h1, h2, h3, h4, h5 {
+h1, h2, h3, h4, h5 {
     font-family: 'Open Sans', system-ui, sans-serif;
     @apply mt-6;
     @apply mb-4;
 }
 
-.content > h1 {
+h1 {
     @apply text-4xl;
     @apply font-medium;
 }
 
-.content > h2 {
+h2 {
     @apply text-3xl;
     @apply font-medium;
 }
 
-.content > h3 {
+h3 {
     @apply text-2xl;
     @apply font-medium;
 }
 
-.content > h4 {
+h4 {
     @apply font-medium;
 }
 
-.content > h5 {
+h5 {
     @apply font-medium;
 }
 
-.content > p {
+.content p {
     @apply mb-4;
 }
 
-.content > ul {
-    @apply mb-4;
+.content a {
+    @apply underline;
+}
+
+.content ul {
     @apply pl-8;
     @apply list-disc;
 }
 
-.content > div > pre {
+.content pre {
     @apply mb-4;
     @apply p-4;
     @apply whitespace-pre-wrap;

@@ -7,7 +7,7 @@ enableGitInfo = true
 
 [markup]
 [markup.highlight]
-style = "monokailight"
+style = "catppuccin-latte"
 
 [params]
 AuthorName = "Franco Posa"
