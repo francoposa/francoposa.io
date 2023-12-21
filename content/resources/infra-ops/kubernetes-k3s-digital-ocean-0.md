@@ -55,7 +55,7 @@ Tools: Ansible, Helm, K3s, and DigitalOcean
 
 ### [DigitalOcean](https://digitalocean.com/)
 * Simple, affordable cloud computing products and interfaces
-  * importantly, the DigitalOcean "Droplet" cloud server comes with a public IPv4 address by default
+  * in particular, the DigitalOcean "Droplet" cloud server comes with a public IPv4 address by default
 * Integrations with common Infrastructure-as-Code tools: Ansible, Terraform, Pulumi, Crossplane, etc.
 
 ### [Ansible](https://docs.ansible.com/ansible/latest/)

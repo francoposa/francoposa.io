@@ -1,6 +1,6 @@
 ---
-title: "Zero to Production with Kubernetes, Part 3: Deploying a K3s Kubernetes Cluster to a DigitalOcean Server"
-summary: "K3s Installation, Configuration, and KubeConfig Management"
+title: "Zero to Production with Kubernetes, Part 3: Deploying a K3s Kubernetes Cluster with Ansible"
+summary: "K3s Installation, Configuration, and KubeConfig Management with Ansible"
 slug: kubernetes-k3s-ansible-digital-ocean-3
 aliases:
   - /resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-3/
@@ -8,14 +8,17 @@ date: 2023-04-16
 order_number: 4
 ---
 
+
+
 ## 1. Prepare K3s Configuration
 
 K3s can be configured with command-line arguments, environment variables, and a [config file](https://docs.k3s.io/installation/configuration#configuration-file).
-In keeping with a config-as-code/GitOps approach, we prefer to keep K3s config in a version-controlled file.
-Config files which support comments (as YAML does) also make it easier to maintain documentation on why any particular options were chosen.
 
-[K3s documentation for the server configuration](https://docs.k3s.io/cli/server) covers all server options in detail.
-We will not have to change much as the defaults are well-selected, particularly for single-node clusters.
+In keeping with a config-as-code/GitOps approach, we prefer to define configuration in version-controlled files.
+In particular, config formats which support comments (YAML, TOML, etc.) allow us to maintain notes on *why* particular options have been chosen.
+
+[K3s server configuration documentation](https://docs.k3s.io/cli/server) covers all server options in detail.
+We will not have to change much, as the defaults are well-selected particularly for single-node clusters.
 
 *./cloud-infra/ansible/k3s/config.yaml:*
 
@@ -30,7 +33,7 @@ write-kubeconfig-mode: "0644"
 # so the Ansible playbook can find-and-replace 'default' with the desired name
 node-name: default
 # set placeholder IPs so Ansible playbook can find-and-replace with node's public IP
-# if left unset, these values will also be unset, 0.0.0.0, or 127.0.0.1,
+# if left unset, these values may be unset, 0.0.0.0, or 127.0.0.1,
 # which makes it difficult to communicate with the cluster from outside the host
 tls-san: "x.x.x.x"
 node-external-ip: "x.x.x.x"

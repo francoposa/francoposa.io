@@ -12,13 +12,11 @@ order_number: 2
 
 ### Register SSH Keys to Your DigitalOcean Account
 
-[Generate an SSH keypair](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/create-with-openssh/) and
-[upload the SSH public key to DigitalOcean](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/to-account/).
+First, we need to [generate an Ed25519 SSH keypair](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key) and
+[upload the SSH public key to DigitalOcean](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/to-team/).
 
-Note that many newer distro images have deprecated RSA key access in favor of the more modern Edwards-curve signature algorithms.
-
-MD5 fingerprints of the SSH public keys will be used by the DigitalOcean API to identify the SSH keys in your account.
-Fingerprints can be generated with `ssh-keygen -l -E md5 -f [public key file]` as described [here](https://superuser.com/questions/421997/what-is-a-ssh-key-fingerprint-and-how-is-it-generated).
+The SSH public key's MD5 fingerprint will be used to identify the SSH key to the DigitalOcean API.
+The MD5 fingerprint for an SSH key can be viewed with `ssh-keygen -l -E md5 -f [public key file]` as described [here](https://superuser.com/questions/421997/what-is-a-ssh-key-fingerprint-and-how-is-it-generated).
 
 ### Create a DigitalOcean API Token
 
@@ -48,7 +46,7 @@ version = "0.1.0a0"
 
 [tool.poetry.dependencies]
 python = "^3.10"
-ansible = "7.*"
+ansible = "9.*"
 
 [tool.poetry.dev-dependencies]
 yamllint = "1.*"
@@ -127,7 +125,8 @@ By default, the Ansible module waits for the VM to be fully active before return
         size: s-1vcpu-2gb
         region: sfo3
         ssh_keys:
-          - "59:01:94:df:80:a9:97:3e:78:00:85:66:05:06:c7:42" # id_ed25519_infra_ops
+          # md5 fingerprint for our ed25519 ssh key
+          - "59:01:94:df:80:a9:97:3e:78:00:85:66:05:06:c7:42"
         user_data: "{{ lookup('ansible.builtin.file', '../../../cloud-init.sh') }}"
         oauth_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
       register: k3s_demo_master
@@ -220,23 +219,19 @@ if sshd -t -q; then systemctl restart sshd; fi
 
 ## 2. Confirm SSH Access to the Server
 
-Before we can do any actual work *on* the droplet, we need SSH access.
-
-Ensure the SSH key -
-one of the keys which was registered to the droplet upon creation -
-is registered with the SSH agent.
-Ansible will also use the local SSH agent for access to the server inventory.
+Ensure the SSH key which was registered to the droplet upon creation is registered with the SSH agent on our local machine:
 
 ```shell
 % ssh-add ~/.ssh/id_ed25519_infra_ops
 ```
 
-Test SSH access with the droplet IP address
-(printed from the debug task in the playbook or visible in the DigitalOcean web UI)
-and the non-root user created with the Cloud Init User Data script.
+Test SSH access with the droplet IP address and the non-root user created with the Cloud Init User Data script.
+The IP address is printed from the debug task in the playbook or visible in the DigitalOcean web UI.
 
 ```shell
 % ssh infra_ops@137.184.94.4
 Warning: Permanently added '137.184.94.4' (ED25519) to the list of known hosts.
 infra_ops@debian-s-1vcpu-2gb-sfo3-01:~$
 ```
+
+By default, Ansible will use this local SSH agent configuration for access to the server inventory.
