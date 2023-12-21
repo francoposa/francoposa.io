@@ -31,7 +31,7 @@ Additionally, install [`yamllint`](https://yamllint.readthedocs.io/en/stable/) t
 For `pip` users, `requirements.txt`:
 
 ```text
-ansible==5.*
+ansible==9.*
 yamllint=1.*
 ```
 
