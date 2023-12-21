@@ -20,9 +20,8 @@ In particular, config formats which support comments (YAML, TOML, etc.) allow us
 [K3s server configuration documentation](https://docs.k3s.io/cli/server) covers all server options in detail.
 We will not have to change much, as the defaults are well-selected particularly for single-node clusters.
 
-*./cloud-infra/ansible/k3s/config.yaml:*
-
 ```yaml
+# github.com/francoposa/learn-infra-ops/blob/main/infrastructure/ansible/k3s/config.yaml
 ---
 # override k3s default with standard kubeconfig location expected by kubectl
 write-kubeconfig: /home/infra_ops/.kube/config
@@ -46,13 +45,12 @@ bind-address: "x.x.x.x"
 % export DO_API_TOKEN=dop_v1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 % ansible-playbook \
-  --inventory ./cloud-infra/ansible/inventory/sources \
-  ./cloud-infra/ansible/k3s/install.yaml
+  --inventory ./infrastructure/ansible/inventory/sources \
+  ./infrastructure/ansible/k3s/install.yaml
 ```
 
-*./cloud-infra/ansible/k3s/install.yaml:*
-
 ```yaml
+# github.com/francoposa/learn-infra-ops/blob/main/infrastructure/ansible/k3s/install.yaml
 ---
 - hosts: k3s-demo-master
   become: yes
@@ -117,9 +115,8 @@ If this is not preferred, we have multiple viable options:
 
 As I am usually spinning up a fresh cluster after tearing down the last one, I use this playbook as-is, allowing the new `default` kubeconfig context to overwrite the old.
 
-*./cloud-infra/ansible/k3s/local-kube-config.yaml:*
-
 ```yaml
+# github.com/francoposa/learn-infra-ops/blob/main/infrastructure/ansible/k3s/local-kube-config.yaml
 ---
 - hosts: k3s-demo-master
   vars:

@@ -102,12 +102,11 @@ By default, the Ansible module waits for the VM to be fully active before return
 ```shell
 % export DO_API_TOKEN=dop_v1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-% ansible-playbook ./cloud-infra/ansible/inventory/mgmt/digitalocean-demo-create.yaml
+% ansible-playbook ./infrastructure/ansible/inventory/mgmt/digitalocean-demo-create.yaml
 ```
 
-*./cloud-infra/ansible/inventory/mgmt/digitalocean-demo-create.yaml:*
-
 ```yaml
+# github.com/francoposa/learn-infra-ops/blob/main/infrastructure/ansible/inventory/mgmt/digitalocean-demo-create.yaml
 ---
 - hosts: localhost
   tasks:

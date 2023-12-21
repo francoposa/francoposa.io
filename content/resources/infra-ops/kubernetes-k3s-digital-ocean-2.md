@@ -64,6 +64,7 @@ Our single host is in all three groups we created: `k3s-demo-master` for the mas
 A bare-bones static inventory definition to assign our host to three host groups would look like below:
 
 ```yaml
+# github.com/francoposa/learn-infra-ops/blob/main/infrastructure/ansible/inventory/sources/digitalocean-static-example.yaml
 ---
 demo:  # host group
    hosts:
@@ -95,9 +96,8 @@ The [DigitalOcean inventory plugin](https://docs.ansible.com/ansible/latest/coll
 
 We can use a simplified version of the plugin config example in the DigitalOcean inventory plugin docs:
 
-*./cloud-infra/ansible/inventory/sources/digitalocean.yaml:*
-
 ```yaml
+# github.com/francoposa/learn-infra-ops/blob/main/infrastructure/ansible/inventory/sources/digitalocean.yaml
 ---
 plugin: community.digitalocean.digitalocean
 api_token: "{{ lookup('ansible.builtin.env', 'DO_API_TOKEN') }}"
@@ -123,7 +123,7 @@ compose:
 We can check the dynamic inventory output with a graph view of just the hosts:
 
 ```shell
-% ansible-inventory -i ./cloud-infra/ansible/inventory/sources/digitalocean.yaml --graph  # add --vars to see all host variables
+% ansible-inventory -i ./infrastructure/ansible/inventory/sources/digitalocean.yaml --graph  # add --vars to see all host variables
 ```
 
 ```shell
@@ -140,7 +140,7 @@ We can check the dynamic inventory output with a graph view of just the hosts:
 or a full view in the same format as a static inventory file:
 
 ```shell
-% ansible-inventory -i ./cloud-infra/ansible/inventory/sources/digitalocean.yaml --list --yaml
+% ansible-inventory -i ./infrastructure/ansible/inventory/sources/digitalocean.yaml --list --yaml
 ```
 
 ```yaml
@@ -179,7 +179,7 @@ We can add the following to `[inventory directory]/group_vars/all.yaml`, or `dem
 ansible_user: infra_ops
 ```
 
-Now if we run `ansible-inventory -i ./cloud-infra/ansible/inventory/sources/digitalocean.yaml --list --yaml` again, you will see the `ansible_user` variable applied to the host.
+Now if we run `ansible-inventory -i ./infrastructure/ansible/inventory/sources/digitalocean.yaml --list --yaml` again, you will see the `ansible_user` variable applied to the host.
 
 ```yaml
 all:
@@ -198,13 +198,12 @@ all:
 % export DO_API_TOKEN=dop_v1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 % ansible-playbook \
-  --inventory ./cloud-infra/ansible/inventory/sources/digitalocean.yaml \
-  ./cloud-infra/ansible/inventory/mgmt/digitalocean-demo-shell-example.yaml
+  --inventory ./infrastructure/ansible/inventory/sources/digitalocean.yaml \
+  ./infrastructure/ansible/inventory/mgmt/digitalocean-demo-shell-example.yaml
 ```
 
-*./cloud-infra/ansible/inventory/mgmt/digitalocean-demo-shell-example.yaml:*
-
 ```yaml
+# github.com/francoposa/learn-infra-ops/blob/main/infrastructure/ansible/inventory/mgmt/digitalocean-demo-shell-example.yaml
 ---
 - hosts: k3s-demo-master
   tasks:
