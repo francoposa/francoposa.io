@@ -6,13 +6,11 @@ date: 2023-10-02
 order_number: 1
 ---
 
-##
-
-**This document is a work in progress**
-
 ## 0. Prerequisites
 
-* the `git` command-line tool installed on your machine
+### 0.1 Install Git
+
+Most machines will already have `git` installed, but the Git official book provides [install instructions](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) as well.
 
 ## 1. Initialize Global Git Configuration
 

@@ -8,6 +8,16 @@ date: 2022-07-30
 order_number: 3
 ---
 
+## 0. Prerequisites
+
+### 0.1 Export the DigitalOcean API Token
+Make the API token created in Part 1 available to our shell environment,
+with the variable name expected by the DigitalOcean Ansible inventory plugin:
+
+```shell
+export DO_API_TOKEN=dop_v1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
 ## 1. Ansible Inventory Basics
 
 If you are familiar with Ansible inventory, jump to [Using Dynamic Inventory Plugins]({{< relref "#3-using-dynamic-inventory-plugins" >}})

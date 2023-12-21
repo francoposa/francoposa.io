@@ -10,7 +10,7 @@ order_number: 2
 
 ## 0. Prerequisites
 
-### Register SSH Keys to Your DigitalOcean Account
+### 0.1 Register SSH Keys to Your DigitalOcean Account
 
 First, we need to [generate an Ed25519 SSH keypair](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key) and
 [upload the SSH public key to DigitalOcean](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/to-team/).
@@ -18,12 +18,12 @@ First, we need to [generate an Ed25519 SSH keypair](https://docs.github.com/en/a
 The SSH public key's MD5 fingerprint will be used to identify the SSH key to the DigitalOcean API.
 The MD5 fingerprint for an SSH key can be viewed with `ssh-keygen -l -E md5 -f [public key file]` as described [here](https://superuser.com/questions/421997/what-is-a-ssh-key-fingerprint-and-how-is-it-generated).
 
-### Create a DigitalOcean API Token
+### 0.2 Create a DigitalOcean API Token
 
 [Create a Personal Access Token](https://docs.digitalocean.com/reference/api/create-personal-access-token/).
 Give the token the `write` scope in order to be able to create, update, and delete cloud resources in your account.
 
-### Install Ansible
+### 0.3 Install Ansible
 
 In a Python virtual environment, install the latest version of Ansible 5.
 Additionally, install [`yamllint`](https://yamllint.readthedocs.io/en/stable/) to validate all the YAML we will be working with for both Ansible and Kubernetes.
@@ -59,7 +59,7 @@ requires = ["poetry>=0.12"]
 Without deploying Ansible to run on a server, the distinction between the standard dependencies and "dev" dependencies is not particularly important.
 In general, we keep static analysis and testing tools in `dev-dependencies` when using Poetry.
 
-### Install the Ansible Community DigitalOcean Collection
+### 0.4 Install the Ansible Community DigitalOcean Collection
 
 The DigitalOcean Ansible collection wraps the DigitalOcean API to provide a cloud infrastructure automation experience consistent with standard Ansible usage.
 
