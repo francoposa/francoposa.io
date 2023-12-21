@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Courier+Prime&family=Open+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime&family=Work+Sans:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -16,32 +16,29 @@ blockquote {
 }
 
 h1, h2, h3, h4, h5 {
-    font-family: 'Open Sans', system-ui, sans-serif;
+    font-family: 'Work Sans', system-ui, sans-serif;
     @apply mt-6;
     @apply mb-4;
 }
 
 h1 {
     @apply text-4xl;
-    @apply font-medium;
 }
 
 h2 {
     @apply text-3xl;
-    @apply font-medium;
 }
 
 h3 {
     @apply text-2xl;
+}
+
+:is(h1,h2,h3) {
     @apply font-medium;
 }
 
-h4 {
-    @apply font-medium;
-}
-
-h5 {
-    @apply font-medium;
+:is(h4,h5) {
+    @apply font-semibold;
 }
 
 .content p {
@@ -61,4 +58,5 @@ h5 {
     @apply mb-4;
     @apply p-4;
     @apply whitespace-pre-wrap;
+    @apply text-sm;
 }
