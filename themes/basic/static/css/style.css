@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Courier+Prime&family=Work+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -39,6 +39,10 @@ h3 {
 
 :is(h4,h5) {
     @apply font-semibold;
+}
+
+code {
+    background-color: rgb(240, 240, 240);
 }
 
 .content p {
