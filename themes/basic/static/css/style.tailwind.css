@@ -917,6 +917,11 @@ code {
   list-style-type: disc;
 }
 
+.content ol{
+  padding-left: 2rem;
+  list-style-type: decimal;
+}
+
 .content pre{
   margin-bottom: 1rem;
   padding: 1rem;

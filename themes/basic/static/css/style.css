@@ -58,6 +58,11 @@ code {
     @apply list-disc;
 }
 
+.content ol {
+    @apply pl-8;
+    @apply list-decimal;
+}
+
 .content pre {
     @apply mb-4;
     @apply p-4;
