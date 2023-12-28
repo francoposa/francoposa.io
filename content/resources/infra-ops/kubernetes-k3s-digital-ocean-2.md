@@ -8,6 +8,39 @@ date: 2022-07-30
 order_number: 3
 ---
 
+## Purpose
+
+### Reproducible Infrastructure
+
+With a cloud server now available to us in the form of a DigitalOcean "Droplet" VM,
+it may seem like we are ready to rip - we could SSH into the VM and start running command after command.
+
+But cloud servers are not the cheapest thing to keep up and running if they are not always in use.
+When we tear down the VM, what happens to our history of commands we used?
+What if we want to run those commands on two servers at once, or ten, or a thousand?
+What if we want to reproduce the same effects on Linux server distros that utilize different commands?
+
+Modern approaches to infrastructure operations enable us to treat our servers as "cattle, not pets".
+We want to be able to update, rollback, delete, and reproduce our infrastructure over and over again,
+across time periods and environments with speed and confidence.
+
+### Ansible's Role
+
+Ansible's inventory system allows us to herd the cattle of our servers
+from various cloud providers, regions, or on-prem locations, into arbitrary "host groups".
+
+Ansible's modules then allow us to configure the servers and install software without much regard
+to the host's location, operating system, or other painful idiosyncrasies.
+
+## Goals
+
+We will:
+
+1. Learn the basic concepts of Ansible's "inventory", organizing hosts into named groups
+2. Declare our DigitalOcean VM as static Ansible inventory
+3. Convert the static declaration to dynamic inventory, synced from our DigitalOcean account
+4. Run our first Ansible playbook against the dynamic inventory
+
 ## 0. Prerequisites
 
 ### 0.1 Export the DigitalOcean API Token
@@ -15,7 +48,7 @@ Make the API token created in Part 1 available to our shell environment,
 with the variable name expected by the DigitalOcean Ansible inventory plugin:
 
 ```shell
-export DO_API_TOKEN=dop_v1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+% export DO_API_TOKEN=dop_v1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
 ## 1. Ansible Inventory Basics
@@ -189,7 +222,11 @@ We can add the following to `[inventory directory]/group_vars/all.yaml`, or `dem
 ansible_user: infra_ops
 ```
 
-Now if we run `ansible-inventory -i ./infrastructure/ansible/inventory/sources/digitalocean.yaml --list --yaml` again, you will see the `ansible_user` variable applied to the host.
+Now if we run our Ansible inventory list commands again, we can see the `ansible_user` variable applied to the host.
+
+```shell
+% ansible-inventory -i ./infrastructure/ansible/inventory/sources/digitalocean.yaml --list --yaml
+```
 
 ```yaml
 all:
@@ -204,18 +241,15 @@ all:
 
 ## 5. Running an Ansible Playbook with Dynamic Inventory
 
-```shell
-% export DO_API_TOKEN=dop_v1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+With the dynamic inventory plugin hooked up to our DigitalOcean account and the host variables in place,
+we can test the usage of the inventory in an Ansible playbook.
 
-% ansible-playbook \
-  --inventory ./infrastructure/ansible/inventory/sources/digitalocean.yaml \
-  ./infrastructure/ansible/inventory/mgmt/digitalocean-demo-shell-example.yaml
-```
+We will keep it simple, just using some shell output to verify that the playbook is running on the intended host:
 
 ```yaml
 # github.com/francoposa/learn-infra-ops/blob/main/infrastructure/ansible/inventory/mgmt/digitalocean-demo-shell-example.yaml
 ---
-- hosts: k3s-demo-master
+- hosts: k3s-master
   tasks:
     - name: cat hostname
       shell: |
@@ -227,3 +261,31 @@ all:
         msg: |
           {{ cat_hostname.stdout_lines }}
 ```
+
+Run the Ansible playbook:
+
+```shell
+% ansible-playbook \
+  --inventory ./infrastructure/ansible/inventory/sources/digitalocean.yaml \
+  ./infrastructure/ansible/inventory/mgmt/digitalocean-demo-shell-example.yaml
+```
+
+The output from `cat /etc/hostname` on the DigitalOcean VM should match the `ansible_host`
+we get from the inventory plugin - in this example, `debian-s-1vcpu-2gb-sfo3-01`.
+
+## Conclusion
+
+At this point we have gained some familiarity with the basic structure of Ansible's "Inventory" concept
+used to organize host and assign variables to them.
+
+We have the ability to declare static inventory in flat file, which can be an easy way to get started but a pain
+to maintain in the dynamic, ephemeral environments of modern infrastructure.
+
+Finally, we address the pain points of static inventory with the use of an Ansible dynamic inventory plugin,
+allowing the DigitalOcean API to provide a live view of the host inventory.
+With the DigitalOcean VMs mapped into Ansible host groups based on tags and labels,
+our Ansible playbooks can now be run against these dynamic host groups without the need to
+continuously juggle DNS hostnames or IP addresses.
+
+Though the dynamic inventory setup has more initial complexity for our current example use case of a single host,
+it will pay off down the line as the our infrastructure components are rotated, destroyed, and recreated.
