@@ -8,36 +8,12 @@ date: 2022-07-30
 order_number: 3
 ---
 
-## Purpose
-
-### Reproducible Infrastructure
-
-With a cloud server now available to us in the form of a DigitalOcean "Droplet" VM,
-it may seem like we are ready to rip - we could SSH into the VM and start running command after command.
-
-But cloud servers are not the cheapest thing to keep up and running if they are not always in use.
-When we tear down the VM, what happens to our history of commands we used?
-What if we want to run those commands on two servers at once, or ten, or a thousand?
-What if we want to reproduce the same effects on Linux server distros that utilize different commands?
-
-Modern approaches to infrastructure operations enable us to treat our servers as "cattle, not pets".
-We want to be able to update, rollback, delete, and reproduce our infrastructure over and over again,
-across time periods and environments with speed and confidence.
-
-### Ansible's Role
-
-Ansible's inventory system allows us to herd the cattle of our servers
-from various cloud providers, regions, or on-prem locations, into arbitrary "host groups".
-
-Ansible's modules then allow us to configure the servers and install software without much regard
-to the host's location, operating system, or other painful idiosyncrasies.
-
 ## Goals
 
 We will:
 
 1. Learn the basic concepts of Ansible's "inventory", organizing hosts into named groups
-2. Declare our DigitalOcean VM as static Ansible inventory
+2. Declare our DigitalOcean server as static Ansible inventory
 3. Convert the static declaration to dynamic inventory, synced from our DigitalOcean account
 4. Run our first Ansible playbook against the dynamic inventory
 
@@ -93,12 +69,12 @@ While we will ultimately move on to using dynamic inventory, we can first take a
 
 #### Declaring Static Host Groups
 
-When we created our VM with the DigitalOcean Ansible module in [Part 1](/resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-1/), we assigned three tags with the intention of using them later as the Ansible host groups.
+When we created our server with the DigitalOcean Ansible module in [Part 1](/resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-1/), we assigned three tags with the intention of using them later as the Ansible host groups.
 Our single host is in all three groups we created: `k3s-demo-master` for the master node, `k3s demo`, used for all nodes in the cluster, and `demo` for all resources in the "demo" project of the DigitalOcean account.
 
 #### Assigning Static Host Variables
 
-* `ansible_host` - the public IPv4 address assigned to the VM on creation from DigitalOcean's public IP space.
+* `ansible_host` - the public IPv4 address assigned to the server on creation from DigitalOcean's public IP space.
 * `ansible_user` - the `USERNAME` from the [Cloud Init script from Part 1](/resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-1/#cloud-init-and-user-data).
   * use DigitalOcean's default `root` user if you skipped the user setup via cloud-init step
 
@@ -270,7 +246,7 @@ Run the Ansible playbook:
   ./infrastructure/ansible/inventory/mgmt/digitalocean-demo-shell-example.yaml
 ```
 
-The output from `cat /etc/hostname` on the DigitalOcean VM should match the `ansible_host`
+The output from `cat /etc/hostname` on the DigitalOcean server should match the `ansible_host`
 we get from the inventory plugin - in this example, `debian-s-1vcpu-2gb-sfo3-01`.
 
 ## Conclusion
@@ -283,7 +259,7 @@ to maintain in the dynamic, ephemeral environments of modern infrastructure.
 
 Finally, we address the pain points of static inventory with the use of an Ansible dynamic inventory plugin,
 allowing the DigitalOcean API to provide a live view of the host inventory.
-With the DigitalOcean VMs mapped into Ansible host groups based on tags and labels,
+With the DigitalOcean servers mapped into Ansible host groups based on tags and labels,
 our Ansible playbooks can now be run against these dynamic host groups without the need to
 continuously juggle DNS hostnames or IP addresses.
 

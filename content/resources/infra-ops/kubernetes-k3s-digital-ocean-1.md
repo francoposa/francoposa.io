@@ -1,12 +1,21 @@
 ---
 title: "Zero to Production with Kubernetes, Part 1: Creating a DigitalOcean Server with Ansible"
-summary: "Ansible, Ansible Collections, DigitalOcean VMs, and Initial Server Configuration"
+summary: "Ansible, Ansible Collections, DigitalOcean Droplets, and Initial Server Configuration"
 slug: zero-to-production-with-kubernetes-1
 aliases:
   - /resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-1/
 date: 2021-07-27
 order_number: 2
 ---
+
+## Goals
+
+We will:
+
+1. Create a cloud server on DigitalOcean using an idempotent Ansible playbook
+2. Assign labels to the server for later use with Ansible's host inventory management
+3. Supply the server with an init script to secure the SSH access configuration
+4. Confirm SSH access to the Server
 
 ## 0. Prerequisites
 
@@ -68,25 +77,25 @@ A full Ansible installation pulls in the DigitalOcean collection as part of Ansi
 To check which version is installed:
 
 ```shell
-% ansible-galaxy collection list
+ansible-galaxy collection list
 ```
 
 or
 
 ```shell
-% ansible-galaxy collection list | grep digitalocean
+ansible-galaxy collection list | grep digitalocean
 ```
 
 To upgrade the collection to the latest version:
 
 ```shell
-% ansible-galaxy collection install community.digitalocean --upgrade
+ansible-galaxy collection install community.digitalocean --upgrade
 ```
 
 To install a particular version of the collection:
 
 ```shell
-% ansible-galaxy collection install community.digitalocean:==1.15.0
+ansible-galaxy collection install community.digitalocean:==1.15.0
 ```
 
 ## 1. Create a DigitalOcean Server with Ansible
@@ -96,8 +105,8 @@ To install a particular version of the collection:
 > you can use, either standalone or as part of a larger, cloud-based
 > infrastructure.
 
-We can create a DigitalOcean VM with the Ansible [`community.digitalocean.digital_ocean_droplet`](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_droplet_module.html) module.
-By default, the Ansible module waits for the VM to be fully active before returning success.
+We can create a DigitalOcean server with the Ansible [`community.digitalocean.digital_ocean_droplet`](https://docs.ansible.com/ansible/latest/collections/community/digitalocean/digital_ocean_droplet_module.html) module.
+By default, the Ansible module waits for the server to be fully active before returning success.
 
 ```shell
 % export DO_API_TOKEN=dop_v1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -167,7 +176,7 @@ Current slugs are also available directly from the DigitalOcean CLI:
 On first boot, the configuration can set up user accounts, apply networking rules, install packages and much more.
 
 To keep things simple and familiar, we only utilize [User-Data script format](https://cloudinit.readthedocs.io/en/latest/index.html),
-which allows Cloud Init to run arbitrary shell scripts during the VM initialization.
+which allows Cloud Init to run arbitrary shell scripts during the server initialization.
 Sticking to the shell script format allows us to run and test locally if needed without knowing anything else about Cloud Init.
 
 I use the following script, adapted from both DigitalOcean's [Recommended Droplet Setup](https://docs.digitalocean.com/tutorials/recommended-droplet-setup/) guide,
