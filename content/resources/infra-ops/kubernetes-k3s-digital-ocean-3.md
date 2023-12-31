@@ -8,6 +8,44 @@ date: 2023-04-16
 order_number: 4
 ---
 
+## Goals
+
+We will:
+
+1. Prepare a config file for a K3s master node installation
+2. Use Ansible to mount the K3s config to our cloud server and install the K3s master node
+3. Copy the K3s kube config to our local machine for use with `kubectl`, the standard Kubernetes command-line tool
+4. Confirm access to the remote K3s cluster from our local machine with `kubectl`
+
+## 0. Prerequisites
+
+### 0.1 Configure Ansible Host Inventory
+
+In [Part 1](/resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-1) we created a DigitalOcean server with Ansible,
+and in [Part 2](/resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-2) we learned how to address the server
+with Ansible's inventory system using both static declarations and dynamic inventory plugins.
+
+From here on out, we do not specifically require our host to be a DigitalOcean server
+as long as the host is addressable via our Ansible inventory.
+
+The Ansible playbooks here address the host group `k3s-demo-master`.
+We can use the static or dynamic inventories strategies to assign any existing host into this group,
+or update the playbooks used here to address any other existing Ansible host group we may have.
+
+### 0.2 Export the DigitalOcean API Token
+Make the API token created in Part 1 available to our shell environment,
+with the variable name expected by the DigitalOcean Ansible inventory plugin:
+
+```shell
+% export DO_API_TOKEN=dop_v1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+### 0.3 Install the `kubectl` Command-Line Tooling
+
+Install `kubectl` with the official Kubernetes guide [here](https://kubernetes.io/docs/tasks/tools/#kubectl).
+
+Additionally, many Kubernetes users also rely on [`kubectx` and `kubens`](https://github.com/ahmetb/kubectx),
+which provide an easy way to switch which "contexts" (clusters) and "namespaces" without typing out the command-line arguments to `kubectl` every time.
 
 
 ## 1. Prepare K3s Configuration
@@ -39,7 +77,7 @@ node-external-ip: "x.x.x.x"
 bind-address: "x.x.x.x"
 ```
 
-## 2. Copy K3s Config to Droplet and Install K3s with Ansible
+## 2. Copy K3s Config to Server and Install K3s with Ansible
 
 ```shell
 % export DO_API_TOKEN=dop_v1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -123,7 +161,7 @@ As I am usually spinning up a fresh cluster after tearing down the last one, I u
     local_k3s_demo_kube_config_path: ~/.kube/digitalocean-demo-k3s-demo.yaml
   tasks:
     - name: copy master kube config to local
-      fetch:
+      ansible.builtin.fetch:
         src: /etc/rancher/k3s/k3s.yaml
         dest: "{{ local_k3s_demo_kube_config_path }}"
         flat: true
@@ -132,7 +170,7 @@ As I am usually spinning up a fresh cluster after tearing down the last one, I u
         var: hostvars[inventory_hostname].ansible_host
     - name: replace kube config localhost with master ip
       delegate_to: localhost
-      replace:
+      ansible.builtin.replace:
         path: "{{ local_k3s_demo_kube_config_path }}"
         regexp: '127\.0\.0\.1'  # ansible only likes single quotes for this regex
         replace: "{{ hostvars[inventory_hostname].ansible_host }}"
@@ -141,20 +179,35 @@ As I am usually spinning up a fresh cluster after tearing down the last one, I u
       # https://stackoverflow.com/questions/46184125/how-to-merge-kubectl-config-file-with-kube-config
       # the KUBECONFIG order of files matters; if there are two clusters or users with
       # the same name, the merge will keep the one from the file listed first
-      shell: |
-          KUBECONFIG={{ local_k3s_demo_kube_config_path }}:~/.kube/config \
-          kubectl config view --merge --flatten > ~/.kube/config_merged \
-          && mv ~/.kube/config_merged ~/.kube/config \
-          && rm {{ local_k3s_demo_kube_config_path }} \
-          && chmod 600 ~/.kube/config
+      ansible.builtin.shell: |
+        KUBECONFIG={{ local_k3s_demo_kube_config_path }}:~/.kube/config \
+        kubectl config view --merge --flatten > ~/.kube/config_merged \
+        && mv ~/.kube/config_merged ~/.kube/config \
+        && rm {{ local_k3s_demo_kube_config_path }} \
+        && chmod 600 ~/.kube/config
 
 ```
 Now, we can manage our cluster with `kubectl` from our local machine:
 
 ```shell
+% kubectl cluster-info
+Kubernetes control plane is running at https://137.184.2.102:6443
+CoreDNS is running at https://137.184.2.102:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+Metrics-server is running at https://137.184.2.102:6443/api/v1/namespaces/kube-system/services/https:metrics-server:https/proxy
+
 % kubectl get nodes
 NAME              STATUS   ROLES                  AGE   VERSION
 k3s-demo-master   Ready    control-plane,master   16d   v1.26.4+k3s1
 % kubectl cluster-info
 Kubernetes control plane is running at https://137.184.2.102:6443
+
 ```
+
+## Conclusion
+
+We now have a fully-functioning single-node K3s Kubernetes cluster running and available in a cloud server.
+The public IP address assigned to the VM allows us to manage our server and kubernetes cluster from anywhere.
+
+Moreover, all of our configuration and installation steps are declared in version-controlled files,
+enabling us to duplicate the same infrastructure state across as many hosts as we want,
+or repeat the same infrastructure state in a single host after tearing it down and spinning it back up.

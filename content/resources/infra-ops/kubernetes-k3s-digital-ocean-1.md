@@ -77,25 +77,25 @@ A full Ansible installation pulls in the DigitalOcean collection as part of Ansi
 To check which version is installed:
 
 ```shell
-ansible-galaxy collection list
+% ansible-galaxy collection list
 ```
 
 or
 
 ```shell
-ansible-galaxy collection list | grep digitalocean
+% ansible-galaxy collection list | grep digitalocean
 ```
 
 To upgrade the collection to the latest version:
 
 ```shell
-ansible-galaxy collection install community.digitalocean --upgrade
+% ansible-galaxy collection install community.digitalocean --upgrade
 ```
 
 To install a particular version of the collection:
 
 ```shell
-ansible-galaxy collection install community.digitalocean:==1.15.0
+% ansible-galaxy collection install community.digitalocean:==1.15.0
 ```
 
 ## 1. Create a DigitalOcean Server with Ansible

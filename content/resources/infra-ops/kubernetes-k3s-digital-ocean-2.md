@@ -225,10 +225,10 @@ We will keep it simple, just using some shell output to verify that the playbook
 ```yaml
 # github.com/francoposa/learn-infra-ops/blob/main/infrastructure/ansible/inventory/mgmt/digitalocean-demo-shell-example.yaml
 ---
-- hosts: k3s-master
+- hosts: k3s-demo-master
   tasks:
     - name: cat hostname
-      shell: |
+      ansible.builtin.shell: |
         cat /etc/hostname
       register: cat_hostname
 
@@ -236,6 +236,7 @@ We will keep it simple, just using some shell output to verify that the playbook
       ansible.builtin.debug:
         msg: |
           {{ cat_hostname.stdout_lines }}
+
 ```
 
 Run the Ansible playbook:
@@ -251,7 +252,7 @@ we get from the inventory plugin - in this example, `debian-s-1vcpu-2gb-sfo3-01`
 
 ## Conclusion
 
-At this point we have gained some familiarity with the basic structure of Ansible's "Inventory" concept
+We now have some basic familiarity with the structure of Ansible's inventory concepts
 used to organize host and assign variables to them.
 
 We have the ability to declare static inventory in flat file, which can be an easy way to get started but a pain
@@ -264,4 +265,4 @@ our Ansible playbooks can now be run against these dynamic host groups without t
 continuously juggle DNS hostnames or IP addresses.
 
 Though the dynamic inventory setup has more initial complexity for our current example use case of a single host,
-it will pay off down the line as the our infrastructure components are rotated, destroyed, and recreated.
+it will pay off down the line as our infrastructure components are rotated, destroyed, and recreated.
