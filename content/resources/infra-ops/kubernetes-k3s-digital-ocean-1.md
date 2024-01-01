@@ -257,9 +257,9 @@ or to ensure one that we previously created still exists and is turned on.
 
 Our playbook uses the DigitalOcean Ansible Collection as a wrapper for the DigitalOcean API,
 allowing to specify the region, size, and Linux distro for the server.
-Tags or labels are assigned to the server so that we can later address the hots via its tags
+Tags or labels are assigned to the server so that we can later address the host via its tags,
 rather than always checking up on which IP address our latest server instances have.
 
-Finally, we have supplied a user data script to secure the server's SSH configuration,
+Finally, we have supplied a Cloud Init script to secure the server's SSH configuration,
 disabling root user access and password-based access so only our SSH key and our newly
 created non-root user can log in to administer the server.
