@@ -171,11 +171,11 @@ Current slugs are also available directly from the DigitalOcean CLI:
 * `ssh_keys`: md5 fingerprints of the SSH keys which can access the droplet
 * `user_data`: User Data script for Cloud-Init-compatible distros - see below for details
 
-### Cloud Init and User Data
+### 1.1 Cloud Init and User Data
 [Cloud Init](https://cloudinit.readthedocs.io/en/latest/index.html) is a standardized approach to configuring cloud compute instances.
 On first boot, the configuration can set up user accounts, apply networking rules, install packages and much more.
 
-To keep things simple and familiar, we only utilize [User-Data script format](https://cloudinit.readthedocs.io/en/latest/index.html),
+To keep things simple and familiar, we only utilize [user data script format](https://cloudinit.readthedocs.io/en/latest/explanation/format.html#user-data-script),
 which allows Cloud Init to run arbitrary shell scripts during the server initialization.
 Sticking to the shell script format allows us to run and test locally if needed without knowing anything else about Cloud Init.
 
@@ -242,4 +242,24 @@ Warning: Permanently added '137.184.94.4' (ED25519) to the list of known hosts.
 infra_ops@debian-s-1vcpu-2gb-sfo3-01:~$
 ```
 
+We can also check that the root user is denied access, even with the correct SSH key:
+```shell
+% ssh root@137.184.94.4
+root@137.184.94.4: Permission denied (publickey).
+```
+
 By default, Ansible will use this local SSH agent configuration for access to the server inventory.
+
+## Conclusion
+
+We now have an idempotent Ansible playbook to initialize a DigitalOcean server with a public IP address,
+or to ensure one that we previously created still exists and is turned on.
+
+Our playbook uses the DigitalOcean Ansible Collection as a wrapper for the DigitalOcean API,
+allowing to specify the region, size, and Linux distro for the server.
+Tags or labels are assigned to the server so that we can later address the hots via its tags
+rather than always checking up on which IP address our latest server instances have.
+
+Finally, we have supplied a user data script to secure the server's SSH configuration,
+disabling root user access and password-based access so only our SSH key and our newly
+created non-root user can log in to administer the server.

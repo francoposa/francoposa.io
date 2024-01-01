@@ -252,8 +252,8 @@ we get from the inventory plugin - in this example, `debian-s-1vcpu-2gb-sfo3-01`
 
 ## Conclusion
 
-We now have some basic familiarity with the structure of Ansible's inventory concepts
-used to organize host and assign variables to them.
+We now have some basic familiarity with the structure of Ansible's inventory concepts,
+used to organize hosts into host groups and assign variables to them.
 
 We have the ability to declare static inventory in flat file, which can be an easy way to get started but a pain
 to maintain in the dynamic, ephemeral environments of modern infrastructure.
