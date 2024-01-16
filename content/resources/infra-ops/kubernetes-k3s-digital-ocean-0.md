@@ -1,6 +1,6 @@
 ---
 title: "Zero to Production with Kubernetes, Part 0: Goals and Tool Selection"
-summary: "DigitalOcean Droplets, Ansible, K3s, and Helm"
+summary: "Software Infrastructure and Operations with DigitalOcean Droplets, Ansible, K3s, and Helm"
 slug: zero-to-production-with-kubernetes-0
 aliases:
   - /resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-0/
@@ -8,7 +8,30 @@ date: 2021-07-27
 order_number: 1
 ---
 
+## Purpose
+
+As software engineers, the early months and years of our careers are often highly focused just on writing _working_ code.
+Then, as soon as we have our heads above water, we immediately seek (or are asked to) to write clearer code,
+more impactful code, more performant code, and to solve increasingly complex technical or end-user problems.
+
+All of this coding and technical education and growth is often confined within the application boundary -
+a mobile app, a web frontend, a backend CRUD server, or a data pipeline.
+We rarely learn in any depth - if at all - how to deploy and operate our software in production.
+
+This gap in experience and knowledge limits our ability to take advantage of one of the most unique aspects
+and greatest joys of software engineering, which is that a single person or a very small team can create,
+deploy, and operate a nontrivial application or entire system of software.
+
+Let's get to it.
+
 ## Goals
+
+This series of guides seeks to a strike a balance between learning and getting shit done.
+These two options are naturally in tension, and balance chosen by the guides may not be for everyone.
+Feel free to skip over explanations when you are in the mood to just get shit done,
+or to deep dive into the resources and documentation when you are hungry to learn more.
+
+With that said, we will:
 
 ### 1. Ship Software!
 
