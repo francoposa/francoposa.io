@@ -27,7 +27,7 @@ Let's get to it.
 ## Goals
 
 This series of guides seeks to a strike a balance between learning and getting shit done.
-These two options are naturally in tension, and balance chosen by the guides may not be for everyone.
+These two options are naturally in tension, and then balance chosen by the guides may not be for everyone.
 Feel free to skip over explanations when you are in the mood to just get shit done,
 or to deep dive into the resources and documentation when you are hungry to learn more.
 
@@ -50,7 +50,7 @@ As stated above, the number one goal is to ship software.
 
 We will:
 
-* Install a single-node Kubernetes cluster onto a cloud VM
+* Install a single-node Kubernetes cluster onto a cloud server
 * Install Kubernetes components to manage SSL/TLS certificates
 * Deploy a stateless HTTP service to the Kubernetes cluster
 * Configure the Kubernetes ingress provider to route traffic to the service
@@ -60,10 +60,10 @@ We will:
 Though we will not go super deep on these topics (because we are focused on shipping software),
 we will gain some basic exposure to:
 
-* Infrastructure and Operations automation with Ansible
-* Linux/cloud server user management
-* Docker builds, Dockerfiles, and Docker/container repositories
-* Version-controlled Kubernetes deployment packaging with Helm
+* Infrastructure and operations automation with Ansible
+* Linux cloud server configuration
+* Docker builds, Dockerfiles, and container repositories
+* Kubernetes deployment packaging with Helm
 * Domain and DNS configuration
 
 <!---
@@ -75,6 +75,18 @@ Tools: Ansible, Helm, K3s, and DigitalOcean
 -->
 
 ## Tool Selection
+
+Here again, we will try to strike a balance.
+The tension in software tooling is often between a perceived "simplicity" or "user-friendliness"
+vs. the tool being "advanced" or "feature-rich".
+
+The tools below are chosen to allow us to get off the ground easily without needing to peek behind the curtain too much.
+At the same time, they are powerful enough to allow us to push into much more advanced territory if we desire.
+
+Moreover, software tools are just vessels for overarching concepts and practices which can be applied universally.
+At this stage of our learning, it is far more important to understand concepts than to become a master of a particular tool.
+Thousands of software tools will come and go, and at the end of it we will still be managing servers,
+abstracting the concepts of compute, storage, and networking, and packing, deploying and monitoring software on those servers.
 
 ### [DigitalOcean](https://digitalocean.com/)
 * Simple, affordable cloud computing products and interfaces
