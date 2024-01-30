@@ -54,11 +54,13 @@ code {
 }
 
 .content ul {
+    @apply mb-4;
     @apply pl-8;
     @apply list-disc;
 }
 
 .content ol {
+    @apply mb-4;
     @apply pl-8;
     @apply list-decimal;
 }
