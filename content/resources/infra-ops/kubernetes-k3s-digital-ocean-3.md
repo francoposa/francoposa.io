@@ -19,7 +19,15 @@ We will:
 
 ## 0. Prerequisites
 
-### 0.1 Configure Ansible Host Inventory
+### 0.1 Install the `kubectl` Command-Line Tooling
+
+Install `kubectl` with the official Kubernetes guide [here](https://kubernetes.io/docs/tasks/tools/#kubectl).
+
+Additionally, many Kubernetes users also rely on [`kubectx` and `kubens`](https://github.com/ahmetb/kubectx),
+which provide an easy way to switch which "contexts" (clusters) and "namespaces"
+without typing out the command-line arguments to `kubectl` every time.
+
+### 0.2 Configure Ansible Host Inventory
 
 In [Part 1](/resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-1) we created a DigitalOcean server with Ansible,
 and in [Part 2](/resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-2) we learned how to address the server
@@ -32,21 +40,14 @@ The Ansible playbooks here address the host group `k3s-demo-master`.
 We can use the static or dynamic inventories strategies to assign any existing host into this group,
 or update the playbooks used here to address any other existing Ansible host group we may have.
 
-### 0.2 Export the DigitalOcean API Token
-Make the API token created in Part 1 available to our shell environment,
-with the variable name expected by the DigitalOcean Ansible inventory plugin:
+### 0.3 Export the DigitalOcean API Token
+
+If using the DigitalOcean Ansible inventory plugin, make the API token created in Part 1
+available to our shell environment with the variable name expected by the plugin:
 
 ```shell
 % export DO_API_TOKEN=dop_v1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
-
-### 0.3 Install the `kubectl` Command-Line Tooling
-
-Install `kubectl` with the official Kubernetes guide [here](https://kubernetes.io/docs/tasks/tools/#kubectl).
-
-Additionally, many Kubernetes users also rely on [`kubectx` and `kubens`](https://github.com/ahmetb/kubectx),
-which provide an easy way to switch which "contexts" (clusters) and "namespaces" without typing out the command-line arguments to `kubectl` every time.
-
 
 ## 1. Prepare K3s Configuration
 
