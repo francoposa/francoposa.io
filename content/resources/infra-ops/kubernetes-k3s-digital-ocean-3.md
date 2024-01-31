@@ -1,7 +1,7 @@
 ---
 title: "Zero to Production with Kubernetes, Part 3: Deploying a K3s Kubernetes Cluster with Ansible"
 summary: "K3s Installation, Configuration, and KubeConfig Management with Ansible"
-slug: kubernetes-k3s-ansible-digital-ocean-3
+slug: zero-to-production-with-kubernetes-3
 aliases:
   - /resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-3/
 date: 2023-04-16

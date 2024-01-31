@@ -1,7 +1,7 @@
 ---
 title: "Zero to Production with Kubernetes, Part 4: Deploying a Service to Kubernetes"
-summary: "Deploying Software with Kubernetes Manifests, Helm Charts, and Ansible"
-slug: kubernetes-k3s-ansible-digital-ocean-4
+summary: "Deploying an HTTP Server with Kubernetes Manifests"
+slug: zero-to-production-with-kubernetes-4
 date: 2024-01-20
 order_number: 5
 ---
@@ -12,16 +12,22 @@ order_number: 5
 
 We will:
 
-1. Prepare Kubernetes manifests in the standard YAML format for an HTTP service deployment
-2. Deploy, monitor, update, and delete the HTTP service using the `kubectl` CLI
-3. Convert the Kubernetes YAML manifests into a Helm chart
-4. Deploy, monitor, update, rollback, and delete the HTTP service with the `helm` CLI
+1. Create a [Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)
+for our resources on the Kubernetes cluster
+2. Create a [Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/)
+with multiple replicas of a simple HTTP server container
+3. Create a [Service](https://kubernetes.io/docs/concepts/services-networking/service/)
+to route traffic to the HTTP server pods
 
-For this guide, we will leave converting either the Kubernetes or Helm deployment methods
-to Ansible playbooks as an exercise for the reader.
+[//]: # (We will leave converting the Kubernetes deployment method to an Ansible playbook as an exercise for the reader.)
+
+[//]: # (The Ansible core [k8s]&#40;https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html&#41;)
+
+[//]: # (module are is a very straightforward mapping of the `kubectl` CLI.)
+
+We will leave converting the `kubectl` deployment method to an Ansible playbook as an exercise for the reader.
 The Ansible core [k8s](https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html)
-and [helm](https://docs.ansible.com/ansible/latest/collections/kubernetes/core/helm_module.html)
-modules are both very straightforward mappings of the `kubectl` and `helm` CLIs.
+module are is a very straightforward mapping of the `kubectl` CLI.
 
 ## 0. Prerequisites
 
@@ -53,22 +59,29 @@ k3s-demo-master   Ready    control-plane,master   16d   v1.26.4+k3s1
 Kubernetes control plane is running at https://137.184.2.102:6443
 ```
 
-### 0.3 Install the `helm` Command-Line Interface
+### 0.3 An HTTP Server Container
 
-Install `helm` with the official instructions [here](https://helm.sh/docs/intro/install/).
+For the HTTP service, we will use the [`traefik/whoami`](https://hub.docker.com/r/traefik/whoami) image,
+though any container will suffice as long as it exposes an HTTP server on a port.
 
-The `helm` command will utilize the same kubeconfig as is configured for our `kubectl` CLI,
-and respects the context and namespace configuration applied by `kubectx` and `kubens`.
+For an example of how to create and containerize a simple echo server for Kubernetes,
+see [Containerizing a Golang Application with Dockerfile and Makefile](/resources/golang/golang-containerizing-dockerfile-makefile/).
 
-## 1. Declare an HTTP Service Deployment with Kubernetes Manifests
+The `docker.io/traefik/whoami` container uses port `80` by default, while the
+`ghcr.io/francoposa/echo-server-go/echo-server` container uses port `8080` -
+be sure to reference the correct port(s) for the container when declaring the Deployment.
 
-We will declare a [Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/),
-a [Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/), and
-a [Service](https://kubernetes.io/docs/concepts/services-networking/service/).
+[//]: # (### 0.3 Install the `helm` Command-Line Interface)
 
-For the HTTP service, we will be using the [`traefik/whoami`](https://hub.docker.com/r/traefik/whoami) image.
+[//]: # ()
+[//]: # (Install `helm` with the official instructions [here]&#40;https://helm.sh/docs/intro/install/&#41;.)
 
-### 1.1 Declaring a Namespace
+[//]: # ()
+[//]: # (The `helm` command will utilize the same kubeconfig as is configured for our `kubectl` CLI,)
+
+[//]: # (and respects the context and namespace configuration applied by `kubectx` and `kubens`.)
+
+## 1. Create a Namespace
 
 Kubernetes namespaces are a lightweight way isolate resources within a single cluster.
 By default, namespaces serve as little more than a conceptual boundary drawn between related resources.
@@ -77,6 +90,8 @@ Because namespaces serve as a sort of container for other Kubernetes resources,
 they are a bit unique and are often managed "out of band" of the other resources -
 namespace must be created before any resources can be deployed to them,
 and namespaces must not be deleted unless we intend to delete every resource within the namespace.
+
+#### 1.1 Declare the Namespace
 
 Declare the namespace in a manifest file: 
 
@@ -89,7 +104,65 @@ metadata:
   name: whoami
 ```
 
-### 1.2 Declaring a Deployment
+#### 1.2 Apply the Namespace
+
+Use `kubectl apply`  create the namespace on the cluster:
+
+```shell
+% kubectl apply -f kubernetes/traefik/whoami/manifests/namespace.yaml
+namespace/whoami created
+```
+
+#### 1.3 View Namespaces
+
+Whenever we want to list Kubernetes resources, we start with a `kubectl get [resource type]`:
+
+```shell
+% kubectl get namespace  # or the short version, `kubectl get ns`
+NAME              STATUS   AGE
+kube-system       Active   39d
+kube-public       Active   39d
+kube-node-lease   Active   39d
+default           Active   39d
+whoami            Active    5m
+```
+
+Note that the kubectl output will not tell us which is the current active namespace.
+For that we would need:
+
+```shell
+% kubectl config view | grep namespace
+    namespace: default
+```
+
+or `kubens`, which will highlight the current active namespace:
+
+```shell
+% kubens
+kube-system
+kube-public
+kube-node-lease
+default  # this would be highlighted in our terminal
+whoami
+```
+
+#### 1.4 Switch Namespaces
+
+Similarly here we can use `kubectl`:
+
+```shell
+kubectl config set-context --current --namespace=whoami
+```
+
+Or again the more convenient `kubens`:
+
+```shell
+% kubens whoami
+Context "default" modified.
+Active namespace is "whoami".
+```
+
+### 2. Create a Deployment
 
 A Kubernetes Deployment is the most common and straightforward way to deploy a stateless service to a cluster.
 
@@ -97,7 +170,9 @@ To start, we basically just need to know the container image we want to run,
 which port(s) the container exposes, and how many replicas of the container to run -
 everything else is just some standard metadata.
 
-Declare the Deployment in a manifest file:
+#### 2.1 Declare the Deployment
+
+Declare the deployment in a manifest file:
 
 ```yaml
 # github.com/francoposa/learn-infra-ops/blob/main/kubernetes/traefik/whoami/manifests/whoami.yaml
@@ -133,105 +208,3 @@ spec:
               # see the container image documentation for which port is exposed
               containerPort: 80
 ```
-
-
-[//]: # (...)
-
-[//]: # (#### Create a Namespace)
-
-[//]: # (and use `kubectl apply`  create the namespace on the cluster:)
-
-[//]: # ()
-[//]: # (```shell)
-
-[//]: # (% kubectl apply -f kubernetes/traefik/whoami/manifests/namespace.yaml )
-
-[//]: # (namespace/whoami created)
-
-[//]: # (```)
-
-[//]: # ()
-[//]: # (#### View Namespaces)
-
-[//]: # ()
-[//]: # (Whenever we want to list Kubernetes resources, we start with a `kubectl get [resource type]`:)
-
-[//]: # ()
-[//]: # (```shell)
-
-[//]: # (% kubectl get namespace  # or the short version, `kubectl get ns`)
-
-[//]: # (NAME              STATUS   AGE)
-
-[//]: # (kube-system       Active   39d)
-
-[//]: # (kube-public       Active   39d)
-
-[//]: # (kube-node-lease   Active   39d)
-
-[//]: # (default           Active   39d)
-
-[//]: # (whoami            Active    5m)
-
-[//]: # (```)
-
-[//]: # ()
-[//]: # (Note that the kubectl output will not tell us which is the current active namespace.)
-
-[//]: # (For that we would need:)
-
-[//]: # ()
-[//]: # (```shell)
-
-[//]: # (% kubectl config view | grep namespace)
-
-[//]: # (    namespace: default)
-
-[//]: # (```)
-
-[//]: # ()
-[//]: # (or `kubens`, which will highlight the current active namespace:)
-
-[//]: # ()
-[//]: # (```shell)
-
-[//]: # (% kubens)
-
-[//]: # (kube-system)
-
-[//]: # (kube-public)
-
-[//]: # (kube-node-lease)
-
-[//]: # (default  # this would be highlighted in our terminal)
-
-[//]: # (whoami)
-
-[//]: # (```)
-
-[//]: # ()
-[//]: # (#### Switch Namespaces)
-
-[//]: # ()
-[//]: # (Similarly here we can use `kubectl`:)
-
-[//]: # ()
-[//]: # (```shell)
-
-[//]: # (kubectl config set-context --current --namespace=whoami)
-
-[//]: # (```)
-
-[//]: # ()
-[//]: # (Or again the more convenient `kubens`:)
-
-[//]: # ()
-[//]: # (```shell)
-
-[//]: # (% kubens whoami)
-
-[//]: # (Context "default" modified.)
-
-[//]: # (Active namespace is "whoami".)
-
-[//]: # (```)
