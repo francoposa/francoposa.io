@@ -456,7 +456,7 @@ Forwarding from [::1]:8080 -> 80
 We _could_ demonstrate the functionality of the Service by spinning up a client Pod
 to make requests to our server Pods from within the cluster, in which case the traffic
 would be routed and load-balanced via the Service endpoint.
-However, that would be a bit tedious and trivial, and it is not what we are _really_ here to accomplish.
+However, this would be a bit tedious and trivial and it is not what we are _really_ here to accomplish.
 
 In the next guide, we will take on the most complex but rewarding part of the journey to production:
 exposing our HTTP server to the public internet, complete with a domain name and TLS encryption.
