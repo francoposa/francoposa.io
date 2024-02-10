@@ -307,8 +307,8 @@ By specifying the `-l/--selector` flag, we can get all the pods matching the sel
 We have waited all this time to actually interact with our HTTP server!
 
 Unfortunately, the `kubectl port-forward` command only can only talk to a single pod
-and does not allow us to utilize the label selectors hack, but we can still select pods
-by the Deployment name in order to avoid using the pod names.
+and does not allow us to utilize the label selectors hack avilable to tailing logs,
+but we can still select pods by the Deployment name in order to avoid using the pod names.
 
 Recall that we named our container port `web`, so we do not have to remember _which_ port number it is.
 We will forward it to our local port 8080:
@@ -435,3 +435,38 @@ Take note of some attributes of the Service resource:
 * `Port: web 80/TCP`: components can access the Service through the Service's port named `web`, which has defaulted to port `80`
 * `TargetPort: web/TCP`: the Service will route traffic to whichever port on the Pod is named `web`,
 avoiding the need to know (and update) which exact port number the Pod has exposed
+
+#### 4.4 Port-Forward to a Pod
+
+This time around it is a bit less exciting.
+
+We can now port-forward using the selector `svc/whoami`, but the traffic will still not actually
+go through the service endpoint or be load-balanced between multiple Pods.
+This is not a limitation of the Service, but rather of the `port-forward` utility,
+which is a rather rudimentary debugging tool only meant to interact directly with pods.
+Just like when we used the `deployment/whoami` selector to port-forward, it will select one pod and stick with it for the session.
+
+```shell
+% kubectl port-forward svc/whoami 8080:web
+Forwarding from 127.0.0.1:8080 -> 80
+Forwarding from [::1]:8080 -> 80
+# Ctrl-C to exit
+```
+
+We _could_ demonstrate the functionality of the Service by spinning up a client Pod
+to make requests to our server Pods from within the cluster, in which case the traffic
+would be routed and load-balanced via the Service endpoint.
+However, that would be a bit tedious and trivial, and it is not what we are _really_ here to accomplish.
+
+In the next guide, we will take on the most complex but rewarding part of the journey to production:
+exposing our HTTP server to the public internet, complete with a domain name and TLS encryption.
+
+## Conclusion
+
+We now have a containerized HTTP server running with multiple replicas in our Kubernetes cluster,
+with a service discovery, routing, and load balancing shim in front of the replicas,
+all isolated into a single namespace dedicated only this single application.
+
+As always, we have defined of these resources - the Kubernetes Namespace, Deployment, and Service -
+in version-controlled files, enabling us to duplicate the same infrastructure state across as many clusters as we want,
+or repeat the same infrastructure state in a single cluster after tearing it down and spinning it back up.
