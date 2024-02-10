@@ -167,6 +167,9 @@ Active namespace is "whoami".
 
 A Kubernetes Deployment is the most common and straightforward way to deploy a stateless service to a cluster.
 
+The Deployment resource defines the desired state of the Pods (sets of containers) as well as the number of Pod replicas,
+and provide the interfaces to roll out, scale up or down, and roll back the state of the Pods.
+
 To start, we basically just need to know the container image we want to run,
 which port(s) the container exposes, and how many replicas of the container to run -
 everything else is just some standard metadata.
@@ -366,7 +369,11 @@ as the address is derived from the Pod name which only lasts as long as the Pod 
 Essentially, how do we automatically route traffic to the `whoami` server without caring what the Pod names are,
 or whether we have one, twenty or a thousand replicas of the Pod?
 
-For this, we need a Kubernetes Service resource.
+For this, we need a Kubernetes Service resource, which defines parameters for basic service discovery and routing.
+
+The Service provides a single endpoint for clients to interface with any server Pods matching the label selectors,
+handling the responsibility of keeping track of constantly-changing Pod IP addresses,
+which Pods are starting, ready, or terminating, and load-balancing the traffic between the Pods.
 
 #### 4.1 Declare the Service
 
