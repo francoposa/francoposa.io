@@ -305,7 +305,7 @@ By specifying the `-l/--selector` flag, we can get all the pods matching the sel
 We have waited all this time to actually interact with our HTTP server!
 
 Unfortunately, the `kubectl port-forward` command only can only talk to a single pod
-and does not allow us to utilize the label selectors hack available to tailing logs,
+and does not allow us to utilize the label selectors hack available for tailing logs,
 but we can still select pods by the Deployment name in order to avoid using the pod names.
 
 Recall that we named our container port `web`, so we do not have to remember _which_ port number it is.
