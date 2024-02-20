@@ -210,7 +210,7 @@ all:
       demo:
          hosts:
             debian-s-1vcpu-2gb-sfo3-01:
-               ansible_host: 143.198.52.107
+               ansible_host: 147.182.252.75
                ansible_user: infra_ops
               # ...
 ```

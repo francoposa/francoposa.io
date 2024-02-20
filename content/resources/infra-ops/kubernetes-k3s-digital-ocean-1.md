@@ -237,15 +237,15 @@ Test SSH access with the droplet IP address and the non-root user created with t
 The IP address is printed from the debug task in the playbook or visible in the DigitalOcean web UI.
 
 ```shell
-% ssh infra_ops@137.184.94.4
-Warning: Permanently added '137.184.94.4' (ED25519) to the list of known hosts.
+% ssh infra_ops@147.182.252.75
+Warning: Permanently added '147.182.252.75' (ED25519) to the list of known hosts.
 infra_ops@debian-s-1vcpu-2gb-sfo3-01:~$
 ```
 
 We can also check that the root user is denied access, even with the correct SSH key:
 ```shell
-% ssh root@137.184.94.4
-root@137.184.94.4: Permission denied (publickey).
+% ssh root@147.182.252.75
+root@147.182.252.75: Permission denied (publickey).
 ```
 
 By default, Ansible will use this local SSH agent configuration for access to the server inventory.
