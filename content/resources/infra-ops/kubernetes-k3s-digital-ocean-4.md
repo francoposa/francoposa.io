@@ -32,7 +32,7 @@ module are is a very straightforward mapping of the `kubectl` CLI.
 
 ### 0.1 A Kubernetes Cluster
 
-Unlike other installments in this series, this guide is not dependent on where and how our Kubernetes cluster is deployed.
+Unlike previous installments in this series, this guide is not dependent on where and how our Kubernetes cluster is deployed.
 Ensure the kubeconfig file is accessible on our local machine to be used by the `kubectl` CLI.
 
 ### 0.2 Install the `kubectl` Command-Line Tooling

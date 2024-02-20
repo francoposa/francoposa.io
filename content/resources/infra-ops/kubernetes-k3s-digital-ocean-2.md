@@ -69,13 +69,13 @@ While we will ultimately move on to using dynamic inventory, we can first take a
 
 #### Declaring Static Host Groups
 
-When we created our server with the DigitalOcean Ansible module in [Part 1](/resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-1/), we assigned three tags with the intention of using them later as the Ansible host groups.
+When we created our server with the DigitalOcean Ansible module in [Part 1](/resources/infra-ops/zero-to-production-with-kubernetes-1/), we assigned three tags with the intention of using them later as the Ansible host groups.
 Our single host is in all three groups we created: `k3s-demo-master` for the master node, `k3s demo`, used for all nodes in the cluster, and `demo` for all resources in the "demo" project of the DigitalOcean account.
 
 #### Assigning Static Host Variables
 
 * `ansible_host` - the public IPv4 address assigned to the server on creation from DigitalOcean's public IP space.
-* `ansible_user` - the `USERNAME` from the [Cloud Init script from Part 1](/resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-1/#cloud-init-and-user-data).
+* `ansible_user` - the `USERNAME` from the [Cloud Init script from Part 1](/resources/infra-ops/zero-to-production-with-kubernetes-1/#cloud-init-and-user-data).
   * use DigitalOcean's default `root` user if you skipped the user setup via cloud-init step
 
 #### DigitalOcean Static Inventory
@@ -188,7 +188,7 @@ The Ansible team [received significant pushback](https://github.com/ansible/ansi
 Ansible provides plenty of guidance on how to [manage multiple inventory sources](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html#using-multiple-inventory-sources).
 For further details on more complex configurations follow the links in that section titled _Variable precedence: Where should I put a variable?_ and _How variables are merged_.
 
-For now, we just want to do something simple: apply the `USERNAME` we put in the [Cloud Init script from Part 1](/resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-1/#cloud-init-and-user-data) as the `ansible_user` across all hosts.
+For now, we just want to do something simple: apply the `USERNAME` we put in the [Cloud Init script from Part 1](/resources/infra-ops/zero-to-production-with-kubernetes-1/#cloud-init-and-user-data) as the `ansible_user` across all hosts.
 This will prevent us from having to re-declare the `ansible_user` or any other common host variables in every playbook.
 
 We can add the following to `[inventory directory]/group_vars/all.yaml`, or `demo.yaml`, or whichever host group we want to target.

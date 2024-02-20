@@ -29,8 +29,8 @@ without typing out the command-line arguments to `kubectl` every time.
 
 ### 0.2 Configure Ansible Host Inventory
 
-In [Part 1](/resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-1) we created a DigitalOcean server with Ansible,
-and in [Part 2](/resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-2) we learned how to address the server
+In [Part 1](/resources/infra-ops/zero-to-production-with-kubernetes-1) we created a DigitalOcean server with Ansible,
+and in [Part 2](/resources/infra-ops/zero-to-production-with-kubernetes-2) we learned how to address the server
 with Ansible's inventory system using both static declarations and dynamic inventory plugins.
 
 From here on out, we do not specifically require our host to be a DigitalOcean server
