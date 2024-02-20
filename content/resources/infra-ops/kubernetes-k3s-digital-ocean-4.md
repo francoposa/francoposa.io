@@ -18,15 +18,9 @@ with multiple replicas of a simple HTTP server container
 4. Create a [Service](https://kubernetes.io/docs/concepts/services-networking/service/)
 to route traffic through a single interface to all HTTP server Pods
 
-[//]: # (We will leave converting the Kubernetes deployment method to an Ansible playbook as an exercise for the reader.)
-
-[//]: # (The Ansible core [k8s]&#40;https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html&#41;)
-
-[//]: # (module are is a very straightforward mapping of the `kubectl` CLI.)
-
 We will leave converting the `kubectl` deployment method to an Ansible playbook as an exercise for the reader.
 The Ansible core [k8s](https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html)
-module are is a very straightforward mapping of the `kubectl` CLI.
+module is a very straightforward mapping of the `kubectl` CLI.
 
 ## 0. Prerequisites
 

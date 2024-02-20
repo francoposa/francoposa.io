@@ -16,6 +16,11 @@ We will:
 2. Deploy [cert-manager](https://cert-manager.io/docs/) to our cluster to issue TLS certificates for our domain
 3. Create Kubernetes Ingress rules to route requests to our domain through to our backend HTTP Service
 
+We will leave converting the `kubectl` and `helm` deployment methods to Ansible playbooks as an exercise for the reader.
+The Ansible core [k8s](https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html)
+and [helm](https://docs.ansible.com/ansible/latest/collections/kubernetes/core/helm_module.html)
+modules are very straightforward mappings of the `kubectl` and `helm` CLIs.
+
 ## 0. Prerequisites
 
 ### 0.1 A Kubernetes Cluster with an HTTP Service Deployed
@@ -42,3 +47,6 @@ as a nod to the common usage of echo servers image to demonstrate Kubernetes dep
 ### 0.3 Install the `helm` Command-Line Tooling
 
 Install `helm` with the official Helm guide [here](https://helm.sh/docs/intro/install/).
+
+The `helm` command will utilize the same kubeconfig as is configured for our `kubectl` CLI,
+and respects the context and namespace configuration applied by `kubectx` and `kubens`.
