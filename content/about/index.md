@@ -7,7 +7,7 @@ date: 2020-02-02
 ---
 ## Myself
 
-I am a software engineer with over six years of experience designing, writing, and testing software across many areas of software engineering, including cloud storage, distributed databases, telecom routing, and big data pipelines.
+I am a software engineer with over eight years of experience designing, writing, and testing software across many areas of software engineering, including cloud storage, distributed databases, telecom routing, and big data pipelines.
 
 I love to design, build, and refactor.
 I am passionate about clean architecture, clean code, and idiomatic best practices.

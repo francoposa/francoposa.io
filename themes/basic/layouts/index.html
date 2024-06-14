@@ -1,5 +1,9 @@
 {{ define "main" }}
 <div class="container my-2 px-12 py-4 bg-white">
+    <h1 class="mt-8 mb-1 text-4xl font-mono text-center">{{ .Site.Title }}</h1>
+
+    <p class="mt-2 mb-1 text-center text-xl">{{ .Site.Params.Description }}</p>
+
     {{ range sort .Sections ".Params.order_number" }}
     <h2 class="header text-3xl my-3">
         <a class="text-decoration-none" href="{{ .RelPermalink }}">{{ .Title }}</a>
