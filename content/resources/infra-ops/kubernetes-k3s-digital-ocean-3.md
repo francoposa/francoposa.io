@@ -143,12 +143,12 @@ Kubernetes control plane is running at https://137.184.2.102:6443
 The final step of this playbook performs a merge of kubeconfig files.
 Merging the kubeconfigs for clusters with the same cluster or context name may result in one of the configs being clobbered.
 
-In particular, the k3s cluster context will be named `default`.
+In particular, the K3s cluster context will be named `default`.
 This is not a property of the cluster, but rather just how it is named in the kubeconfig file.
 If we already have a cluster context named `default` in our local kubeconfig, it would be overwritten by the new config copied from the droplet.
 
 If this is not preferred, we have multiple viable options:
-* change the cluster and context name for in the k3s cluster in the kubeconfig file
+* change the cluster and context name for in the K3s cluster in the kubeconfig file
 * change the order of kubeconfigs on merge to retain the desired config
 * skip merging kubeconfigs altogether and switch between configs with the `KUBECONFIG` environment variable
 
