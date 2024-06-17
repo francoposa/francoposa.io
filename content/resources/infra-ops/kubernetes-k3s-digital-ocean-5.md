@@ -103,3 +103,37 @@ backtalk.dev.		600	IN	A	137.184.2.102
 ;; WHEN: Sun Jun 16 15:02:09 PDT 2024
 ;; MSG SIZE  rcvd: 57
 ```
+
+### 1.2 Verify the DNS Record Reaches the Kubernetes Cluster
+
+We can use `curl` to make an HTTP request to the domain.
+As we have not set up any ingress routing for the cluster,
+we only expect to see the default `404` status response provided by an [Ingress Controller](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/).
+In a K3s cluster, this is plaintext response from the bundled `traefik` component.
+
+```shell
+% curl backtalk.dev
+404 page not found
+```
+
+```shell
+% curl -i backtalk.dev
+HTTP/1.1 404 Not Found
+Content-Type: text/plain; charset=utf-8
+X-Content-Type-Options: nosniff
+Date: Sun, 16 Jun 2024 23:50:08 GMT
+Content-Length: 19
+
+404 page not found
+```
+
+We use `curl` because a modern browser may not allow us to reach our domain just yet.
+We have not yet assigned the cluster a TLS certificate from a trusted certificate authority,
+so depending on the browser's security settings we may be blocked completely or have to read warnings before continuing.
+
+
+[//]: # ([Traefik]&#40;https://doc.traefik.io/traefik/&#41; is a cloud-native proxy and edge router.)
+
+[//]: # (In addition to an extensive set of integrations and plugins, Traefik implements the Kubernetes Ingress Controller API)
+
+[//]: # (as well as to provide traffic routing for a cluster.)
