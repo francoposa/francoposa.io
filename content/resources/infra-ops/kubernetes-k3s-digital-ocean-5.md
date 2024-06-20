@@ -72,7 +72,7 @@ but we prefer to keep it simple for now.
 DNS record updates can take some time to propagate throughout the internet and DNS servers make heavy use of caching,
 so do not be surprised if it takes tens of minutes or even hours to see a record update reflected.
 
-DNS records can be checked with the command-line tool `dig`:
+DNS records can be checked with the command-line tool `dig`, which is generally included in any:
 
 ```shell
 % dig +short backtalk.dev
@@ -131,6 +131,89 @@ We use `curl` because a modern browser may not allow us to reach our domain just
 We have not yet assigned the cluster a TLS certificate from a trusted certificate authority,
 so depending on the browser's security settings we may be blocked completely or have to read warnings before continuing.
 
+## 2. Automate TLS Certificates from Let's Encrypt with `cert-manager`
+
+TLS certificates are one of the primary ways that computers communicating across a network verify each other's identity.
+These certificates provide the `S` for `Secure` in `HTTPS` and help prevent a wide array of security exploits,
+from malicious servers from imitating your bank or healthcare provider to man-in-the-middle attacks which can eavesdrop
+and even to alter the traffic between your devices and the web services they communicate with.
+
+Since modern browsers and many HTTP clients do not allow access to non-HTTPS websites by default,
+we need to generate TLS certificates from a trusted authority if we want anyone to use the sites and services we host.
+Historically, both certificate was a manual process for sysadmins and while it is a relatively simple process,
+certificates can be valid for many months so it was easy to forget which ones need renewed when for which domains.
+
+Thankfully with the rise of the nonprofit `Let's Encrypt` [Certificate Authority](https://en.wikipedia.org/wiki/Certificate_authority),
+and more recently the cloud-native [`cert-manager`](https://cert-manager.io/docs/), this process can be complete automated.
+
+### 2.1 Install `cert-manager`
+
+Check the [`cert-manager` release list](https://github.com/cert-manager/cert-manager/releases) for the latest version to install.
+
+```shell
+% kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.15.0/cert-manager.yaml
+```
+
+### 2.2 Declare the Cluster Issuer
+
+The `ClusterIssuer` is not a standard Kubernetes resource like Pods, Deployments, and StatefulSets.
+If is a "Custom Resource Definition" (CRD) defined by `cert-manager` -
+this definition was installed along with the `cert-manager` software itself, so our cluster will recognize it.
+
+These resource configure `cert-manager` to request, store, serve, and renew TLS certificates for our domain.
+The `ClusterIssuer` allows us to use the same certificates for the whole cluster,
+while the similar `Issuer` resource restricts usage of the certificates to a single namespace.
+
+We will first request a certificate from the Let's Encrypt staging servers to verify our configuration.
+These staging certificates will not be accepted by a browser, but allows us to verify the configuration.
+If a certificate request is rejected by the production server, we may not be allowed to try again for some time.
+
+```yaml
+# github.com/francoposa/learn-infra-ops/blob/main/kubernetes/cert-manager/manifests/cluster-issuer.yaml
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: cluster-issuer-staging
+  namespace: cert-manager
+spec:
+  acme:
+    email: franco@francoposa.io
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: staging-cluster-issuer-account-key
+    solvers:
+      - http01:
+          ingress:
+            class: traefik
+```
+
+### 2.3 Apply the Cluster Issuer
+
+```shell
+% kubectl -n cert-manager apply -f kubernetes/cert-manager/manifests/cluster-issuer.yaml
+
+clusterissuer.cert-manager.io/cluster-issuer created
+```
+
+### 2.4 Verify the Cluster Issuer
+
+```shell
+% kubectl get clusterissuer -o wide
+NAME                     READY   STATUS                                                 AGE
+cluster-issuer-staging   True    The ACME account was registered with the ACME server   10m
+```
+
+We can also tail the logs of the `cert-manager` Pod for more information:
+
+```shell
+% kubectl -n cert-manager logs -f deployment/cert-manager
+# ...
+```
+
+[//]: # (Essentially, the `cert-manager` process will make a request to the Let's Encrypt servers,)
+
+[//]: # (saying that it wants to be issued a certificate for our domain, `backtalk.dev`.)
 
 [//]: # ([Traefik]&#40;https://doc.traefik.io/traefik/&#41; is a cloud-native proxy and edge router.)
 
