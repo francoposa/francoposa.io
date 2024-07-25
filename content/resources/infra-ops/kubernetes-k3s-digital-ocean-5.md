@@ -56,7 +56,7 @@ and respects the context and namespace configuration applied by `kubectx` and `k
 We only need the simplest kind of DNS record - an [A record](https://www.cloudflare.com/learning/dns/dns-records/dns-a-record/).
 The A record simply serves to point a domain name to an IPv4 address.
 
-### 1.1 Create the DNS A record with the Domain Registrar
+### 1.1 Create the DNS `A` Record with the Domain Registrar
 
 Each domain registrar will offer a slightly different interface for entering the DNS record,
 but the A record should simply point the root domain (`backtalk.dev`) to the desired IP address (`137.184.2.102`).
@@ -154,7 +154,7 @@ Check the [`cert-manager` release list](https://github.com/cert-manager/cert-man
 % kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.15.0/cert-manager.yaml
 ```
 
-### 2.2 Declare the Cluster Issuer
+### 2.2 Declare the Staging Cluster Issuer
 
 The `ClusterIssuer` is not a standard Kubernetes resource like Pods, Deployments, and StatefulSets.
 If is a "Custom Resource Definition" (CRD) defined by `cert-manager` -
@@ -164,12 +164,12 @@ These resource configure `cert-manager` to request, store, serve, and renew TLS 
 The `ClusterIssuer` allows us to use the same certificates for the whole cluster,
 while the similar `Issuer` resource restricts usage of the certificates to a single namespace.
 
-We will first request a certificate from the Let's Encrypt staging servers to verify our configuration.
-These staging certificates will not be accepted by a browser, but allows us to verify the configuration.
+We will first request a certificate from the Let's Encrypt _staging_ servers.
+These staging certificates will not be accepted by a browser, but will allow us to safely verify the configuration.
 If a certificate request is rejected by the production server, we may not be allowed to try again for some time.
 
 ```yaml
-# github.com/francoposa/learn-infra-ops/blob/main/kubernetes/cert-manager/manifests/cluster-issuer.yaml
+# github.com/francoposa/learn-infra-ops/blob/main/kubernetes/cert-manager/manifests/cluster-issuer-staging.yaml
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -181,22 +181,22 @@ spec:
     email: franco@francoposa.io
     server: https://acme-staging-v02.api.letsencrypt.org/directory
     privateKeySecretRef:
-      name: staging-cluster-issuer-account-key
+      name: cluster-issuer-staging-account-key
     solvers:
       - http01:
           ingress:
             class: traefik
 ```
 
-### 2.3 Apply the Cluster Issuer
+### 2.3 Apply the Staging Cluster Issuer
 
 ```shell
-% kubectl -n cert-manager apply -f kubernetes/cert-manager/manifests/cluster-issuer.yaml
+% kubectl -n cert-manager apply -f kubernetes/cert-manager/manifests/cluster-issuer-staging.yaml
 
 clusterissuer.cert-manager.io/cluster-issuer created
 ```
 
-### 2.4 Verify the Cluster Issuer
+### 2.4 Verify the Staging Cluster Issuer
 
 ```shell
 % kubectl get clusterissuer -o wide
@@ -208,8 +208,12 @@ We can also tail the logs of the `cert-manager` Pod for more information:
 
 ```shell
 % kubectl -n cert-manager logs -f deployment/cert-manager
-# ...
+# ... logs are noisy but we should see some success messages
 ```
+
+### 2.5 Verify the Let's Encrypt Staging Certificate
+
+
 
 [//]: # (Essentially, the `cert-manager` process will make a request to the Let's Encrypt servers,)
 

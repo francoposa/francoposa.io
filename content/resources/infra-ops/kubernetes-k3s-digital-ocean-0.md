@@ -86,11 +86,11 @@ At the same time, they are powerful enough to allow us to push into much more ad
 Moreover, software tools are just vessels for overarching concepts and practices which can be applied universally.
 At this stage of our learning, it is far more important to understand concepts than to become a master of a particular tool.
 Thousands of software tools will come and go, and at the end of it we will still be managing servers,
-abstracting the concepts of compute, storage, and networking, and packing, deploying and monitoring software on those servers.
+abstracting the concepts of compute, storage, and networking, and packaging, deploying and monitoring software on those servers.
 
 ### [DigitalOcean](https://digitalocean.com/)
 * Simple, affordable cloud computing products and interfaces
-  * in particular, the DigitalOcean "Droplet" cloud server comes with a public IPv4 address by default
+    * in particular, the DigitalOcean "Droplet" cloud server comes with a public IPv4 address by default
 * Integrations with common Infrastructure-as-Code tools: Ansible, Terraform, Pulumi, Crossplane, etc.
 
 ### [Ansible](https://docs.ansible.com/ansible/latest/)
