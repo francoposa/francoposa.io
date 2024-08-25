@@ -1,14 +1,67 @@
 baseURL = "https://francoposa.io"
 languageCode = "en-us"
-theme = "basic"
+theme = "typo"
 title = "francoposa.io"
 
 enableGitInfo = true
+
+[params]
+AuthorName = "Franco Posa"
+Description = "Software Engineering and Technical Guides, Docs, and Blogs"
+
+# Collection to display on home
+homeCollectionTitle = 'Resources'
+homeCollection = 'resources'
+
+# Lists parameters
+paginationSize = 8
+listSummaries = true
+
+# Breadcrumbs
+breadcrumbs = true
 
 [markup]
 [markup.highlight]
 style = "friendly"
 
-[params]
-AuthorName = "Franco Posa"
-Description = "Software Engineering and Technical Guides, Docs, and Blogs"
+# # # Disable tags
+# disableKinds = ['taxonomy']
+
+[taxonomies]
+#category = 'categories'
+tag = 'tags'
+
+#[params]
+## Home meta description
+#description = "A tech-oriented personal blog curated by Francesco Tomaselli."
+
+# Appearance settings
+theme = 'auto'
+colorPalette = 'default'
+hideHeader = false
+
+# Intro on main page, content in markdown
+#homeIntroTitle = 'Hi!'
+#homeIntroContent = """
+#I am an Italian Software Engineer with a strong foundation in computer science and a passion for solving complex problems.
+#I am interested in a various topics, including algorithms, distributed systems, databases, and information retrieval. \\
+#Feel free to read [about myself](/about) or to look at my [posts](/posts).
+#"""
+
+# Main menu pages
+[[params.menu]]
+name = "home"
+url = "/"
+
+[[params.menu]]
+name = "resources"
+url = "/resources"
+
+# [[params.menu]]
+# name = "tags"
+# url = "/tags"
+
+[[params.menu]]
+name = "about"
+url = "/about"
+
