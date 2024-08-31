@@ -1,6 +1,6 @@
 baseURL = "https://francoposa.io"
 languageCode = "en-us"
-theme = "typo"
+theme = "hypo"
 title = "francoposa.io"
 
 enableGitInfo = true
