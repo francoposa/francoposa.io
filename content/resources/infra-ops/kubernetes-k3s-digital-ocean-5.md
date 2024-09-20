@@ -3,7 +3,7 @@ title: "Zero to Production with Kubernetes, Part 5: Exposing a Service to the Pu
 summary: "Domains, DNS Records, TLS Certificates, and Kubernetes Ingresses"
 slug: zero-to-production-with-kubernetes-5
 date: 2024-02-18
-order_number: 6
+weight: 6
 ---
 
 ##### **this document is a work in progress**

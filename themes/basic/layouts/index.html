@@ -4,17 +4,17 @@
 
     <p class="mt-2 mb-1 text-center text-xl">{{ .Site.Params.Description }}</p>
 
-    {{ range sort .Sections ".Params.order_number" }}
+    {{ range sort .Sections ".Params.weight" }}
     <h2 class="header text-3xl my-3">
         <a class="text-decoration-none" href="{{ .RelPermalink }}">{{ .Title }}</a>
     </h2>
     <hr>
-        {{ range sort .Sections ".Params.order_number" }}
+        {{ range sort .Sections ".Params.weight" }}
         <h3 class="header text-2xl my-3">
             <a class="text-decoration-none" href="{{ .RelPermalink }}">{{ .Title }}</a>
         </h3>
         <ul class="list-disc pl-8">
-            {{ range sort .Pages ".Params.order_number"}}
+            {{ range sort .Pages ".Params.weight"}}
             <li>
                 <h4 class="mt-2 mb-1 font-normal"><a class="" href="{{ .RelPermalink }}">{{ .Title }}</a></h4>
             </li>

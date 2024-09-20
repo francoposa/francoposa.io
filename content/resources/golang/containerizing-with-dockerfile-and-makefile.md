@@ -3,7 +3,7 @@ title: "Containerizing a Golang Application with Dockerfile and Makefile"
 slug: golang-containerizing-dockerfile-makefile
 summary: "Packaging a Golang Application for Containerized Deployment"
 date: 2024-01-17
-order_number: 1
+weight: 1
 ---
 
 ##### **this document is a work in progress**

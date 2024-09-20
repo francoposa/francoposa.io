@@ -3,7 +3,7 @@ title: "Zero to Production with Kubernetes, Part 4: Deploying a Service to Kuber
 summary: "Deploying an HTTP Server with Kubernetes Manifests"
 slug: zero-to-production-with-kubernetes-4
 date: 2024-01-20
-order_number: 5
+weight: 5
 ---
 
 ## Goals

@@ -3,7 +3,7 @@ title: "Git Good, Part 1: Configuration, Creating Repositories, and Committing C
 slug: git-basics-1
 summary: "Git Config, Init, Add, and Commit"
 date: 2023-10-02
-order_number: 1
+weight: 1
 ---
 
 ## 0. Prerequisites

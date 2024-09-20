@@ -3,7 +3,7 @@ title: "Java Setup for MacOS"
 slug: java-setup-macos
 summary: "A beginner's Java development environment setup for MacOS"
 date: 2020-06-11
-order_number: 3
+weight: 3
 ---
 
 ## 1. Install Java with Homebrew

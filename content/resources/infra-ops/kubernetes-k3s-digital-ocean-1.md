@@ -5,7 +5,7 @@ slug: zero-to-production-with-kubernetes-1
 aliases:
   - /resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-1/
 date: 2021-07-27
-order_number: 2
+weight: 2
 ---
 
 ## Goals
