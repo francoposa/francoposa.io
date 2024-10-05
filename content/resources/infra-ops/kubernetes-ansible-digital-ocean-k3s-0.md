@@ -1,9 +1,11 @@
 ---
-title: "Zero to Production with Kubernetes, Part 0: Goals and Tool Selection"
-summary: "Software Infrastructure and Operations with DigitalOcean Droplets, Ansible, K3s, and Helm"
-slug: zero-to-production-with-kubernetes-0
+title: "Deploy K3s with Ansible on DigitalOcean, Part 0"
+summary: "Goals and Tool Selection"
+description: "Software Infrastructure and Operations with DigitalOcean Droplets, Ansible, and K3s"
+slug: kubernetes-ansible-digital-ocean-k3s-0
 aliases:
   - /resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-0/
+  - /resources/infra-ops/zero-to-production-with-kubernetes-0/
 date: 2021-07-27
 weight: 1
 ---
@@ -66,13 +68,17 @@ we will gain some basic exposure to:
 * Kubernetes deployment packaging with Helm
 * Domain and DNS configuration
 
-<!---
-Practices and Preferences:
-* Automation of Manual Processes
-* Infrastructure as Code
-* Declarative over Imperative
-Tools: Ansible, Helm, K3s, and DigitalOcean
--->
+
+[//]: # (Practices and Preferences:)
+
+[//]: # (* Automation of Manual Processes)
+
+[//]: # (* Infrastructure as Code)
+
+[//]: # (* Declarative over Imperative)
+
+[//]: # (Tools: Ansible, Helm, K3s, and DigitalOcean)
+
 
 ## Tool Selection
 
@@ -90,7 +96,7 @@ abstracting the concepts of compute, storage, and networking, and packaging, dep
 
 ### [DigitalOcean](https://digitalocean.com/)
 * Simple, affordable cloud computing products and interfaces
-    * in particular, the DigitalOcean "Droplet" cloud server comes with a public IPv4 address by default
+  * in particular, the DigitalOcean "Droplet" cloud server comes with a public IPv4 address by default
 * Integrations with common Infrastructure-as-Code tools: Ansible, Terraform, Pulumi, Crossplane, etc.
 
 ### [Ansible](https://docs.ansible.com/ansible/latest/)
@@ -99,7 +105,7 @@ abstracting the concepts of compute, storage, and networking, and packaging, dep
 * Combined imperative and declarative approach
 * Powerful and flexible
   * Power and flexibility come with associated tradeoffs.
-  In the case of Ansible, there can be many ways to do the same thing
+    In the case of Ansible, there can be many ways to do the same thing
   * We will make an effort to use approaches that are cross-platform and require minimal customization and configuration
 
 
@@ -110,8 +116,12 @@ abstracting the concepts of compute, storage, and networking, and packaging, dep
   * These components are essential for proper operation but tough to absorb for a newcomer to Kubernetes and networking in general.
 * Compatible with standard kubernetes tooling, including `kubectl`
 
-### [Helm](https://helm.sh/docs/)
-* Application packaging and deployment management for Kubernetes
-* Declares Kubernetes applications in code with templated, composable Helm Charts
-* Packages Kubernetes applications to share publicly or within an organization
-* Atomically deploys, upgrades, and deletes multi-component Kubernetes applications with a declarative CLI
+[//]: # (### [Helm]&#40;https://helm.sh/docs/&#41;)
+
+[//]: # (* Application packaging and deployment management for Kubernetes)
+
+[//]: # (* Declares Kubernetes applications in code with templated, composable Helm Charts)
+
+[//]: # (* Packages Kubernetes applications to share publicly or within an organization)
+
+[//]: # (* Atomically deploys, upgrades, and deletes multi-component Kubernetes applications with a declarative CLI)
