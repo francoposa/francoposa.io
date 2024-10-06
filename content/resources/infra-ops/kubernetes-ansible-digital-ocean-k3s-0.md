@@ -1,5 +1,5 @@
 ---
-title: "Deploy K3s with Ansible on DigitalOcean, Part 0"
+title: "Deploying K3s with Ansible on DigitalOcean, Part 0"
 summary: "Goals and Tool Selection"
 description: "Software Infrastructure and Operations with DigitalOcean Droplets, Ansible, and K3s"
 slug: kubernetes-ansible-digital-ocean-k3s-0

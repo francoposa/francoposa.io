@@ -1,5 +1,5 @@
 ---
-title: "Deploy K3s with Ansible on DigitalOcean, Part 1"
+title: "Deploying K3s with Ansible on DigitalOcean, Part 1"
 summary: "Creating a DigitalOcean Server with Ansible"
 description: "Ansible, Ansible Collections, DigitalOcean Droplets, and Initial Server Configuration"
 slug: kubernetes-ansible-digital-ocean-k3s-1
