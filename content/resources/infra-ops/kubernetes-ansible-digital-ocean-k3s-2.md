@@ -1,9 +1,11 @@
 ---
-title: "Zero to Production with Kubernetes, Part 2: Using DigitalOcean Servers as Ansible Dynamic Inventory"
-summary: "Ansible Host Groups, Host Variables, and Dynamic Inventory Plugins"
-slug: zero-to-production-with-kubernetes-2
+title: "Deploy K3s with Ansible on DigitalOcean, Part 2"
+summary: "Using DigitalOcean Servers as Ansible Dynamic Inventory"
+description: "Ansible Host Groups, Host Variables, and Dynamic Inventory Plugins"
+slug: kubernetes-ansible-digital-ocean-k3s-2
 aliases:
   - /resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-2/
+  - /resources/infra-ops/zero-to-production-with-kubernetes-2/
 date: 2022-07-30
 weight: 3
 ---
