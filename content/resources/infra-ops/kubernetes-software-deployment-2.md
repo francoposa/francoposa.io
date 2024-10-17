@@ -1,7 +1,10 @@
 ---
-title: "Zero to Production with Kubernetes, Part 5: Exposing a Service to the Public Internet"
-summary: "Domains, DNS Records, TLS Certificates, and Kubernetes Ingresses"
-slug: zero-to-production-with-kubernetes-5
+title: "Delivering Software with Kubernetes, Part 2"
+summary: "Exposing a Service to the Public Internet"
+description: "Domains, DNS Records, TLS Certificates, and Kubernetes Ingresses"
+slug: kubernetes-software-deployment-2
+aliases:
+  - /resources/infra-ops/zero-to-production-with-kubernetes-5/
 date: 2024-02-18
 weight: 6
 ---

@@ -1,9 +1,11 @@
 ---
-title: "Zero to Production with Kubernetes, Part 1: Creating a DigitalOcean Server with Ansible"
-summary: "Ansible, Ansible Collections, DigitalOcean Droplets, and Initial Server Configuration"
-slug: zero-to-production-with-kubernetes-1
+title: "Deploying K3s with Ansible on DigitalOcean, Part 1"
+summary: "Creating a DigitalOcean Server with Ansible"
+description: "Ansible, Ansible Collections, DigitalOcean Droplets, and Initial Server Configuration"
+slug: kubernetes-ansible-digital-ocean-k3s-1
 aliases:
   - /resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-1/
+  - /resources/infra-ops/zero-to-production-with-kubernetes-1/
 date: 2021-07-27
 weight: 2
 ---

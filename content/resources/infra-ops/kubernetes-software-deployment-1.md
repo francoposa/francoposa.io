@@ -1,7 +1,10 @@
 ---
-title: "Zero to Production with Kubernetes, Part 4: Deploying a Service to Kubernetes"
-summary: "Deploying an HTTP Server with Kubernetes Manifests"
-slug: zero-to-production-with-kubernetes-4
+title: "Delivering Software with Kubernetes, Part 1"
+summary: "Deploying a Stateless HTTP Service to Kubernetes"
+description: "Kubernetes CLI Tooling and Manifests for Namespaces, Deployments, Pods, and Services"
+slug: kubernetes-software-deployment-1
+aliases:
+  - /resources/infra-ops/zero-to-production-with-kubernetes-4/
 date: 2024-01-20
 weight: 5
 ---
@@ -18,15 +21,17 @@ with multiple replicas of a simple HTTP server container
 4. Create a [Service](https://kubernetes.io/docs/concepts/services-networking/service/)
 to route traffic through a single interface to all HTTP server Pods
 
-We will leave converting the `kubectl` deployment method to an Ansible playbook as an exercise for the reader.
-The Ansible core [k8s](https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html)
-module is a very straightforward mapping of the `kubectl` CLI.
+[//]: # (We will leave converting the `kubectl` deployment method to an Ansible playbook as an exercise for the reader.)
+
+[//]: # (The Ansible core [k8s]&#40;https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html&#41;)
+
+[//]: # (module is a very straightforward mapping of the `kubectl` CLI.)
 
 ## 0. Prerequisites
 
 ### 0.1 A Kubernetes Cluster
 
-Unlike previous installments in this series, this guide is not dependent on where and how our Kubernetes cluster is deployed.
+This guide is not dependent on where and how our Kubernetes cluster is deployed.
 Ensure the kubeconfig file is accessible on our local machine to be used by the `kubectl` CLI.
 
 ### 0.2 Install the `kubectl` Command-Line Tooling
