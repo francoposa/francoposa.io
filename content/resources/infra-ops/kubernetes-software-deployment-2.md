@@ -6,7 +6,7 @@ slug: kubernetes-software-deployment-2
 aliases:
   - /resources/infra-ops/zero-to-production-with-kubernetes-5/
 date: 2024-02-18
-weight: 6
+weight: 5
 ---
 
 ##### **this document is a work in progress**

@@ -7,7 +7,7 @@ aliases:
   - /resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-2/
   - /resources/infra-ops/zero-to-production-with-kubernetes-2/
 date: 2022-07-30
-weight: 3
+weight: 2
 ---
 
 ## Goals
