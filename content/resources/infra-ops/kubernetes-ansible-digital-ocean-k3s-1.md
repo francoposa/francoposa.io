@@ -44,7 +44,7 @@ Additionally, install [`yamllint`](https://yamllint.readthedocs.io/en/stable/) t
 For `pip` users, `requirements.txt`:
 
 ```text
-ansible==9.*
+ansible==10.*
 yamllint=1.*
 ```
 
@@ -56,10 +56,11 @@ authors = ["francoposa <franco@francoposa.io>"]
 description = ""
 name = "learn-infra-ops"
 version = "0.1.0a0"
+package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.10"
-ansible = "9.*"
+python = "^3.12"
+ansible = "10.*"
 
 [tool.poetry.dev-dependencies]
 yamllint = "1.*"
@@ -99,7 +100,7 @@ To upgrade the collection to the latest version:
 To install a particular version of the collection:
 
 ```shell
-% ansible-galaxy collection install community.digitalocean:==1.15.0
+% ansible-galaxy collection install community.digitalocean:==1.27.0
 ```
 
 ## 1. Create a DigitalOcean Server with Ansible
@@ -126,7 +127,7 @@ By default, the Ansible module waits for the server to be fully active before re
     - name: create k3s master node droplet in project "demo"
       community.digitalocean.digital_ocean_droplet:
         state: active
-        name: debian-s-1vcpu-2gb-sfo3-01
+        name: debian-s-2vcpu-2gb-sfo3-01
         unique_name: true
         project: demo
         tags:
@@ -134,7 +135,7 @@ By default, the Ansible module waits for the server to be fully active before re
           - k3s-demo
           - k3s-demo-master
         image: debian-12-x64
-        size: s-1vcpu-2gb
+        size: s-2vcpu-2gb
         region: sfo3
         ssh_keys:
           # md5 fingerprint for our ed25519 ssh key
@@ -177,9 +178,9 @@ Current slugs are also available directly from the DigitalOcean CLI:
 
 ### 1.1 Cloud Init and User Data
 [Cloud Init](https://cloudinit.readthedocs.io/en/latest/index.html) is a standardized approach to configuring cloud compute instances.
-On first boot, the configuration can set up user accounts, apply networking rules, install packages and much more.
+On first boot, the configuration can set up user accounts, apply networking rules, install packages, and much more.
 
-To keep things simple and familiar, we only utilize [user data script format](https://cloudinit.readthedocs.io/en/latest/explanation/format.html#user-data-script),
+To keep things simple and familiar, we will only utilize the [user data script format](https://cloudinit.readthedocs.io/en/latest/explanation/format.html#user-data-script) here,
 which allows Cloud Init to run arbitrary shell scripts during the server initialization.
 Sticking to the shell script format allows us to run and test locally if needed without knowing anything else about Cloud Init.
 

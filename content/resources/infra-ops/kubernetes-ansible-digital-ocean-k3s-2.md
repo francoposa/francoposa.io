@@ -72,12 +72,12 @@ While we will ultimately move on to using dynamic inventory, we can first take a
 #### Declaring Static Host Groups
 
 When we created our server with the DigitalOcean Ansible module in [Part 1](/resources/infra-ops/zero-to-production-with-kubernetes-1/), we assigned three tags with the intention of using them later as the Ansible host groups.
-Our single host is in all three groups we created: `k3s-demo-master` for the master node, `k3s demo`, used for all nodes in the cluster, and `demo` for all resources in the "demo" project of the DigitalOcean account.
+Our single host is in all three groups we created: `k3s-demo-master` for the master node, `k3s demo` for all nodes in the cluster, and `demo` for all resources in the "demo" project of the DigitalOcean account.
 
 #### Assigning Static Host Variables
 
-* `ansible_host` - the public IPv4 address assigned to the server on creation from DigitalOcean's public IP space.
-* `ansible_user` - the `USERNAME` from the [Cloud Init script from Part 1](/resources/infra-ops/zero-to-production-with-kubernetes-1/#cloud-init-and-user-data).
+* `ansible_host` - set this to the public IPv4 address assigned to the server on creation.
+* `ansible_user` - set this to the `USERNAME` from the [Cloud Init script from Part 1](/resources/infra-ops/zero-to-production-with-kubernetes-1/#cloud-init-and-user-data).
   * use DigitalOcean's default `root` user if you skipped the user setup via cloud-init step
 
 #### DigitalOcean Static Inventory
@@ -196,6 +196,7 @@ This will prevent us from having to re-declare the `ansible_user` or any other c
 We can add the following to `[inventory directory]/group_vars/all.yaml`, or `demo.yaml`, or whichever host group we want to target.
 
 ```yaml
+# github.com/francoposa/learn-infra-ops/blob/main/infrastructure/ansible/inventory/sources/group_vars/demo.yaml
 ---
 ansible_user: infra_ops
 ```

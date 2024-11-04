@@ -83,8 +83,6 @@ bind-address: "x.x.x.x"
 ## 2. Copy K3s Config to Server and Install K3s with Ansible
 
 ```shell
-% export DO_API_TOKEN=dop_v1_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
 % ansible-playbook \
   --inventory ./infrastructure/ansible/inventory/sources \
   ./infrastructure/ansible/k3s/install.yaml
@@ -154,7 +152,14 @@ If this is not preferred, we have multiple viable options:
 * change the order of kubeconfigs on merge to retain the desired config
 * skip merging kubeconfigs altogether and switch between configs with the `KUBECONFIG` environment variable
 
-As I am usually spinning up a fresh cluster after tearing down the last one, I use this playbook as-is, allowing the new `default` kubeconfig context to overwrite the old.
+As I am usually spinning up a fresh cluster after tearing down the last one,
+I use this playbook as-is, allowing the new `default` kubeconfig context to overwrite the old.
+
+```shell
+% ansible-playbook \
+  --inventory ./infrastructure/ansible/inventory/sources \
+  ./infrastructure/ansible/k3s/local-kube-config.yaml
+```
 
 ```yaml
 # github.com/francoposa/learn-infra-ops/blob/main/infrastructure/ansible/k3s/local-kube-config.yaml
@@ -211,6 +216,6 @@ Kubernetes control plane is running at https://137.184.2.102:6443
 We now have a fully-functioning single-node K3s Kubernetes cluster running and available in a cloud server.
 The public IP address assigned to the VM allows us to manage our server and kubernetes cluster from anywhere.
 
-Moreover, all of our configuration and installation steps are declared in version-controlled files,
+All of our configuration and installation steps are declared in version-controlled files,
 enabling us to duplicate the same infrastructure state across as many hosts as we want,
 or repeat the same infrastructure state in a single host after tearing it down and spinning it back up.
