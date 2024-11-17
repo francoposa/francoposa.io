@@ -46,15 +46,15 @@ Verify cluster access and status via `kubectl` with either of the following comm
 
 ```shell
 % kubectl cluster-info
-Kubernetes control plane is running at https://137.184.2.102:6443
-CoreDNS is running at https://137.184.2.102:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
-Metrics-server is running at https://137.184.2.102:6443/api/v1/namespaces/kube-system/services/https:metrics-server:https/proxy
+Kubernetes control plane is running at https://165.232.155.5:6443
+CoreDNS is running at https://165.232.155.5:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+Metrics-server is running at https://165.232.155.5:6443/api/v1/namespaces/kube-system/services/https:metrics-server:https/proxy
 
 % kubectl get nodes
 NAME              STATUS   ROLES                  AGE   VERSION
 k3s-demo-master   Ready    control-plane,master   16d   v1.26.4+k3s1
 % kubectl cluster-info
-Kubernetes control plane is running at https://137.184.2.102:6443
+Kubernetes control plane is running at https://165.232.155.5:6443
 ```
 
 ### 0.3 An HTTP Server Container
@@ -133,7 +133,7 @@ For that we would need:
     namespace: default
 ```
 
-or `kubens`, which will highlight the current active namespace:
+or use `kubens`, which will highlight the current active namespace:
 
 ```shell
 % kubens

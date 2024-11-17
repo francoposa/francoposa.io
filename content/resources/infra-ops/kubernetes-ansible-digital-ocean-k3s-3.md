@@ -128,14 +128,14 @@ bind-address: "x.x.x.x"
 At this point, we should be able to ssh to the droplet and verify that the k3s cluster is initialized.
 
 ```shell
-% ssh infra_ops@137.184.2.102
+% ssh infra_ops@165.232.155.5
 
 infra_ops@debian-s-1vcpu-2gb-sfo3-01:~$ kubectl get nodes
 NAME              STATUS   ROLES                  AGE   VERSION
 k3s-demo-master   Ready    control-plane,master   15d   v1.26.4+k3s1
 
 infra_ops@debian-s-1vcpu-2gb-sfo3-01:~$ kubectl cluster-info
-Kubernetes control plane is running at https://137.184.2.102:6443
+Kubernetes control plane is running at https://165.232.155.5:6443
 ```
 
 ## 2. Copy Kube Config from Droplet and Merge
@@ -199,15 +199,15 @@ Now, we can manage our cluster with `kubectl` from our local machine:
 
 ```shell
 % kubectl cluster-info
-Kubernetes control plane is running at https://137.184.2.102:6443
-CoreDNS is running at https://137.184.2.102:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
-Metrics-server is running at https://137.184.2.102:6443/api/v1/namespaces/kube-system/services/https:metrics-server:https/proxy
+Kubernetes control plane is running at https://165.232.155.5:6443
+CoreDNS is running at https://165.232.155.5:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+Metrics-server is running at https://165.232.155.5:6443/api/v1/namespaces/kube-system/services/https:metrics-server:https/proxy
 
 % kubectl get nodes
 NAME              STATUS   ROLES                  AGE   VERSION
 k3s-demo-master   Ready    control-plane,master   16d   v1.26.4+k3s1
 % kubectl cluster-info
-Kubernetes control plane is running at https://137.184.2.102:6443
+Kubernetes control plane is running at https://165.232.155.5:6443
 
 ```
 

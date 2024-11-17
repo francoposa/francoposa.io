@@ -28,9 +28,9 @@ modules are very straightforward mappings of the `kubectl` and `helm` CLIs.
 
 ### 0.1 A Kubernetes Cluster with an HTTP Service Deployed
 
-We roughly need what was accomplished in [Part 4](/resources/infra-ops/zero-to-production-with-kubernetes-4/).
+We roughly need what was accomplished in [Part 1](/resources/infra-ops/kubernetes-software-deployment-1/).
 While it is not strictly necessary to have the Kubernetes resources (Namespace, Deployment, and Service)
-defined exactly the same way as in Part 4, it will certainly make it easier to follow along.
+defined exactly the same way as in Part 1, it will certainly make it easier to follow along.
 
 ### 0.2 A Public Domain Name
 
@@ -47,12 +47,15 @@ we can stick with getting a domain with one of the cheaper, lesser-known TLDs - 
 I was lucky enough to snag the relatively coherent domain `backtalk.dev` to use for this series,
 as a nod to the common usage of echo servers image to demonstrate Kubernetes deployments.
 
-### 0.3 Install the `helm` Command-Line Tooling
+[//]: # (### 0.3 Install the `helm` Command-Line Tooling)
 
-Install `helm` with the official Helm guide [here](https://helm.sh/docs/intro/install/).
+[//]: # ()
+[//]: # (Install `helm` with the official Helm guide [here]&#40;https://helm.sh/docs/intro/install/&#41;.)
 
-The `helm` command will utilize the same kubeconfig as is configured for our `kubectl` CLI,
-and respects the context and namespace configuration applied by `kubectx` and `kubens`.
+[//]: # ()
+[//]: # (The `helm` command will utilize the same kubeconfig as is configured for our `kubectl` CLI,)
+
+[//]: # (and respects the context and namespace configuration applied by `kubectx` and `kubens`.)
 
 ## 1. Create a DNS Record from the Domain to the Kubernetes Cluster
 
@@ -62,7 +65,7 @@ The A record simply serves to point a domain name to an IPv4 address.
 ### 1.1 Create the DNS `A` Record with the Domain Registrar
 
 Each domain registrar will offer a slightly different interface for entering the DNS record,
-but the A record should simply point the root domain (`backtalk.dev`) to the desired IP address (`137.184.2.102`).
+but the A record should simply point the root domain (`backtalk.dev`) to the desired IP address (`165.232.155.5`).
 
 When using K3s in the cloud, the IP address is simply the public IP address of the cloud server,
 as the `metallb` load balancer component bundled with K3s binds to the host IP address by default.
@@ -79,7 +82,7 @@ DNS records can be checked with the command-line tool `dig`, which is generally 
 
 ```shell
 % dig +short backtalk.dev
-137.184.2.102
+165.232.155.5
 ```
 
 Drop the `+short` to see more information:
@@ -99,7 +102,7 @@ Drop the `+short` to see more information:
 ;backtalk.dev.			IN	A
 
 ;; ANSWER SECTION:
-backtalk.dev.		600	IN	A	137.184.2.102
+backtalk.dev.		600	IN	A	165.232.155.5
 
 ;; Query time: 113 msec
 ;; SERVER: 192.168.0.1#53(192.168.0.1) (UDP)
@@ -131,8 +134,72 @@ Content-Length: 19
 ```
 
 We use `curl` because a modern browser may not allow us to reach our domain just yet.
+
+### 1.3 View TLS Certificate Data
+
+#### View in Browser
+
 We have not yet assigned the cluster a TLS certificate from a trusted certificate authority,
 so depending on the browser's security settings we may be blocked completely or have to read warnings before continuing.
+
+Attempting to access `https://backtalk.dev` from Firefox will show "Did Not Connect: Potential Security Issue".
+Click "Advanced" to show more information:
+
+> backtalk.dev uses an invalid security certificate.
+>
+> The certificate is not trusted because it is self-signed.
+>
+> Error code: MOZILLA_PKIX_ERROR_SELF_SIGNED_CERT
+>
+> View Certificate
+
+Click "View Certificate" to see the certificate and its metadata:
+
+> Subject: TRAEFIK DEFAULT CERT
+>
+> Issuer: TRAEFIK DEFAULT CERT
+>
+> ...
+>
+> Certificate Authority: No
+
+Similarly, accessing `https://backtalk.dev` via Chrome will show "Your connection is not private".
+Clicking the `NET:ERR_CERT_AUTHORITY_INVALID` error message below will reveal the TLS certificate,
+though Chrome does not bother to parse and show us the complete metadata.
+
+#### View with `curl`
+
+While `curl` is not designed for parsing and showing TLS certificates, we can use it for quick checks.
+With the `--verbose` flag, `curl` will log each step of its connection and request process,
+including when it fails to reach an HTTPS address with an invalid certificate:
+
+```shell
+ % curl -i --verbose https://backtalk.dev
+```
+
+```console
+* Host backtalk.dev:443 was resolved.
+* IPv6: (none)
+* IPv4: 165.232.155.5
+*   Trying 165.232.155.5:443...
+* Connected to backtalk.dev (165.232.155.5) port 443
+* ALPN: curl offers h2,http/1.1
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+*  CAfile: /etc/pki/tls/certs/ca-bundle.crt
+*  CApath: none
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+* TLSv1.3 (OUT), TLS alert, unknown CA (560):
+* SSL certificate problem: self-signed certificate
+* closing connection #0
+curl: (60) SSL certificate problem: self-signed certificate
+More details here: https://curl.se/docs/sslcerts.html
+
+curl failed to verify the legitimacy of the server and therefore could not
+establish a secure connection to it. To learn more about this situation and
+how to fix it, please visit the webpage mentioned above.
+```
 
 ## 2. Automate TLS Certificates from Let's Encrypt with `cert-manager`
 
@@ -151,11 +218,19 @@ and more recently the cloud-native [`cert-manager`](https://cert-manager.io/docs
 
 ### 2.1 Install `cert-manager`
 
-Check the [`cert-manager` release list](https://github.com/cert-manager/cert-manager/releases) for the latest version to install.
+Install the latest cert-manager release:
 
 ```shell
-% kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.15.0/cert-manager.yaml
+% kubectl apply -f https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml
 ```
+
+or install a specific version:
+
+```shell
+% kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.16.1/cert-manager.yaml
+```
+
+Components will be installed into the `cert-manager` namespace.
 
 ### 2.2 Declare the Staging Cluster Issuer
 
