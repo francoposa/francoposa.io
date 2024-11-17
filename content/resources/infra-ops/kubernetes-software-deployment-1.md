@@ -52,7 +52,7 @@ Metrics-server is running at https://165.232.155.5:6443/api/v1/namespaces/kube-s
 
 % kubectl get nodes
 NAME              STATUS   ROLES                  AGE   VERSION
-k3s-demo-master   Ready    control-plane,master   16d   v1.26.4+k3s1
+k3s-demo-master   Ready    control-plane,master    6h   v1.26.4+k3s1
 % kubectl cluster-info
 Kubernetes control plane is running at https://165.232.155.5:6443
 ```
@@ -118,10 +118,10 @@ Whenever we want to list Kubernetes resources, we start with a `kubectl get [res
 ```shell
 % kubectl get namespace  # or the short version, `kubectl get ns`
 NAME              STATUS   AGE
-kube-system       Active   39d
-kube-public       Active   39d
-kube-node-lease   Active   39d
-default           Active   39d
+kube-system       Active    6h
+kube-public       Active    6h
+kube-node-lease   Active    6h
+default           Active    6h
 whoami            Active    5m
 ```
 
@@ -251,7 +251,7 @@ Use `kubectl get` to see the Deployment:
 ```shell
 % kubectl get deployment
 NAME     READY   UP-TO-DATE   AVAILABLE   AGE
-whoami   3/3     3            3           112m
+whoami   3/3     3            3            2m
 ```
 
 and the Pods created by the deployment:
@@ -259,9 +259,9 @@ and the Pods created by the deployment:
 ```shell
 % kubectl get pod
 NAME                      READY   STATUS    RESTARTS   AGE
-whoami-7669c49d8c-t55fr   1/1     Running   0          113m
-whoami-7669c49d8c-ww8nl   1/1     Running   0          113m
-whoami-7669c49d8c-gqp8h   1/1     Running   0          113m
+whoami-7669c49d8c-t55fr   1/1     Running   0           2m
+whoami-7669c49d8c-ww8nl   1/1     Running   0           2m
+whoami-7669c49d8c-gqp8h   1/1     Running   0           2m
 ```
 
 #### 3.2 View the Logs

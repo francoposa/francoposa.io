@@ -16,8 +16,8 @@ weight: 5
 We will:
 
 1. Create DNS records to point a domain name to our Kubernetes cluster's public IP address
-2. Deploy [cert-manager](https://cert-manager.io/docs/) to our cluster to issue TLS certificates for our domain
-3. Create Kubernetes Ingress rules to route requests to our domain through to our backend HTTP Service
+2. Create Kubernetes Ingress rules to route requests to our domain through to our backend HTTP Service
+3. Deploy [cert-manager](https://cert-manager.io/docs/) to our cluster to issue TLS certificates for our domain
 
 We will leave converting the `kubectl` and `helm` deployment methods to Ansible playbooks as an exercise for the reader.
 The Ansible core [k8s](https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html)
@@ -26,13 +26,79 @@ modules are very straightforward mappings of the `kubectl` and `helm` CLIs.
 
 ## 0. Prerequisites
 
-### 0.1 A Kubernetes Cluster with an HTTP Service Deployed
+### 0.1 A Kubernetes Cluster with a Public IP Address
 
-We roughly need what was accomplished in [Part 1](/resources/infra-ops/kubernetes-software-deployment-1/).
+We will be building on the same demo cluster used in previous guides in this section:
+a single-node K3s cluster deployed on a small cloud server with a public IP address.
+
+While it is not required to use the same setup for this installment, K3s is strongly recommended
+as it bundles and configures some essential components for exposing our services to the public:
+
+#### 0.1.1 K3s Exposes a LoadBalancer on the Server's Public IP Address
+
+By default, K3s runs a Traefik proxy instance as a LoadBalancer service
+bound to the public IP address of the server node on host ports 80 (HTTP) and 443 (HTTPS).
+
+Other Kubernetes distributions may not include a load balancer at all by default,
+as they assume you will be running a larger cluster with a multiple nodes,
+all on a private network hidden behind an external dedicated public load balancer.
+
+We do not need to configure an external load balancer to distribute traffic across multiple nodes.
+With our single-node setup, we can simply point our DNS records at the single public IP of the node.
+
+Services can be listed with `kubectl` - look for those with type `LoadBalancer` with an external IP.
+
+```shell
+% kubectl --namespace kube-system get svc
+NAME             TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)                      AGE
+kube-dns         ClusterIP      10.43.0.10     <none>          53/UDP,53/TCP,9153/TCP       6h7m
+metrics-server   ClusterIP      10.43.16.167   <none>          443/TCP                      6h7m
+traefik          LoadBalancer   10.43.91.219   165.232.155.5   80:30753/TCP,443:31662/TCP   6h7m
+```
+
+#### 0.1.2 K3s Uses Traefik as its Default Ingress Controller.
+
+Any software which implements the Kubernetes Ingress Controller specification
+will be compatible with all standard Kubernetes Ingress configurations.
+
+Though some ingress class providers offer functionality beyond the official spec,
+we will avoid using any of those options in this guide.
+
+K3s uses Traefik as its default ingress, but other setups may use Nginx or other popular options.
+Adjust references in the Kubernetes manifests accordingly, replacing `traefik` with `nginx` or otherwise.
+
+Ingress controllers can be listed with `kubectl` and inspected to check which is annotated as the default.
+
+```shell
+% kubectl --namespace kube-system get ingressclass
+NAME      CONTROLLER                      PARAMETERS   AGE
+traefik   traefik.io/ingress-controller   <none>       6h8m
+```
+
+```shell
+% kubectl --namespace kube-system describe ingressclass traefik
+Name:         traefik
+Labels:       app.kubernetes.io/instance=traefik-kube-system
+              app.kubernetes.io/managed-by=Helm
+              app.kubernetes.io/name=traefik
+              helm.sh/chart=traefik-27.0.201_up27.0.2
+Annotations:  ingressclass.kubernetes.io/is-default-class: true
+              meta.helm.sh/release-name: traefik
+              meta.helm.sh/release-namespace: kube-system
+Controller:   traefik.io/ingress-controller
+Events:       <none>
+```
+
+### 0.2 A Kubernetes Cluster with an HTTP Service Deployed
+
+In [Part 1](/resources/infra-ops/kubernetes-software-deployment-1/) we deployed the
+[`traefik/whoami`](https://hub.docker.com/r/traefik/whoami) echo server image
+with its corresponding Kubernetes resources (Namespace, Deployment, and Service).
+
 While it is not strictly necessary to have the Kubernetes resources (Namespace, Deployment, and Service)
 defined exactly the same way as in Part 1, it will certainly make it easier to follow along.
 
-### 0.2 A Public Domain Name
+### 0.3 A Public Domain Name
 
 There are plenty of registrars which make purchasing and managing a domain name easy.
 [Porkbun](https://porkbun.com/) in particular offers a great combination of simplicity, good pricing,
@@ -45,7 +111,7 @@ Unless we are launching a legitimate website or application with this domain,
 we can stick with getting a domain with one of the cheaper, lesser-known TLDs - many are under $10/year.
 
 I was lucky enough to snag the relatively coherent domain `backtalk.dev` to use for this series,
-as a nod to the common usage of echo servers image to demonstrate Kubernetes deployments.
+as a nod to the common usage of echo servers to demonstrate Kubernetes deployments.
 
 [//]: # (### 0.3 Install the `helm` Command-Line Tooling)
 
@@ -169,9 +235,9 @@ though Chrome does not bother to parse and show us the complete metadata.
 
 #### View with `curl`
 
-While `curl` is not designed for parsing and showing TLS certificates, we can use it for quick checks.
+While `curl` is not designed for parsing and showing TLS certificates, we can use it for a quick check.
 With the `--verbose` flag, `curl` will log each step of its connection and request process,
-including when it fails to reach an HTTPS address with an invalid certificate:
+including when it fails validate the certificate for an HTTPS address:
 
 ```shell
  % curl -i --verbose https://backtalk.dev
@@ -201,7 +267,15 @@ establish a secure connection to it. To learn more about this situation and
 how to fix it, please visit the webpage mentioned above.
 ```
 
-## 2. Automate TLS Certificates from Let's Encrypt with `cert-manager`
+## 2. Create an Ingress
+
+The Kubernetes Ingress resource defines how the Ingress Controller routes external (typically HTTP) traffic
+to the Service backends, with routing rules based on the hostname and URL path requested.
+
+[//]: # (The Ingress definition and Ingress controller also handle)
+... [TODO] ...
+
+## 3. Automate TLS Certificates from Let's Encrypt with `cert-manager`
 
 TLS certificates are one of the primary ways that computers communicating across a network verify each other's identity.
 These certificates provide the `S` for `Secure` in `HTTPS` and help prevent a wide array of security exploits,
@@ -213,10 +287,10 @@ we need to generate TLS certificates from a trusted authority if we want anyone 
 Historically, both certificate was a manual process for sysadmins and while it is a relatively simple process,
 certificates can be valid for many months so it was easy to forget which ones need renewed when for which domains.
 
-Thankfully with the rise of the nonprofit `Let's Encrypt` [Certificate Authority](https://en.wikipedia.org/wiki/Certificate_authority),
-and more recently the cloud-native [`cert-manager`](https://cert-manager.io/docs/), this process can be complete automated.
+Thankfully with the rise of the nonprofit Let's Encrypt [Certificate Authority](https://en.wikipedia.org/wiki/Certificate_authority),
+and more recently, the cloud-native [`cert-manager`](https://cert-manager.io/docs/), this process can be complete automated.
 
-### 2.1 Install `cert-manager`
+### 3.1 Install `cert-manager`
 
 Install the latest cert-manager release:
 
@@ -232,7 +306,7 @@ or install a specific version:
 
 Components will be installed into the `cert-manager` namespace.
 
-### 2.2 Declare the Staging Cluster Issuer
+### 3.2 Declare the Staging Cluster Issuer
 
 The `ClusterIssuer` is not a standard Kubernetes resource like Pods, Deployments, and StatefulSets.
 If is a "Custom Resource Definition" (CRD) defined by `cert-manager` -
@@ -266,7 +340,7 @@ spec:
             class: traefik
 ```
 
-### 2.3 Apply the Staging Cluster Issuer
+### 3.3 Apply the Staging Cluster Issuer
 
 ```shell
 % kubectl -n cert-manager apply -f kubernetes/cert-manager/manifests/cluster-issuer-staging.yaml
@@ -274,7 +348,7 @@ spec:
 clusterissuer.cert-manager.io/cluster-issuer created
 ```
 
-### 2.4 Verify the Staging Cluster Issuer
+### 3.4 Verify the Staging Cluster Issuer
 
 ```shell
 % kubectl get clusterissuer -o wide
@@ -289,9 +363,9 @@ We can also tail the logs of the `cert-manager` Pod for more information:
 # ... logs are noisy but we should see some success messages
 ```
 
-### 2.5 Verify the Let's Encrypt Staging Certificate
+[//]: # (Unfortunately we cannot verify access through this TLS certificate just yet - )
 
-
+[//]: # (we need a Kubernetes Ingress to put all the pieces together.)
 
 [//]: # (Essentially, the `cert-manager` process will make a request to the Let's Encrypt servers,)
 
