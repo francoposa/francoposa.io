@@ -17,36 +17,35 @@ We will:
 
 1. Create DNS records to point a domain name to our Kubernetes cluster's public IP address
 2. Create Kubernetes Ingress rules to route requests to our domain through to our backend HTTP Service
-3. Deploy [cert-manager](https://cert-manager.io/docs/) to our cluster to issue TLS certificates for our domain
-
-We will leave converting the `kubectl` and `helm` deployment methods to Ansible playbooks as an exercise for the reader.
-The Ansible core [k8s](https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html)
-and [helm](https://docs.ansible.com/ansible/latest/collections/kubernetes/core/helm_module.html)
-modules are very straightforward mappings of the `kubectl` and `helm` CLIs.
+3. Deploy [cert-manager](https://cert-manager.io/docs/) to our cluster to automate TLS certificates for our domain
 
 ## 0. Prerequisites
 
 ### 0.1 A Kubernetes Cluster with a Public IP Address
 
 We will be building on the same demo cluster used in previous guides in this section:
-a single-node K3s cluster deployed on a small cloud server with a public IP address.
+a single-node [K3s](https://docs.k3s.io/) cluster deployed on a small cloud server with a public IP address.
 
 While it is not required to use the same setup for this installment, K3s is strongly recommended
-as it bundles and configures some essential components for exposing our services to the public:
+as it bundles and configures some essential components for exposing our services to the public.
+If you are running a different Kubernetes distribution, you may need to adjust configuration accordingly.
 
-#### 0.1.1 K3s Exposes a LoadBalancer on the Server's Public IP Address
+Regardless, we should understand how the K3s configuration choices enable public traffic to our cluster.
+
+**0.1.1 K3s Exposes a LoadBalancer on the Server's Public IP Address**
 
 By default, K3s runs a Traefik proxy instance as a LoadBalancer service
 bound to the public IP address of the server node on host ports 80 (HTTP) and 443 (HTTPS).
 
-Other Kubernetes distributions may not include a load balancer at all by default,
-as they assume you will be running a larger cluster with a multiple nodes,
-all on a private network hidden behind an external dedicated public load balancer.
+Other Kubernetes distributions may not include a load balancer at all,
+as they presume you will be running the cluster on a private network,
+with traffic routed from the public internet by a separate external load balancer.
 
-We do not need to configure an external load balancer to distribute traffic across multiple nodes.
-With our single-node setup, we can simply point our DNS records at the single public IP of the node.
+With our single-node setup, we do not need to configure an external load balancer.
+We can simply point our DNS records at the single public IP of the node.
 
-Services can be listed with `kubectl` - look for those with type `LoadBalancer` with an external IP.
+Services can be listed with `kubectl get service` or the abbreviation `svc` -
+look for those with type `LoadBalancer` with an external IP.
 
 ```shell
 % kubectl --namespace kube-system get svc
@@ -56,18 +55,18 @@ metrics-server   ClusterIP      10.43.16.167   <none>          443/TCP          
 traefik          LoadBalancer   10.43.91.219   165.232.155.5   80:30753/TCP,443:31662/TCP   6h7m
 ```
 
-#### 0.1.2 K3s Uses Traefik as its Default Ingress Controller.
+**0.1.2 K3s Uses Traefik as its Default Ingress Controller.**
 
 Any software which implements the Kubernetes Ingress Controller specification
 will be compatible with all standard Kubernetes Ingress configurations.
-
 Though some ingress class providers offer functionality beyond the official spec,
 we will avoid using any of those options in this guide.
 
-K3s uses Traefik as its default ingress, but other setups may use Nginx or other popular options.
-Adjust references in the Kubernetes manifests accordingly, replacing `traefik` with `nginx` or otherwise.
+K3s uses Traefik Proxy as its default ingress, but other setups may use NGINX or other popular proxy options.
+Adjust references in the Kubernetes manifests as needed, replacing `traefik` with `nginx` or otherwise.
 
-Ingress controllers can be listed with `kubectl` and inspected to check which is annotated as the default.
+Ingress controllers can be listed with `kubectl get ingressclass` and further inspected with `kubectl describe`.
+Annotations in the `describe` output will indicate if an ingress controller is the default for the cluster.
 
 ```shell
 % kubectl --namespace kube-system get ingressclass
@@ -89,14 +88,14 @@ Controller:   traefik.io/ingress-controller
 Events:       <none>
 ```
 
-### 0.2 A Kubernetes Cluster with an HTTP Service Deployed
+### 0.2 An HTTP Application Deployed With a Kubernetes Service Resource
 
 In [Part 1](/resources/infra-ops/kubernetes-software-deployment-1/) we deployed the
 [`traefik/whoami`](https://hub.docker.com/r/traefik/whoami) echo server image
 with its corresponding Kubernetes resources (Namespace, Deployment, and Service).
 
-While it is not strictly necessary to have the Kubernetes resources (Namespace, Deployment, and Service)
-defined exactly the same way as in Part 1, it will certainly make it easier to follow along.
+The Service resource must exist to be referenced by the Ingress rules we will create
+in order to route external traffic to the HTTP server application running in the Pods.
 
 ### 0.3 A Public Domain Name
 
