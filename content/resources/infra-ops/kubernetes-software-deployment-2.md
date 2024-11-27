@@ -21,19 +21,16 @@ We will:
 
 ## 0. Prerequisites
 
-### 0.1 A Kubernetes Cluster with a Public IP Address
+### 0.1. A Kubernetes Cluster with a LoadBalancer on the Server's Public IP Address
 
 We will be building on the same demo cluster used in previous guides in this section:
 a single-node [K3s](https://docs.k3s.io/) cluster deployed on a small cloud server with a public IP address.
 
-While it is not required to use the same setup for this installment, K3s is strongly recommended
+While it is not required to use exact same setup for this installment, K3s is strongly recommended
 as it bundles and configures some essential components for exposing our services to the public.
 If you are running a different Kubernetes distribution, you may need to adjust configuration accordingly.
 
 Regardless, we should understand how the K3s configuration choices enable public traffic to our cluster.
-
-**0.1.1 K3s Exposes a LoadBalancer on the Server's Public IP Address**
-
 By default, K3s runs a Traefik proxy instance as a LoadBalancer service
 bound to the public IP address of the server node on host ports 80 (HTTP) and 443 (HTTPS).
 
@@ -55,49 +52,15 @@ metrics-server   ClusterIP      10.43.16.167   <none>          443/TCP          
 traefik          LoadBalancer   10.43.91.219   165.232.155.5   80:30753/TCP,443:31662/TCP   6h7m
 ```
 
-**0.1.2 K3s Uses Traefik as its Default Ingress Controller.**
-
-Any software which implements the Kubernetes Ingress Controller specification
-will be compatible with all standard Kubernetes Ingress configurations.
-Though some ingress class providers offer functionality beyond the official spec,
-we will avoid using any of those options in this guide.
-
-K3s uses Traefik Proxy as its default ingress, but other setups may use NGINX or other popular proxy options.
-Adjust references in the Kubernetes manifests as needed, replacing `traefik` with `nginx` or otherwise.
-
-Ingress controllers can be listed with `kubectl get ingressclass` and further inspected with `kubectl describe`.
-Annotations in the `describe` output will indicate if an ingress controller is the default for the cluster.
-
-```shell
-% kubectl --namespace kube-system get ingressclass
-NAME      CONTROLLER                      PARAMETERS   AGE
-traefik   traefik.io/ingress-controller   <none>       6h8m
-```
-
-```shell
-% kubectl --namespace kube-system describe ingressclass traefik
-Name:         traefik
-Labels:       app.kubernetes.io/instance=traefik-kube-system
-              app.kubernetes.io/managed-by=Helm
-              app.kubernetes.io/name=traefik
-              helm.sh/chart=traefik-27.0.201_up27.0.2
-Annotations:  ingressclass.kubernetes.io/is-default-class: true
-              meta.helm.sh/release-name: traefik
-              meta.helm.sh/release-namespace: kube-system
-Controller:   traefik.io/ingress-controller
-Events:       <none>
-```
-
-### 0.2 An HTTP Application Deployed With a Kubernetes Service Resource
+### 0.2. An HTTP Application Deployed With a Kubernetes Service Resource
 
 In [Part 1](/resources/infra-ops/kubernetes-software-deployment-1/) we deployed the
 [`traefik/whoami`](https://hub.docker.com/r/traefik/whoami) echo server image
-with its corresponding Kubernetes resources (Namespace, Deployment, and Service).
+with its corresponding Kubernetes resources (Namespace, Deployment,  and Service).
 
-The Service resource must exist to be referenced by the Ingress rules we will create
-in order to route external traffic to the HTTP server application running in the Pods.
+Standard Kubernetes Ingress routing rules can only route traffic to Services.
 
-### 0.3 A Public Domain Name
+### 0.3. A Public Domain Name
 
 There are plenty of registrars which make purchasing and managing a domain name easy.
 [Porkbun](https://porkbun.com/) in particular offers a great combination of simplicity, good pricing,
@@ -127,7 +90,7 @@ as a nod to the common usage of echo servers to demonstrate Kubernetes deploymen
 We only need the simplest kind of DNS record - an [A record](https://www.cloudflare.com/learning/dns/dns-records/dns-a-record/).
 The A record simply serves to point a domain name to an IPv4 address.
 
-### 1.1 Create the DNS `A` Record with the Domain Registrar
+### 1.1. Create the DNS `A` Record with the Domain Registrar
 
 Each domain registrar will offer a slightly different interface for entering the DNS record,
 but the A record should simply point the root domain (`backtalk.dev`) to the desired IP address (`165.232.155.5`).
@@ -138,7 +101,7 @@ There are many other valid but slightly more complicated setups we could use as 
 reserving a static IP to avoid using the random one assigned to a new VM or provisioning a cloud load balancer,
 but we prefer to keep it simple for now.
 
-### 1.2 Verify the DNS Record with `dig`
+### 1.2. Verify the DNS Record with `dig`
 
 DNS record updates can take some time to propagate throughout the internet and DNS servers make heavy use of caching,
 so do not be surprised if it takes tens of minutes or even hours to see a record update reflected.
@@ -175,12 +138,12 @@ backtalk.dev.		600	IN	A	165.232.155.5
 ;; MSG SIZE  rcvd: 57
 ```
 
-### 1.2 Verify the DNS Record Reaches the Kubernetes Cluster
+### 1.3. Verify the DNS Record Reaches the Kubernetes Cluster
 
 We can use `curl` to make an HTTP request to the domain.
 As we have not set up any ingress routing for the cluster,
 we only expect to see the default `404` status response provided by an [Ingress Controller](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/).
-In a K3s cluster, this is plaintext response from the bundled `traefik` component.
+In a K3s cluster, this is plaintext response from the bundled `traefik` component which serves as the Ingress.
 
 ```shell
 % curl backtalk.dev
@@ -198,81 +161,129 @@ Content-Length: 19
 404 page not found
 ```
 
-We use `curl` because a modern browser may not allow us to reach our domain just yet.
-
-### 1.3 View TLS Certificate Data
-
-#### View in Browser
-
-We have not yet assigned the cluster a TLS certificate from a trusted certificate authority,
-so depending on the browser's security settings we may be blocked completely or have to read warnings before continuing.
-
-Attempting to access `https://backtalk.dev` from Firefox will show "Did Not Connect: Potential Security Issue".
-Click "Advanced" to show more information:
-
-> backtalk.dev uses an invalid security certificate.
->
-> The certificate is not trusted because it is self-signed.
->
-> Error code: MOZILLA_PKIX_ERROR_SELF_SIGNED_CERT
->
-> View Certificate
-
-Click "View Certificate" to see the certificate and its metadata:
-
-> Subject: TRAEFIK DEFAULT CERT
->
-> Issuer: TRAEFIK DEFAULT CERT
->
-> ...
->
-> Certificate Authority: No
-
-Similarly, accessing `https://backtalk.dev` via Chrome will show "Your connection is not private".
-Clicking the `NET:ERR_CERT_AUTHORITY_INVALID` error message below will reveal the TLS certificate,
-though Chrome does not bother to parse and show us the complete metadata.
-
-#### View with `curl`
-
-While `curl` is not designed for parsing and showing TLS certificates, we can use it for a quick check.
-With the `--verbose` flag, `curl` will log each step of its connection and request process,
-including when it fails validate the certificate for an HTTPS address:
-
-```shell
- % curl -i --verbose https://backtalk.dev
-```
-
-```console
-* Host backtalk.dev:443 was resolved.
-* IPv6: (none)
-* IPv4: 165.232.155.5
-*   Trying 165.232.155.5:443...
-* Connected to backtalk.dev (165.232.155.5) port 443
-* ALPN: curl offers h2,http/1.1
-* TLSv1.3 (OUT), TLS handshake, Client hello (1):
-*  CAfile: /etc/pki/tls/certs/ca-bundle.crt
-*  CApath: none
-* TLSv1.3 (IN), TLS handshake, Server hello (2):
-* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
-* TLSv1.3 (IN), TLS handshake, Certificate (11):
-* TLSv1.3 (OUT), TLS alert, unknown CA (560):
-* SSL certificate problem: self-signed certificate
-* closing connection #0
-curl: (60) SSL certificate problem: self-signed certificate
-More details here: https://curl.se/docs/sslcerts.html
-
-curl failed to verify the legitimacy of the server and therefore could not
-establish a secure connection to it. To learn more about this situation and
-how to fix it, please visit the webpage mentioned above.
-```
+By default, modern web browsers will not allow us to access the domain until it has a proper TLS certificate.
+More on this later - for now, we will use `curl` without HTTPS to make requests to our domain.
 
 ## 2. Create an Ingress
 
-The Kubernetes Ingress resource defines how the Ingress Controller routes external (typically HTTP) traffic
-to the Service backends, with routing rules based on the hostname and URL path requested.
+### Kubernetes Ingress Concepts
 
-[//]: # (The Ingress definition and Ingress controller also handle)
-... [TODO] ...
+Kubernetes Ingress concepts are generally just official names for the basic functionality of a reverse proxy.
+
+The Kubernetes Ingress resource itself is simply a routing rule configuration
+to define how the proxy routes external (typically HTTP) traffic to the Service backends.
+
+An [Ingress _Controller_](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/)
+refers to a Kubernetes component which monitors the cluster for changes in Ingress resources.
+The Controller in turn configures the Ingress _Provider_ (the actual reverse proxy) with corresponding routing rules.
+The two terms are often used interchangeably, as both responsibilities are usually handled by the same piece of software.
+
+K3s uses Traefik Proxy as its default Ingress Controller, but other setups may use NGINX or other popular proxy options.
+Adjust references in the Kubernetes manifests as needed, replacing `traefik` with `nginx` or otherwise.
+
+[//]: # (Though some reverse proxies offer functionality beyond the official Ingress Controller specification,)
+
+[//]: # (we will avoid using any of those options in this guide.)
+
+Ingress controllers can be listed with `kubectl get ingressclass` and further inspected with `kubectl describe`.
+Annotations in the `describe` output will indicate if an ingress controller is the default for the cluster.
+
+```shell
+% kubectl --namespace kube-system get ingressclass
+NAME      CONTROLLER                      PARAMETERS   AGE
+traefik   traefik.io/ingress-controller   <none>       6h8m
+```
+
+```shell
+% kubectl --namespace kube-system describe ingressclass traefik
+Name:         traefik
+Labels:       app.kubernetes.io/instance=traefik-kube-system
+              app.kubernetes.io/managed-by=Helm
+              app.kubernetes.io/name=traefik
+              helm.sh/chart=traefik-27.0.201_up27.0.2
+Annotations:  ingressclass.kubernetes.io/is-default-class: true
+              meta.helm.sh/release-name: traefik
+              meta.helm.sh/release-namespace: kube-system
+Controller:   traefik.io/ingress-controller
+Events:       <none>
+```
+
+### 2.1. Declare the Ingress
+
+Declare the namespace in a manifest file:
+
+```yaml
+# github.com/francoposa/learn-infra-ops/blob/main/kubernetes/traefik/whoami/manifests/ingress.yaml
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: whoami
+  namespace: whoami
+spec:
+  rules:
+    - host: backtalk.dev
+      http:
+        paths:
+          - path: /whoami
+            pathType: Prefix
+            backend:
+              service:
+                name: whoami
+                port:
+                  name: web
+```
+
+### 2.2. Apply the Ingress
+
+Use `kubectl apply` to create the ingress on the cluster:
+
+```shell
+% kubectl -n whoami apply -f kubernetes/traefik/whoami/manifests/ingress.yaml
+ingress.networking.k8s.io/whoami created
+```
+
+### 2.3. Verify the Ingress and Send Requests to the HTTP Server
+
+The Ingress rule we created matches on the host `backtalk.dev` and path `whoami`.
+Again we can use `curl` without HTTPS, but now our requests can reach all the way to the app running in the pods.
+
+```shell
+% curl -i backtalk.dev/whoami
+HTTP/1.1 200 OK
+Content-Length: 408
+Content-Type: text/plain; charset=utf-8
+Date: Wed, 27 Nov 2024 05:50:07 GMT
+
+Hostname: whoami-56bf46959b-nbp7t
+IP: 127.0.0.1
+IP: ::1
+IP: 10.42.0.25
+IP: fe80::60cd:22ff:fe42:754c
+RemoteAddr: 10.42.0.14:51774
+GET /whoami HTTP/1.1
+Host: backtalk.dev
+User-Agent: curl/8.9.1
+Accept: */*
+Accept-Encoding: gzip
+X-Forwarded-For: 10.42.0.1
+X-Forwarded-Host: backtalk.dev
+X-Forwarded-Port: 80
+X-Forwarded-Proto: http
+X-Forwarded-Server: traefik-d7c9c5778-5pbmq
+X-Real-Ip: 10.42.0.1
+```
+
+We can also verify that any other route besides `/whoami` will return a `404` status as before.
+
+```shell
+% curl backtalk.dev
+404 page not found
+% curl backtalk.dev/whoareyou
+404 page not found
+```
+
+With traffic successfully routing from public internet to the pods in our cluster, all that is left is to enable HTTPS.
 
 ## 3. Automate TLS Certificates from Let's Encrypt with `cert-manager`
 
@@ -283,13 +294,13 @@ and even to alter the traffic between your devices and the web services they com
 
 Since modern browsers and many HTTP clients do not allow access to non-HTTPS websites by default,
 we need to generate TLS certificates from a trusted authority if we want anyone to use the sites and services we host.
-Historically, both certificate was a manual process for sysadmins and while it is a relatively simple process,
-certificates can be valid for many months so it was easy to forget which ones need renewed when for which domains.
+Historically, certificate creation and renewal was a manual process for sysadmins and while it is relatively simple,
+various factors made it easy to forget or lose track of which certificates need renewed when and for which domains.
 
 Thankfully with the rise of the nonprofit Let's Encrypt [Certificate Authority](https://en.wikipedia.org/wiki/Certificate_authority),
 and more recently, the cloud-native [`cert-manager`](https://cert-manager.io/docs/), this process can be complete automated.
 
-### 3.1 Install `cert-manager`
+### 3.1. Install `cert-manager`
 
 Install the latest cert-manager release:
 
@@ -305,7 +316,7 @@ or install a specific version:
 
 Components will be installed into the `cert-manager` namespace.
 
-### 3.2 Declare the Staging Cluster Issuer
+### 3.2. Declare the Staging Cluster Issuer
 
 The `ClusterIssuer` is not a standard Kubernetes resource like Pods, Deployments, and StatefulSets.
 If is a "Custom Resource Definition" (CRD) defined by `cert-manager` -
@@ -339,7 +350,7 @@ spec:
             class: traefik
 ```
 
-### 3.3 Apply the Staging Cluster Issuer
+### 3.3. Apply the Staging Cluster Issuer
 
 ```shell
 % kubectl -n cert-manager apply -f kubernetes/cert-manager/manifests/cluster-issuer-staging.yaml
@@ -347,7 +358,7 @@ spec:
 clusterissuer.cert-manager.io/cluster-issuer created
 ```
 
-### 3.4 Verify the Staging Cluster Issuer
+### 3.4. Verify the Staging Cluster Issuer
 
 ```shell
 % kubectl get clusterissuer -o wide
@@ -375,3 +386,130 @@ We can also tail the logs of the `cert-manager` Pod for more information:
 [//]: # (In addition to an extensive set of integrations and plugins, Traefik implements the Kubernetes Ingress Controller API)
 
 [//]: # (as well as to provide traffic routing for a cluster.)
+
+
+
+[//]: # (### 1.3 View TLS Certificate Data)
+
+[//]: # ()
+[//]: # (The default certificate returned by the `traefik` ingress proxy is a "self-signed" certificate,)
+
+[//]: # (which serves as temporary placeholder until we can get TLS certificate from a known Certificate Authority &#40;CA&#41;.)
+
+[//]: # ()
+[//]: # (Depending on the browser's security settings we may be blocked completely or have to read warnings before continuing,)
+
+[//]: # (but we can use the browser itself or some output from `curl` to confirm the status of the TLS certificate.)
+
+[//]: # ()
+[//]: # (#### View in Browser)
+
+[//]: # ()
+[//]: # (Attempting to access `https://backtalk.dev` from Firefox will show "Did Not Connect: Potential Security Issue".)
+
+[//]: # (Click "Advanced" to show more information:)
+
+[//]: # ()
+[//]: # (> backtalk.dev uses an invalid security certificate.)
+
+[//]: # (>)
+
+[//]: # (> The certificate is not trusted because it is self-signed.)
+
+[//]: # (>)
+
+[//]: # (> Error code: MOZILLA_PKIX_ERROR_SELF_SIGNED_CERT)
+
+[//]: # (>)
+
+[//]: # (> View Certificate)
+
+[//]: # ()
+[//]: # (Click "View Certificate" to see the certificate and its metadata:)
+
+[//]: # ()
+[//]: # (> Subject: TRAEFIK DEFAULT CERT)
+
+[//]: # (>)
+
+[//]: # (> Issuer: TRAEFIK DEFAULT CERT)
+
+[//]: # (>)
+
+[//]: # (> ...)
+
+[//]: # (>)
+
+[//]: # (> Certificate Authority: No)
+
+[//]: # ()
+[//]: # (Similarly, accessing `https://backtalk.dev` via Chrome will show "Your connection is not private".)
+
+[//]: # (Clicking the `NET:ERR_CERT_AUTHORITY_INVALID` error message below will reveal the TLS certificate,)
+
+[//]: # (though Chrome does not bother to parse and show us the complete metadata.)
+
+[//]: # ()
+[//]: # (#### View with `curl`)
+
+[//]: # ()
+[//]: # (While `curl` is not designed for parsing and showing TLS certificates, we can use it for a quick check.)
+
+[//]: # (With the `--verbose` flag, `curl` will log each step of its connection and request process,)
+
+[//]: # (including when it fails validate the certificate for an HTTPS address:)
+
+[//]: # ()
+[//]: # (```shell)
+
+[//]: # ( % curl -i --verbose https://backtalk.dev)
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (```console)
+
+[//]: # (* Host backtalk.dev:443 was resolved.)
+
+[//]: # (* IPv6: &#40;none&#41;)
+
+[//]: # (* IPv4: 165.232.155.5)
+
+[//]: # (*   Trying 165.232.155.5:443...)
+
+[//]: # (* Connected to backtalk.dev &#40;165.232.155.5&#41; port 443)
+
+[//]: # (* ALPN: curl offers h2,http/1.1)
+
+[//]: # (* TLSv1.3 &#40;OUT&#41;, TLS handshake, Client hello &#40;1&#41;:)
+
+[//]: # (*  CAfile: /etc/pki/tls/certs/ca-bundle.crt)
+
+[//]: # (*  CApath: none)
+
+[//]: # (* TLSv1.3 &#40;IN&#41;, TLS handshake, Server hello &#40;2&#41;:)
+
+[//]: # (* TLSv1.3 &#40;IN&#41;, TLS handshake, Encrypted Extensions &#40;8&#41;:)
+
+[//]: # (* TLSv1.3 &#40;IN&#41;, TLS handshake, Certificate &#40;11&#41;:)
+
+[//]: # (* TLSv1.3 &#40;OUT&#41;, TLS alert, unknown CA &#40;560&#41;:)
+
+[//]: # (* SSL certificate problem: self-signed certificate)
+
+[//]: # (* closing connection #0)
+
+[//]: # (curl: &#40;60&#41; SSL certificate problem: self-signed certificate)
+
+[//]: # (More details here: https://curl.se/docs/sslcerts.html)
+
+[//]: # ()
+[//]: # (curl failed to verify the legitimacy of the server and therefore could not)
+
+[//]: # (establish a secure connection to it. To learn more about this situation and)
+
+[//]: # (how to fix it, please visit the webpage mentioned above.)
+
+[//]: # (```)
+
+[//]: # ()
