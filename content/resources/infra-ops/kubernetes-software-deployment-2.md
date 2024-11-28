@@ -30,16 +30,9 @@ While it is not required to use exact same setup for this installment, K3s is st
 as it bundles and configures some essential components for exposing our services to the public.
 If you are running a different Kubernetes distribution, you may need to adjust configuration accordingly.
 
-Regardless, we should understand how the K3s configuration choices enable public traffic to our cluster.
-By default, K3s runs a Traefik proxy instance as a LoadBalancer service
+Regardless, we should understand how K3s' default configuration has enabled public traffic to our cluster.
+By default, K3s runs a Traefik Proxy instance as a LoadBalancer service
 bound to the public IP address of the server node on host ports 80 (HTTP) and 443 (HTTPS).
-
-Other Kubernetes distributions may not include a load balancer at all,
-as they presume you will be running the cluster on a private network,
-with traffic routed from the public internet by a separate external load balancer.
-
-With our single-node setup, we do not need to configure an external load balancer.
-We can simply point our DNS records at the single public IP of the node.
 
 Services can be listed with `kubectl get service` or the abbreviation `svc` -
 look for those with type `LoadBalancer` with an external IP.
@@ -52,6 +45,13 @@ metrics-server   ClusterIP      10.43.16.167   <none>          443/TCP          
 traefik          LoadBalancer   10.43.91.219   165.232.155.5   80:30753/TCP,443:31662/TCP   6h7m
 ```
 
+Other Kubernetes distributions may not include a load balancer at all,
+as they presume you will be running the cluster on a private network,
+with traffic routed from the public internet by a separate external load balancer.
+
+With our single-node setup, we do not need to configure an external load balancer.
+We can simply point our DNS records at the single public IP of the node.
+
 ### 0.2. An HTTP Application Deployed With a Kubernetes Service Resource
 
 In [Part 1](/resources/infra-ops/kubernetes-software-deployment-1/) we deployed the
@@ -62,28 +62,18 @@ Standard Kubernetes Ingress routing rules can only route traffic to Services.
 
 ### 0.3. A Public Domain Name
 
-There are plenty of registrars which make purchasing and managing a domain name easy.
-[Porkbun](https://porkbun.com/) in particular offers a great combination of simplicity, good pricing,
-and support for many TLDs (the TLD or Top Level Domain is the part after the dot, as in `.com`, `.net`, `.io`, etc.),
-but others such as Domain.com, NameCheap, and Cloudflare work perfectly fine as well.
+I have found [Porkbun](https://porkbun.com/) to be my preferred domain registrar, with good pricing,
+a simple interface, and support for plenty of TLDs, (the part after the dot, as in `.com`, `.net`, `.io`, etc.),
+Other registrars such as Domain.com, NameCheap, Bluehost, and Cloudflare work perfectly fine as well.
 
 Cooler-sounding, shorter, or correctly-spelled domain names are often already taken,
 but for our own education and demonstration purposes, the domain name and TLD should not matter much.
 Unless we are launching a legitimate website or application with this domain,
-we can stick with getting a domain with one of the cheaper, lesser-known TLDs - many are under $10/year.
+we can stick with getting a domain with one of the cheaper, lesser-known TLDs
+such as `.cc` or `.xyz` - many are under $10/year.
 
 I was lucky enough to snag the relatively coherent domain `backtalk.dev` to use for this series,
 as a nod to the common usage of echo servers to demonstrate Kubernetes deployments.
-
-[//]: # (### 0.3 Install the `helm` Command-Line Tooling)
-
-[//]: # ()
-[//]: # (Install `helm` with the official Helm guide [here]&#40;https://helm.sh/docs/intro/install/&#41;.)
-
-[//]: # ()
-[//]: # (The `helm` command will utilize the same kubeconfig as is configured for our `kubectl` CLI,)
-
-[//]: # (and respects the context and namespace configuration applied by `kubectx` and `kubens`.)
 
 ## 1. Create a DNS Record from the Domain to the Kubernetes Cluster
 
@@ -168,18 +158,19 @@ More on this later - for now, we will use `curl` without HTTPS to make requests 
 
 ### Kubernetes Ingress Concepts
 
-Kubernetes Ingress concepts are generally just official names for the basic functionality of a reverse proxy.
+Kubernetes Ingress concepts are generally just official names for the functionality of a reverse proxy.
 
 The Kubernetes Ingress resource itself is simply a routing rule configuration
 to define how the proxy routes external (typically HTTP) traffic to the Service backends.
 
-An [Ingress _Controller_](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/)
-refers to a Kubernetes component which monitors the cluster for changes in Ingress resources.
-The Controller in turn configures the Ingress _Provider_ (the actual reverse proxy) with corresponding routing rules.
-The two terms are often used interchangeably, as both responsibilities are usually handled by the same piece of software.
+An Ingress Controller has two responsibilities:
+1. serve as a reverse proxy, with all the standard reverse proxy capabilities
+2. monitor the cluster for changes in Ingress resources and other configuration
+and update its own proxy configuration and routing rules accordingly
 
-K3s uses Traefik Proxy as its default Ingress Controller, but other setups may use NGINX or other popular proxy options.
-Adjust references in the Kubernetes manifests as needed, replacing `traefik` with `nginx` or otherwise.
+The Ingress Class resource is just an annotation or label to refer to an Ingress Controller.
+
+
 
 [//]: # (Though some reverse proxies offer functionality beyond the official Ingress Controller specification,)
 
@@ -208,9 +199,12 @@ Controller:   traefik.io/ingress-controller
 Events:       <none>
 ```
 
+K3s uses Traefik Proxy as its default Ingress Controller, but other setups may use NGINX or other popular proxy options.
+Adjust references to the ingress class in the Kubernetes manifests as needed, replacing `traefik` with `nginx` or otherwise.
+
 ### 2.1. Declare the Ingress
 
-Declare the namespace in a manifest file:
+Declare the ingress in a manifest file:
 
 ```yaml
 # github.com/francoposa/learn-infra-ops/blob/main/kubernetes/traefik/whoami/manifests/ingress.yaml
@@ -221,6 +215,8 @@ metadata:
   name: whoami
   namespace: whoami
 spec:
+  # default ingress class will be used if ingressClassName is not specified
+  ingressClassName: traefik
   rules:
     - host: backtalk.dev
       http:
@@ -283,7 +279,8 @@ We can also verify that any other route besides `/whoami` will return a `404` st
 404 page not found
 ```
 
-With traffic successfully routing from public internet to the pods in our cluster, all that is left is to enable HTTPS.
+With our Ingress rules in place, traffic is now routed through the ingress proxy to our Service and on to the Pods.
+Only one step remains to making our application accessible to the general public - enabling HTTPS.
 
 ## 3. Automate TLS Certificates from Let's Encrypt with `cert-manager`
 
@@ -513,3 +510,13 @@ We can also tail the logs of the `cert-manager` Pod for more information:
 [//]: # (```)
 
 [//]: # ()
+
+[//]: # (### 0.3 Install the `helm` Command-Line Tooling)
+
+[//]: # ()
+[//]: # (Install `helm` with the official Helm guide [here]&#40;https://helm.sh/docs/intro/install/&#41;.)
+
+[//]: # ()
+[//]: # (The `helm` command will utilize the same kubeconfig as is configured for our `kubectl` CLI,)
+
+[//]: # (and respects the context and namespace configuration applied by `kubectx` and `kubens`.)
