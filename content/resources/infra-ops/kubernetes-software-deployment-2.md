@@ -384,132 +384,137 @@ We can also tail the logs of the `cert-manager` Pod for more information:
 
 [//]: # (as well as to provide traffic routing for a cluster.)
 
+## Appendix A: Verify TLS Certificate Data
 
+There are various CLI tools which can view and analyze TLS certificates, often with complex and obscure invocations,
+but we will focus just on some quick checks using tools we already know: `curl` and our browser.
 
-[//]: # (### 1.3 View TLS Certificate Data)
+Each tool will show slightly different output depending on where we are in our certificate provisioning process.
 
-[//]: # ()
-[//]: # (The default certificate returned by the `traefik` ingress proxy is a "self-signed" certificate,)
+1. Out of the box, the Traefik Proxy in our K3s cluster will return a ["self-signed certificate"](https://en.wikipedia.org/wiki/Self-signed_certificate).
+2. After setting up our automated certificate provisioning with Let's Encrypt's staging server,
+we will have a certificate that has been signed by a Certificate Authority
+    1. This certificate will _still_ not be accepted clients,
+    as the staging server is not in their list of trusted "well known" CAs.
+3. Finally, when we flip our configuration to the Let's Encrypt production server,
+the browser and all of our other HTTPS clients will accept it.
 
-[//]: # (which serves as temporary placeholder until we can get TLS certificate from a known Certificate Authority &#40;CA&#41;.)
+### View TLS Certificate in Browser
 
-[//]: # ()
-[//]: # (Depending on the browser's security settings we may be blocked completely or have to read warnings before continuing,)
+Until we have the trusted certificate from the Let's Encrypt production server, we may be blocked completely
+or have to read warnings before accessing our domain - this depends on the browser's security settings.
 
-[//]: # (but we can use the browser itself or some output from `curl` to confirm the status of the TLS certificate.)
+The interface will vary by browser, but Firefox makes it the easiest to see the actual certificates.
+In Firefox, attempting to access `https://backtalk.dev` will show **Did Not Connect: Potential Security Issue**.
+Click **Advanced** to show more information.
 
-[//]: # ()
-[//]: # (#### View in Browser)
+The error messages will vary depending on whether we received the default self-signed certificate
+or the signed certificate from the Let's Encrypt staging servers.
 
-[//]: # ()
-[//]: # (Attempting to access `https://backtalk.dev` from Firefox will show "Did Not Connect: Potential Security Issue".)
+**Self-signed certificate:**
 
-[//]: # (Click "Advanced" to show more information:)
+> backtalk.dev uses an invalid security certificate.
+>
+> The certificate is not trusted because it is self-signed.
+>
+> Error code: MOZILLA_PKIX_ERROR_SELF_SIGNED_CERT
 
-[//]: # ()
-[//]: # (> backtalk.dev uses an invalid security certificate.)
+**Staging certificate:**
 
-[//]: # (>)
+> Someone could be trying to impersonate the site and you should not continue.
+>
+> Websites prove their identity via certificates.
+> Firefox does not trust backtalk.dev because its certificate issuer is unknown,
+> the certificate is self-signed, or the server is not sending the correct intermediate certificates.
+>
+> Error code: SEC_ERROR_UNKNOWN_ISSUER
 
-[//]: # (> The certificate is not trusted because it is self-signed.)
+Click **View Certificate** to see the certificate and its metadata:
+the certificate name, issuer name, any info about the issuing CA, and whether the CA is trusted.
 
-[//]: # (>)
+**Self-signed certificate:**
 
-[//]: # (> Error code: MOZILLA_PKIX_ERROR_SELF_SIGNED_CERT)
+> Subject: TRAEFIK DEFAULT CERT
+>
+> Issuer: TRAEFIK DEFAULT CERT
+>
+> Certificate Authority: No
 
-[//]: # (>)
+**Staging certificate:**
 
-[//]: # (> View Certificate)
+> Subject: backtalk.dev
+>
+> Issuer: (STAGING) Let's Encrypt
+>
+> Certificate Authority: No (this will only say yes if it is a trusted CA)
+>
+> Authority Info (AIA)
+>
+> Location: http://stg-r11.i.lencr.org/
+>
+> Method: CA Issuers
 
-[//]: # ()
-[//]: # (Click "View Certificate" to see the certificate and its metadata:)
+For the **trusted production certificate**, the browser will just navigate to the site like normal.
+Click the lock icon next the URL in the navigation bar and follow the menus to view the certificate if desired.
 
-[//]: # ()
-[//]: # (> Subject: TRAEFIK DEFAULT CERT)
+### View TLS Certificate Data with `curl`
 
-[//]: # (>)
+While `curl` is not designed for parsing and showing TLS certificates, we can use it for a quick check.
 
-[//]: # (> Issuer: TRAEFIK DEFAULT CERT)
+With the `--verbose` flag, `curl` will log each step of its connection and request process,
+including when it fails validate the certificate for an HTTPS address.
 
-[//]: # (>)
+Like the browser, the verbose logs from `curl` depend on which certificate we have.
 
-[//]: # (> ...)
+**Self-signed certificate:**
 
-[//]: # (>)
+```shell
+ % curl -i --verbose https://backtalk.dev
 
-[//]: # (> Certificate Authority: No)
+* Host backtalk.dev:443 was resolved.
 
-[//]: # ()
-[//]: # (Similarly, accessing `https://backtalk.dev` via Chrome will show "Your connection is not private".)
+# ...
 
-[//]: # (Clicking the `NET:ERR_CERT_AUTHORITY_INVALID` error message below will reveal the TLS certificate,)
+curl: (60) SSL certificate problem: self-signed certificate
 
-[//]: # (though Chrome does not bother to parse and show us the complete metadata.)
+More details here: https://curl.se/docs/sslcerts.html
 
-[//]: # ()
-[//]: # (#### View with `curl`)
+# ... etc.
+```
 
-[//]: # ()
-[//]: # (While `curl` is not designed for parsing and showing TLS certificates, we can use it for a quick check.)
+**Staging certificate:**
 
-[//]: # (With the `--verbose` flag, `curl` will log each step of its connection and request process,)
+```shell
+% curl -i -v https://backtalk.dev
+* Host backtalk.dev:443 was resolved.
 
-[//]: # (including when it fails validate the certificate for an HTTPS address:)
+# ...
 
-[//]: # ()
-[//]: # (```shell)
+curl: (60) SSL certificate problem: unable to get local issuer certificate
+More details here: https://curl.se/docs/sslcerts.html
 
-[//]: # ( % curl -i --verbose https://backtalk.dev)
+# ... etc.
+```
 
-[//]: # (```)
+**Trusted production certificate:**
 
-[//]: # ()
-[//]: # (```console)
+```shell
+% curl -i -v https://backtalk.dev
+* Host backtalk.dev:443 was resolved.
 
-[//]: # (* Host backtalk.dev:443 was resolved.)
+# ...
+* SSL connection using TLSv1.3 / TLS_AES_128_GCM_SHA256 / x25519 / RSASSA-PSS
+* ALPN: server accepted h2
+* Server certificate:
+*  subject: CN=backtalk.dev
+*  start date: Nov 28 05:56:04 2024 GMT
+*  expire date: Feb 26 05:56:03 2025 GMT
+*  subjectAltName: host "backtalk.dev" matched cert's "backtalk.dev"
+*  issuer: C=US; O=Let's Encrypt; CN=R10
+*  SSL certificate verify ok.
 
-[//]: # (* IPv6: &#40;none&#41;)
-
-[//]: # (* IPv4: 165.232.155.5)
-
-[//]: # (*   Trying 165.232.155.5:443...)
-
-[//]: # (* Connected to backtalk.dev &#40;165.232.155.5&#41; port 443)
-
-[//]: # (* ALPN: curl offers h2,http/1.1)
-
-[//]: # (* TLSv1.3 &#40;OUT&#41;, TLS handshake, Client hello &#40;1&#41;:)
-
-[//]: # (*  CAfile: /etc/pki/tls/certs/ca-bundle.crt)
-
-[//]: # (*  CApath: none)
-
-[//]: # (* TLSv1.3 &#40;IN&#41;, TLS handshake, Server hello &#40;2&#41;:)
-
-[//]: # (* TLSv1.3 &#40;IN&#41;, TLS handshake, Encrypted Extensions &#40;8&#41;:)
-
-[//]: # (* TLSv1.3 &#40;IN&#41;, TLS handshake, Certificate &#40;11&#41;:)
-
-[//]: # (* TLSv1.3 &#40;OUT&#41;, TLS alert, unknown CA &#40;560&#41;:)
-
-[//]: # (* SSL certificate problem: self-signed certificate)
-
-[//]: # (* closing connection #0)
-
-[//]: # (curl: &#40;60&#41; SSL certificate problem: self-signed certificate)
-
-[//]: # (More details here: https://curl.se/docs/sslcerts.html)
-
-[//]: # ()
-[//]: # (curl failed to verify the legitimacy of the server and therefore could not)
-
-[//]: # (establish a secure connection to it. To learn more about this situation and)
-
-[//]: # (how to fix it, please visit the webpage mentioned above.)
-
-[//]: # (```)
-
-[//]: # ()
+# ... etc.
+```
 
 [//]: # (### 0.3 Install the `helm` Command-Line Tooling)
 
