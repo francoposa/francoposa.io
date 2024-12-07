@@ -1,13 +1,13 @@
 baseURL = "https://francoposa.io"
 languageCode = "en-us"
 theme = "hypo"
-title = "francoposa.io"
+title = "Software Engineering Notes by Franco Posa"
 
 enableGitInfo = true
 
 [params]
 AuthorName = "Franco Posa"
-Description = "Software Engineering and Technical Guides, Docs, and Blogs"
+Description = "Software Engineering and Technical Guides, Docs, and Blogs by Franco Posa"
 
 # Collection to display on home
 homeSectionTitle = 'Resources'

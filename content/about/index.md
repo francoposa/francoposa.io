@@ -7,7 +7,11 @@ date: 2020-02-02
 ---
 ## Myself
 
-I am a software engineer with over eight years of experience designing, writing, and testing software across many areas of software engineering, including cloud storage, distributed databases, telecom routing, and big data pipelines.
+I am a software engineer with over eight years of experience building software across many areas of software engineering,
+including cloud storage, distributed databases, telecom routing, and big data pipelines.
+
+I enjoy building a deep understanding of topics across all areas of software engineering,
+and I believe in building open-source software that is friendly to its users, operators, and developers alike.
 
 I love to design, build, and refactor.
 I am passionate about clean architecture, clean code, and idiomatic best practices.
@@ -17,8 +21,6 @@ I am biased towards minimalism and simplicity:
 > "Write programs that do one thing and do it well" - _The Unix Philosophy_
 
 > "There should be one -- and preferably only one -- obvious way to do it." - _The Zen of Python_
-
-I enjoy building a deep understanding of topics across all areas of software engineering.
 
 ## This Site
 
