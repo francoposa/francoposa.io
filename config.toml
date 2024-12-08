@@ -1,7 +1,7 @@
 baseURL = "https://francoposa.io"
 languageCode = "en-us"
 theme = "hypo"
-title = "Software Engineering Notes by Franco Posa"
+title = "francoposa.io"
 
 enableGitInfo = true
 
