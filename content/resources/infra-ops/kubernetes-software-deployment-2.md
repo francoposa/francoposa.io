@@ -9,8 +9,6 @@ date: 2024-02-18
 weight: 5
 ---
 
-##### **this document is a work in progress**
-
 ## Goals
 
 We will:
@@ -57,8 +55,9 @@ We can simply point our DNS records at the single public IP of the node.
 In [Part 1](/resources/infra-ops/kubernetes-software-deployment-1/) we deployed the
 [`traefik/whoami`](https://hub.docker.com/r/traefik/whoami) echo server image
 with its corresponding Kubernetes resources (Namespace, Deployment,  and Service).
-
-Standard Kubernetes Ingress routing rules can only route traffic to Services.
+Any HTTP application can be used, and the separate namespace is not required,
+but there must a Service in front of the Pods controlled by the Deployent -
+the standard Kubernetes Ingress routing rules can only route traffic to Services.
 
 ### 0.3. A Public Domain Name
 
@@ -83,7 +82,8 @@ The A record simply serves to point a domain name to an IPv4 address.
 ### 1.1. Create the DNS `A` Record with the Domain Registrar
 
 Each domain registrar will offer a slightly different interface for entering the DNS record,
-but the A record should simply point the root domain (`backtalk.dev`) to the desired IP address (`165.232.155.5`).
+but the A record should simply point the root domain (`backtalk.dev`)
+to the desired IP address (`165.232.155.5` in this example).
 
 When using K3s in the cloud, the IP address is simply the public IP address of the cloud server,
 as the `metallb` load balancer component bundled with K3s binds to the host IP address by default.
@@ -154,6 +154,8 @@ Content-Length: 19
 By default, modern web browsers will not allow us to access the domain until it has a proper TLS certificate.
 More on this later - for now, we will use `curl` without HTTPS to make requests to our domain.
 
+Refer to [Appendix A](#appendix-a-verify-tls-certificate-data) to view and debug the TLS certificate data.
+
 ## 2. Create an Ingress
 
 ### Kubernetes Ingress Concepts
@@ -164,13 +166,11 @@ The Kubernetes Ingress resource itself is simply a routing rule configuration
 to define how the proxy routes external (typically HTTP) traffic to the Service backends.
 
 An Ingress Controller has two responsibilities:
-1. serve as a reverse proxy, with all the standard reverse proxy capabilities
+1. serve as a reverse proxy, with all the standard reverse proxy routing capabilities
 2. monitor the cluster for changes in Ingress resources and other configuration
 and update its own proxy configuration and routing rules accordingly
 
 The Ingress Class resource is just an annotation or label to refer to an Ingress Controller.
-
-
 
 [//]: # (Though some reverse proxies offer functionality beyond the official Ingress Controller specification,)
 
@@ -204,7 +204,7 @@ Adjust references to the ingress class in the Kubernetes manifests as needed, re
 
 ### 2.1. Declare the Ingress
 
-Declare the ingress in a manifest file:
+Declare the Ingress in a manifest file:
 
 ```yaml
 # github.com/francoposa/learn-infra-ops/blob/main/kubernetes/traefik/whoami/manifests/ingress.yaml
@@ -232,7 +232,7 @@ spec:
 
 ### 2.2. Apply the Ingress
 
-Use `kubectl apply` to create the ingress on the cluster:
+Use `kubectl apply` to create the Ingress on the cluster:
 
 ```shell
 % kubectl -n whoami apply -f kubernetes/traefik/whoami/manifests/ingress.yaml
@@ -352,7 +352,7 @@ spec:
 ```shell
 % kubectl -n cert-manager apply -f kubernetes/cert-manager/manifests/cluster-issuer-staging.yaml
 
-clusterissuer.cert-manager.io/cluster-issuer created
+clusterissuer.cert-manager.io/cluster-issuer-staging created
 ```
 
 ### 3.4. Verify the Staging Cluster Issuer
@@ -370,19 +370,197 @@ We can also tail the logs of the `cert-manager` Pod for more information:
 # ... logs are noisy but we should see some success messages
 ```
 
-[//]: # (Unfortunately we cannot verify access through this TLS certificate just yet - )
+### 3.5. Integrate the Staging Cluster Issuer with the Ingress
 
-[//]: # (we need a Kubernetes Ingress to put all the pieces together.)
+We need two additions to our Ingress resource.
 
-[//]: # (Essentially, the `cert-manager` process will make a request to the Let's Encrypt servers,)
+First, we set a cluster issuer annotation to the exact name of our `ClusterIssuer`: `"cluster-issuer-staging"`.
+This annotation is read by `cert-manager` in order to identify which ingress rules
+require TLS certificates which issuer should be used to generate them.
 
-[//]: # (saying that it wants to be issued a certificate for our domain, `backtalk.dev`.)
+Next, the `tls` section of the Ingress spec sets which domains in the Ingress rule require TLS.
+Without `cert-manager`, the `secretName` would have to refer to a Kubernetes secret
+that we had already created containing the TLS certificate for the required domain.
+However, the automation provided by `cert-manager` scans the cluster for Ingress resources
+with the correct annotations and sets up the secret containing the certificate for us.
 
-[//]: # ([Traefik]&#40;https://doc.traefik.io/traefik/&#41; is a cloud-native proxy and edge router.)
+Declare the updated Ingress resource in the same file:
 
-[//]: # (In addition to an extensive set of integrations and plugins, Traefik implements the Kubernetes Ingress Controller API)
+```yaml
+# github.com/francoposa/learn-infra-ops/blob/main/kubernetes/traefik/whoami/manifests/ingress.yaml
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: whoami
+  namespace: whoami
+  annotations:
+    cert-manager.io/cluster-issuer: "cluster-issuer-staging"
+spec:
+  tls:
+    - hosts:
+        - backtalk.dev
+      secretName: tls-backtalk-ingress-http-staging
+  rules:
+    - host: backtalk.dev
+      http:
+        paths:
+          - path: /whoami
+            pathType: Prefix
+            backend:
+              service:
+                name: whoami
+                port:
+                  name: web
+```
 
-[//]: # (as well as to provide traffic routing for a cluster.)
+### 3.6. Apply the Updated Ingress
+
+Use `kubectl apply` to update the Ingress on the cluster:
+
+```shell
+% kubectl -n whoami apply -f kubernetes/traefik/whoami/manifests/ingress.yaml
+ingress.networking.k8s.io/whoami updated
+```
+
+At this point, accessing `backtalk.dev` via HTTPS will still be disallowed by most browsers and clients,
+but it will now return a Let's Encrypt staging certificate rather than the default self-signed certificate from Traefik.
+We can view the staging certificate data via or browser or `curl`
+as described in [Appendix A](#appendix-a-verify-tls-certificate-data).
+
+Now we can move on to production!
+
+### 3.7. Declare the Production Cluster Issuer
+
+The production `ClusterIssuer` looks a lot like the staging one,
+but it points to the Let's Encrypt production server URL
+(and uses a different name for itself and its secret).
+
+```yaml
+# github.com/francoposa/learn-infra-ops/blob/main/kubernetes/cert-manager/manifests/cluster-issuer.yaml
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: cluster-issuer
+  namespace: cert-manager
+spec:
+  acme:
+    email: franco@francoposa.io
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: cluster-issuer-account-key
+    solvers:
+      - http01:
+          ingress:
+            class: traefik
+```
+
+### 3.8. Apply the Production Cluster Issuer
+
+```shell
+% kubectl -n cert-manager apply -f kubernetes/cert-manager/manifests/cluster-issuer.yaml
+
+clusterissuer.cert-manager.io/cluster-issuer created
+```
+
+### 3.9. Verify the Production Cluster Issuer
+
+Use the same tools as before:
+
+```shell
+% kubectl get clusterissuer -o wide
+NAME                     READY   STATUS                                                 AGE
+cluster-issuer           True    The ACME account was registered with the ACME server    1m
+cluster-issuer-staging   True    The ACME account was registered with the ACME server   60m
+```
+
+```shell
+% kubectl -n cert-manager logs -f deployment/cert-manager
+# ... logs are noisy but we should see some success messages
+```
+
+### 3.10. Integrate the Production Cluster Issuer with the Ingress
+
+We only need to update the annotation referencing which `ClusterIssuer` to use
+and the name of the secret to store the new production TLS certificate in.
+
+Declare the updated Ingress resource in the same file -
+staging values are commented out to show the changes:
+
+```yaml
+# github.com/francoposa/learn-infra-ops/blob/main/kubernetes/traefik/whoami/manifests/ingress.yaml
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: whoami
+  namespace: whoami
+  annotations:
+    #    cert-manager.io/cluster-issuer: "cluster-issuer-staging"
+    cert-manager.io/cluster-issuer: "cluster-issuer"
+spec:
+  tls:
+    - hosts:
+        - backtalk.dev
+      #      secretName: tls-backtalk-ingress-http-staging
+      secretName: tls-backtalk-ingress-http
+  rules:
+    - host: backtalk.dev
+      http:
+        paths:
+          - path: /whoami
+            pathType: Prefix
+            backend:
+              service:
+                name: whoami
+                port:
+                  name: web
+```
+
+### 3.11. Apply the Updated Ingress
+
+Use `kubectl apply` to update the Ingress on the cluster:
+
+```shell
+% kubectl -n whoami apply -f kubernetes/traefik/whoami/manifests/ingress.yaml
+ingress.networking.k8s.io/whoami updated
+```
+
+## 4. Access the Service From the Public Internet over HTTPS
+
+HTTPS clients will now accept the production TLS certificate returned from our cluster by Traefik,
+so we can access `https://backtalk.dev` via our browser or `curl`.
+
+If any issues persist, refer to [Appendix A](#appendix-a-verify-tls-certificate-data) to view and debug the TLS certificate data.
+
+## Conclusion
+
+We now have an application in our Kubernetes cluster available over the public internet and accessible via HTTPS.
+The automation of TLS certificate issuance and renewal removes a significant barrier
+to deploying and delivering software services to our end users.
+
+It is worth noting that the Ingress routing rule patterns we have used here to configure Traefik are very simple.
+The Kubernetes Ingress specification is relatively limited compared to the full feature set
+of typical reverse proxies, whether it is Traefik, NGINX, HAProxy, or proprietary cloud solutions.
+More mature and complex software systems will almost certainly need to take advantage
+the more powerful and convenient features of each reverse proxy option.
+However, these configuration options which extend beyond the official Ingress spec
+will not be directly portable between clusters utilizing different proxies as their Ingress Controller.
+Like anything else in software engineering, we have to seek out a balance between
+the portability of a limited spec-compliant feature set and using a specific technology to its full potential.
+
+[//]: # (The Kubernetes Ingress patterns we have used here with Traefik Proxy are very simple,)
+
+[//]: # (but offer an introduction to using a declarative rules for routing traffic from the public internet to our services.)
+
+[//]: # (The common Ingress Controllers such as Traefik and NGINX also offer features)
+
+[//]: # (which often go beyond the official Kubernetes specifications but can provide more power and convenience,)
+
+[//]: # (such as auto-discovery of routable services and numerous plugin & middleware capabilities)
+
+[//]: # (offering authentication, authorization, URL path rewriting, header filtering and transformation, and much more.)
 
 ## Appendix A: Verify TLS Certificate Data
 
@@ -423,7 +601,14 @@ or the signed certificate from the Let's Encrypt staging servers.
 
 > Someone could be trying to impersonate the site and you should not continue.
 >
-> Websites prove their identity via certificates.
+> Websites prove their identity via certificates.### 3.6. Apply the Updated Ingress
+
+Use `kubectl apply` to update the Ingress on the cluster:
+
+```shell
+% kubectl -n whoami apply -f kubernetes/traefik/whoami/manifests/ingress.yaml
+ingress.networking.k8s.io/whoami updated
+```
 > Firefox does not trust backtalk.dev because its certificate issuer is unknown,
 > the certificate is self-signed, or the server is not sending the correct intermediate certificates.
 >
