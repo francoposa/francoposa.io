@@ -2,6 +2,10 @@
 title: "Delivering Software with Kubernetes, Part 2"
 summary: "Exposing a Service to the Public Internet"
 description: "Domains, DNS Records, TLS Certificates, and Kubernetes Ingresses"
+tags:
+  - kubernetes
+  - networking
+
 slug: kubernetes-software-deployment-2
 aliases:
   - /resources/infra-ops/zero-to-production-with-kubernetes-5/
@@ -85,8 +89,7 @@ Each domain registrar will offer a slightly different interface for entering the
 but the A record should simply point the root domain (`backtalk.dev`)
 to the desired IP address (`165.232.155.5` in this example).
 
-When using K3s in the cloud, the IP address is simply the public IP address of the cloud server,
-as the `metallb` load balancer component bundled with K3s binds to the host IP address by default.
+When using K3s in the cloud, the IP address is simply the public IP address of the cloud server.
 There are many other valid but slightly more complicated setups we could use as well -
 reserving a static IP to avoid using the random one assigned to a new VM or provisioning a cloud load balancer,
 but we prefer to keep it simple for now.
