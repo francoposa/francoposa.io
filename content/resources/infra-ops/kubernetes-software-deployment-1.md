@@ -2,6 +2,9 @@
 title: "Delivering Software with Kubernetes, Part 1"
 summary: "Deploying a Stateless HTTP Service to Kubernetes"
 description: "Kubernetes CLI Tooling and Manifests for Namespaces, Deployments, Pods, and Services"
+tags:
+  - Kubernetes
+
 slug: kubernetes-software-deployment-1
 aliases:
   - /resources/infra-ops/zero-to-production-with-kubernetes-4/

@@ -3,8 +3,10 @@ title: "Delivering Software with Kubernetes, Part 2"
 summary: "Exposing a Service to the Public Internet"
 description: "Domains, DNS Records, TLS Certificates, and Kubernetes Ingresses"
 tags:
-  - kubernetes
-  - networking
+  - Kubernetes
+  - K3s
+  - Networking
+  - Traefik
 
 slug: kubernetes-software-deployment-2
 aliases:

@@ -2,6 +2,10 @@
 title: "Deploying K3s with Ansible on DigitalOcean, Part 2"
 summary: "Using DigitalOcean Servers as Ansible Dynamic Inventory"
 description: "Ansible Host Groups, Host Variables, and Dynamic Inventory Plugins"
+tags:
+  - Ansible
+  - DigitalOcean
+
 slug: kubernetes-ansible-digital-ocean-k3s-2
 aliases:
   - /resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-2/

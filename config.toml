@@ -3,6 +3,7 @@ languageCode = "en-us"
 theme = "hypo"
 title = "francoposa.io"
 
+#capitalizeListTitles = false
 enableGitInfo = true
 
 [params]

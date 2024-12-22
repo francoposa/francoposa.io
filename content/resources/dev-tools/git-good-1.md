@@ -1,7 +1,12 @@
 ---
-title: "Git Good, Part 1: Configuration, Creating Repositories, and Committing Changes"
-slug: git-basics-1
+title: "Git Basics, Part 1"
 summary: "Git Config, Init, Add, and Commit"
+description: "Configuration, Creating Repositories, and Committing Changes"
+tags:
+  - Git
+  - GitHub
+
+slug: git-basics-1
 date: 2023-10-02
 weight: 1
 ---

@@ -2,6 +2,12 @@
 title: "Deploying K3s with Ansible on DigitalOcean, Part 3"
 summary: "Deploying a K3s Kubernetes Cluster with Ansible"
 description: "K3s Installation, Configuration, and KubeConfig Management with Ansible"
+tags:
+  - Kubernetes
+  - K3s
+  - Ansible
+  - DigitalOcean
+
 slug: kubernetes-ansible-digital-ocean-k3s-3
 aliases:
   - /resources/infra-ops/kubernetes-k3s-ansible-digital-ocean-3/

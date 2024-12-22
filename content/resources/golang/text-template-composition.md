@@ -1,7 +1,12 @@
 ---
 title: "Golang Templates, Part 1: Concepts and Composition"
-slug: golang-templates-1
 summary: "Understanding Golang Template Nesting and Hierarchy With Simple Text Templates"
+tags:
+  - Golang
+  - Templating
+  - Data Structures
+
+slug: golang-templates-1
 date: 2020-12-10
 weight: 2
 ---
