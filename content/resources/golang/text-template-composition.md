@@ -8,7 +8,7 @@ tags:
 
 slug: golang-templates-1
 date: 2020-12-10
-weight: 2
+weight: 1
 ---
 ## Template Composition Concepts
 

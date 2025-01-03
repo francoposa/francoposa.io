@@ -11,7 +11,7 @@ tags:
 
 slug: golang-containerizing-dockerfile-makefile
 date: 2024-01-17
-weight: 1
+weight: 3
 ---
 
 ##### **this document is a work in progress**
