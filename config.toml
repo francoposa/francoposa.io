@@ -10,10 +10,11 @@ enableGitInfo = true
 AuthorName = "Franco Posa"
 Description = "Software Engineering and Technical Guides, Docs, and Blogs by Franco Posa"
 
-# Collection to display on home
-homeSectionTitle = 'Resources'
+# title of the collection to display on home page
+homeCollectionTitle = 'Resources'
 
-# Lists parameters
+# show next/prev post links in footer of single page
+singlePageFooterPagination = true
 paginationSize = 8
 listSummaries = true
 
@@ -24,16 +25,15 @@ breadcrumbs = true
 [markup.highlight]
 style = "friendly"
 
-# # # Disable tags
-# disableKinds = ['taxonomy']
+tableOfContents = true
+[markup.tableOfContents]
+startLevel = 2
+endLevel = 2
+ordered = false
 
 [taxonomies]
 #category = 'categories'
 tag = 'tags'
-
-#[params]
-## Home meta description
-#description = "A tech-oriented personal blog curated by Francesco Tomaselli."
 
 # Appearance settings
 theme = 'auto'
