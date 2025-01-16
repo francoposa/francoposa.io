@@ -130,10 +130,10 @@ goos: linux
 goarch: amd64
 pkg: benchmark_example
 cpu: AMD Ryzen 7 PRO 6860Z with Radeon Graphics
-BenchmarkMakeQueuePath/func_baseline-16     7806996   155.6 ns/op
-BenchmarkMakeQueuePath/func_noAppend-16    15997032    72.84 ns/op
+BenchmarkMakeQueuePath/func_baseline-16    15183444    67.30 ns/op
+BenchmarkMakeQueuePath/func_noAppend-16    42104808    29.80 ns/op
 PASS
-ok      benchmark_example       2.626s
+ok      benchmark_example       2.393s
 ```
 
 The output of the benchmark shows us our test names, the number of times each test was run,
@@ -154,14 +154,14 @@ goos: linux
 goarch: amd64
 pkg: benchmark_example
 cpu: AMD Ryzen 7 PRO 6860Z with Radeon Graphics
-BenchmarkMakeQueuePath/func_baseline-16    10989939    129.1 ns/op     48 B/op    2 allocs/op
-BenchmarkMakeQueuePath/func_noAppend-16    22709061     54.84 ns/op    32 B/op    1 allocs/op
+BenchmarkMakeQueuePath/func_baseline-16    15659572    67.82 ns/op    48 B/op    2 allocs/op
+BenchmarkMakeQueuePath/func_noAppend-16    38129188    30.20 ns/op    32 B/op    1 allocs/op
 PASS
-ok      benchmark_example       2.840s
+ok      benchmark_example       2.332s
 ```
 
 This benchmark already shows us that the `noAppend` function is faster than the `baseline` using `append` -
-just over *twice* as fast with an average of ~73 ns/op vs. `baseline` at ~156 ns/op.
+just over *twice* as fast with an average of ~30 ns/op vs. `baseline` at ~68 ns/op.
 Further, as we suspected, the `baseline` function using `append` is making two memory allocations:
 we can infer this is one allocation for each slice declared.
 Turns out the compiler is not *that* smart.
@@ -196,7 +196,6 @@ This is all well and good, but "timed reliably" does not tell us much.
 It notably does *not* indicate that the number of iterations is chosen
 to give us a defensible comparison between our benchmark scenarios.
 
-
 Benchmark outputs are not always as clear as one option running twice as fast as another.
 Recall your introductory statistics classes if you ever took them, or paid attention:
 when the difference between the averages of two datasets is small,
@@ -221,18 +220,18 @@ or just omit the option to explicitly control iterations altogether.
 ```
 
 With an emphasis collecting more datapoints to increase our confidence in the results,
-we can choose a number iterations greater than the ~20 million that Go has chosen for us
+we can choose a number iterations greater than the ~40 million that Go has chosen for us
 in pursuit of its goal that "the benchmark function lasts long enough to be timed reliably".
 
-Since our benchmark is small and fast, it does not hurt to overshoot on iterations - why not a nice round 32 million?
+Since our benchmark is small and fast, it does not hurt to overshoot on iterations - why not a nice round 64 million?
 ```shell
-[~/repos/benchmark-example] % go test -test.bench=. -test.benchtime=32000000x -test.benchmem
+[~/repos/benchmark-example] % go test -test.bench=. -test.benchtime=64000000x -test.benchmem
 goos: linux
 goarch: amd64
 pkg: benchmark_example
 cpu: AMD Ryzen 7 PRO 6860Z with Radeon Graphics
-BenchmarkMakeQueuePath/func_baseline-16    32000000    141.3 ns/op     48 B/op    2 allocs/op
-BenchmarkMakeQueuePath/func_noAppend-16    32000000     63.06 ns/op    32 B/op    1 allocs/op
+BenchmarkMakeQueuePath/func_baseline-16    64000000    66.19 ns/op    48 B/op    2 allocs/op
+BenchmarkMakeQueuePath/func_noAppend-16    64000000    32.33 ns/op    32 B/op    1 allocs/op
 PASS
-ok      benchmark_example       6.548s
+ok      benchmark_example       6.311s
 ```
