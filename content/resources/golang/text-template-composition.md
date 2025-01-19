@@ -4,7 +4,7 @@ summary: "Understanding Golang Template Nesting and Hierarchy With Simple Text T
 tags:
   - Golang
   - Templating
-  - Data Structures
+  - DataStructures
 
 slug: golang-templates-1
 date: 2020-12-10
