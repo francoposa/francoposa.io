@@ -6,7 +6,6 @@ tags:
   - Golang
   - Performance
   - Benchmarking
-  - Shell-Scripting
 
 slug: golang-benchmarking-1
 date: 2025-01-25
