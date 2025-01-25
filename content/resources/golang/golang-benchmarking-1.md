@@ -1,7 +1,7 @@
 ---
 title: "Golang Benchmarking, Part 1"
-summary: "Basic CPU and Memory Benchmarking with Go"
-description: "Performance Benchmarks with Go's testing Package and Statistical Analysis with benchstat"
+summary: "Basic CPU and Memory Benchmarking & Analysis with Go"
+description: "Performance Benchmarks with Go's testing Package and Statistical Tests with benchstat"
 tags:
   - Golang
   - Performance
@@ -14,14 +14,32 @@ draft: false
 weight: 3
 ---
 
-**this document is a work in progress**
-
 ## Goals
 
 We will:
 
 1. Write & run a simple performance benchmark test with the Go testing package
-2. Apply statistical comparisons between benchmark results with the `benchstat` tool
+2. Apply statistical tests between benchmark results with the `benchstat` tool
+
+## 0. Prerequisites
+
+### 0.1 Install `benchstat`
+
+Install the `benchstat` tool into your `$GOPATH/bin`:
+```shell
+% go install golang.org/x/perf/cmd/benchstat@latest
+```
+
+Then check that `benchstat` is available in your `$PATH`:
+```shell
+% which benchstat
+~/go/bin/benchstat
+````
+
+If the command is not found, then you may need to add the `$GOPATH/bin` directory to your `$PATH`:
+```shell
+% export PATH=$PATH:$GOPATH/bin
+```
 
 ## 1. Write and Run a Simple Benchmark in Go
 
@@ -61,8 +79,8 @@ Further complexity and changes to make it more representative of real-world usag
 
 Benchmark test names in Go must always start with `Benchmark` and take `b *testing.B` as their only argument.
 Also note the use of `fmt.Sprintf("func=%s", testCase.name)` to name each scenario within the benchmark.
-This is a [standardized practice](https://go.googlesource.com/proposal/+/master/design/14313-benchmark-format.md)
-for Go benchmark outputs which allows it to work with analysis tools like `benchstat`.
+This is a [standardized `key=value` format](https://go.googlesource.com/proposal/+/master/design/14313-benchmark-format.md)
+for differentiating Go benchmark scenarios, which allows the output to work with analysis tools like `benchstat`.
 
 ```golang
 package benchmark_example
@@ -101,7 +119,7 @@ func BenchmarkQueuePath(b *testing.B) {
 }
 ```
 
-### 1.3. Run a Simple Benchmark & Analyze Results
+### 1.3. Run the Benchmark & View Results
 
 Go benchmarks are run via the standard `go test` command,
 with [specific CLI flags](https://pkg.go.dev/cmd/go#hdr-Testing_flags) used to control benchmark behavior.
@@ -163,8 +181,9 @@ we can infer this is one allocation for each slice declared.
 
 This is great news!
 We have a simple change that can cut the CPU time spent in this hotspot in half.
-However, we still have more we can do to gain more information from the benchmarks
-and increase our confidence that are results will carry over to the real world.
+However, not all benchmark results are this clear - often there is a much smaller difference
+which requires a statistical test to determine if the difference is significant.
+We have more we can do to increase our confidence that are results will carry over to the real world.
 
 ## 2. Control Benchmark Iterations
 
@@ -219,7 +238,10 @@ Since our benchmark is small and fast, it does not hurt to overshoot a bit itera
 
 Add the flag `-test.benchtime=48000000x` to our `go test` command:
 ```shell
-[~/repos/benchmark-example] % go test -test.bench=. -test.benchtime=64000000x -test.benchmem
+[~/repos/benchmark-example] % go test \
+  -test.bench=. \
+  -test.benchtime=64000000x \
+  -test.benchmem
 goos: linux
 goarch: amd64
 pkg: benchmark_example
@@ -230,10 +252,10 @@ PASS
 ok      benchmark_example       3.759s
 ```
 
-Now we have increased the iterations beyond what Go would have chosen to ensure the scenarios are "timed reliably",
+Now we have increased the iterations beyond what Go has chosen to ensure the scenarios are "timed reliably",
 but Go still does not provide us with a way to make a statistical comparison between the two scenarios.
 
-W will introduce the `benchstat` tool which is designed for that exact purpose, but first we must produce more data.
+We will introduce the `benchstat` tool which is designed for that exact purpose, but first we must produce more data.
 Like any statistical test, `benchstat` requires us to have several *samples* for each benchmark scenario,
 where each sample is a full set of results from a single run of the benchmark suite.
 
@@ -249,7 +271,11 @@ appends the new results to the file rather than overwriting any existing records
 
 The final piece is adding `-test.count` to give `benchstat` enough samples to work with:
 ```shell
-[~/repos/benchmark-example] % go test -test.bench=. -test.benchtime=48000000x -test.count=10 -test.benchmem | tee benchmark-queue-path.txt
+[~/repos/benchmark-example] % go test \
+  -test.bench=. \
+  -test.benchtime=48000000x \
+  -test.count=10 \
+  -test.benchmem | tee -a benchmark-queue-path.txt
 goos: linux
 goarch: amd64
 pkg: benchmark_example
@@ -277,3 +303,51 @@ BenchmarkQueuePath/func=noAppend-16    48000000       26.68 ns/op    32 B/op    
 PASS
 ok      benchmark_example       38.390s
 ```
+
+## 3. Apply Statistical Tests with `benchstat`
+
+By default, `benchstat` is set up to compare benchmark results with the same name across multiple files -
+this case is tailored for comparing identical benchmark suite names across two different versions of a codebase.
+
+In our case, we have a single version of the codebase, and we want to compare benchmark scenarios with different names.
+The [documentation](https://pkg.go.dev/golang.org/x/perf/cmd/benchstat#hdr-Configuring_comparisons)
+for this is a bit hard to understand, but a working example will help.
+
+We have the scenario names `BenchmarkQueuePath/func=baseline-16` and `BenchmarkQueuePath/func=noAppend-16`,
+and we want to compare the samples for `func=baseline` to samples for `func=noAppend`.
+Our use of the standard `key=value` format in the benchmark names will make possible with `benchstat`.
+The `-col` option can take a list of keys across which to compare samples - in our case, the key is just `/func`.
+
+This only works if our scenario names use the `key=value` format!
+
+```shell
+[~/repos/benchmark-example] % benchstat -col /func benchmark-queue-path.txt
+goos: linux
+goarch: amd64
+pkg: benchmark_example
+cpu: AMD Ryzen 7 PRO 6860Z with Radeon Graphics
+             │  baseline   │              noAppend               │
+             │   sec/op    │   sec/op     vs base                │
+QueuePath-16   53.13n ± 2%   26.59n ± 1%  -49.94% (p=0.000 n=10)
+
+             │  baseline  │              noAppend              │
+             │    B/op    │    B/op     vs base                │
+QueuePath-16   48.00 ± 0%   32.00 ± 0%  -33.33% (p=0.000 n=10)
+
+             │  baseline  │              noAppend              │
+             │ allocs/op  │ allocs/op   vs base                │
+QueuePath-16   2.000 ± 0%   1.000 ± 0%  -50.00% (p=0.000 n=10)
+```
+
+This is, again, great news!
+With p-values of `0.000` the statistical tests show that there is a statistically significant difference in performance.
+The `noAppend` function is faster, uses less memory than the `baseline` function - by a long shot.
+
+## 4. Conclusion
+
+We now have a basic understanding of how write, run, and analyze benchmarks in Go.
+
+Benchmarking is an often-overlooked part of engineering teams' development workflows,
+done ad-hoc only when a large performance issue is suspected, or not at all.
+However, like any other habit, a bit of discipline and repetition can make it a natural part of our workflow.
+Proactive benchmarking can help us catch performance issues early, and even prevent them from ever reaching production.
