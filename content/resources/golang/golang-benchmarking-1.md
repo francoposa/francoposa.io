@@ -6,9 +6,10 @@ tags:
   - Golang
   - Performance
   - Benchmarking
+  - Shell-Scripting
 
 slug: golang-benchmarking-1
-date: 2025-01-16
+date: 2025-01-25
 draft: false
 weight: 3
 ---
@@ -59,6 +60,9 @@ We start with our building blocks - the simplest possible representation of the 
 Further complexity and changes to make it more representative of real-world usage can always come later.
 
 Benchmark test names in Go must always start with `Benchmark` and take `b *testing.B` as their only argument.
+Also note the use of `fmt.Sprintf("func=%s", testCase.name)` to name each scenario within the benchmark.
+This is a [standardized practice](https://go.googlesource.com/proposal/+/master/design/14313-benchmark-format.md)
+for Go benchmark outputs which allows it to work with analysis tools like `benchstat`.
 
 ```golang
 package benchmark_example
@@ -88,7 +92,7 @@ func BenchmarkQueuePath(b *testing.B) {
 	}
 
 	for _, testCase := range testCases {
-		b.Run(fmt.Sprintf("func_%s", testCase.name), func(b *testing.B) {
+		b.Run(fmt.Sprintf("func=%s", testCase.name), func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				_ = testCase.pathFunc("component", "tenant")
 			}
@@ -122,8 +126,8 @@ goos: linux
 goarch: amd64
 pkg: benchmark_example
 cpu: AMD Ryzen 7 PRO 6860Z with Radeon Graphics
-BenchmarkQueuePath/func_baseline-16    22597748    52.15 ns/op
-BenchmarkQueuePath/func_noAppend-16    39801882    25.97 ns/op
+BenchmarkQueuePath/func=baseline-16    22597748    52.15 ns/op
+BenchmarkQueuePath/func=noAppend-16    39801882    25.97 ns/op
 PASS
 ok      benchmark_example       2.304s
 ```
@@ -146,8 +150,8 @@ goos: linux
 goarch: amd64
 pkg: benchmark_example
 cpu: AMD Ryzen 7 PRO 6860Z with Radeon Graphics
-BenchmarkQueuePath/func_baseline-16    22136233    52.31 ns/op    48 B/op    2 allocs/op
-BenchmarkQueuePath/func_noAppend-16    41793476    26.22 ns/op    32 B/op    1 allocs/op
+BenchmarkQueuePath/func=baseline-16    22136233    52.31 ns/op    48 B/op    2 allocs/op
+BenchmarkQueuePath/func=noAppend-16    41793476    26.22 ns/op    32 B/op    1 allocs/op
 PASS
 ok      benchmark_example       2.345s
 ```
@@ -171,7 +175,7 @@ The answer lies in `b.N`.
 
 Recall our benchmark function:
 ```golang
-b.Run(fmt.Sprintf("func_%s", testCase.name), func(b *testing.B) {
+b.Run(fmt.Sprintf("func=%s", testCase.name), func(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		_ = testCase.pathFunc("component", "tenant")
 	}
@@ -183,16 +187,14 @@ The Go [benchmarking docs](https://pkg.go.dev/testing#hdr-Benchmarks) give us a 
 > The benchmark function must run the target code b.N times.
 > It is called multiple times with b.N adjusted until the benchmark function lasts long enough to be timed reliably.
 
-This is all well and good, but "timed reliably" does not tell us much.
-It notably does *not* indicate that the number of iterations is chosen
-to give us a defensible comparison between our benchmark scenarios.
-
-Benchmark outputs are not always as clear as one option running twice as fast as another.
-Recall your introductory statistics classes if you ever took them, or paid attention:
-when the difference between the averages of two datasets is small,
-we can gain more confidence in the **statistical significance** of the difference by collecting more data points.
+We have all sorts of reasons to want to control this number of iterations in our benchmark runs.
+We can set a specific round number of iterations just to have a clean and consistent dataset,
+reduce iterations to speed up the process for long and complex benchmarks,
+or increasing the number of iterations to collect more data points and increase confidence in the results.
 
 ### 2.2. Control Benchmark Iterations with Test Flags
+
+#### 2.2.1. The `-test.benchtime` Flag
 
 We could just delete the usage of `b.N` from our code and hardcode the number of iterations into the test,
 but it is far more convenient for us and any other engineers we work with to avoid this.
@@ -213,19 +215,65 @@ In our test runs up to this, point Go has chosen ~40 million iterations
 in pursuit of its goal that "the benchmark function lasts long enough to be timed reliably".
 
 With an emphasis collecting more datapoints to increase our confidence in the results, we should choose a larger number.
-Since our benchmark is small and fast, it does not hurt to overshoot on iterations - why not a nice round 64 million?
+Since our benchmark is small and fast, it does not hurt to overshoot a bit iterations - why not a nice round 48 million?
 
-Add the flag `-test.benchtime=64000000x` to our `go test` command:
-```shell
-[~/repos/benchmark-example] % go test -test.bench=. -test.benchtime=64000000x
+Add the flag `-test.benchtime=48000000x` to our `go test` command:
 ```shell
 [~/repos/benchmark-example] % go test -test.bench=. -test.benchtime=64000000x -test.benchmem
 goos: linux
 goarch: amd64
 pkg: benchmark_example
 cpu: AMD Ryzen 7 PRO 6860Z with Radeon Graphics
-BenchmarkQueuePath/func_baseline-16    64000000    52.43 ns/op    48 B/op    2 allocs/op
-BenchmarkQueuePath/func_noAppend-16    64000000    26.00 ns/op    32 B/op    1 allocs/op
+BenchmarkQueuePath/func=baseline-16    48000000    52.13 ns/op    48 B/op    2 allocs/op
+BenchmarkQueuePath/func=noAppend-16    48000000    26.07 ns/op    32 B/op    1 allocs/op
 PASS
-ok      benchmark_example       5.024s
+ok      benchmark_example       3.759s
+```
+
+Now we have increased the iterations beyond what Go would have chosen to ensure the scenarios are "timed reliably",
+but Go still does not provide us with a way to make a statistical comparison between the two scenarios.
+
+W will introduce the `benchstat` tool which is designed for that exact purpose, but first we must produce more data.
+Like any statistical test, `benchstat` requires us to have several *samples* for each benchmark scenario,
+where each sample is a full set of results from a single run of the benchmark suite.
+
+To collect these samples, we just need to run the same suite multiple times and save the results to a file.
+
+#### 2.2.2. The `-test.count` Flag and Saving Benchmark Results with `tee`
+
+The `tee` command duplicates shell input to both standard output and a file.
+In this case we can use `tee` to watch the progression of the benchmark runs in the terminal
+at the same time that the results are written to a file for `benchstat` to analyze.
+The `-a/--append` flag can also be used to ensure that each new run of `tee`
+appends the new results to the file rather than overwriting any existing records.
+
+The final piece is adding `-test.count` to give `benchstat` enough samples to work with:
+```shell
+[~/repos/benchmark-example] % go test -test.bench=. -test.benchtime=48000000x -test.count=10 -test.benchmem | tee benchmark-queue-path.txt
+goos: linux
+goarch: amd64
+pkg: benchmark_example
+cpu: AMD Ryzen 7 PRO 6860Z with Radeon Graphics
+BenchmarkQueuePath/func=baseline-16    48000000       52.54 ns/op    48 B/op    2 allocs/op
+BenchmarkQueuePath/func=baseline-16    48000000       52.90 ns/op    48 B/op    2 allocs/op
+BenchmarkQueuePath/func=baseline-16    48000000       53.01 ns/op    48 B/op    2 allocs/op
+BenchmarkQueuePath/func=baseline-16    48000000       53.11 ns/op    48 B/op    2 allocs/op
+BenchmarkQueuePath/func=baseline-16    48000000       52.78 ns/op    48 B/op    2 allocs/op
+BenchmarkQueuePath/func=baseline-16    48000000       55.26 ns/op    48 B/op    2 allocs/op
+BenchmarkQueuePath/func=baseline-16    48000000       53.58 ns/op    48 B/op    2 allocs/op
+BenchmarkQueuePath/func=baseline-16    48000000       53.20 ns/op    48 B/op    2 allocs/op
+BenchmarkQueuePath/func=baseline-16    48000000       53.15 ns/op    48 B/op    2 allocs/op
+BenchmarkQueuePath/func=baseline-16    48000000       54.02 ns/op    48 B/op    2 allocs/op
+BenchmarkQueuePath/func=noAppend-16    48000000       26.61 ns/op    32 B/op    1 allocs/op
+BenchmarkQueuePath/func=noAppend-16    48000000       26.60 ns/op    32 B/op    1 allocs/op
+BenchmarkQueuePath/func=noAppend-16    48000000       26.39 ns/op    32 B/op    1 allocs/op
+BenchmarkQueuePath/func=noAppend-16    48000000       26.30 ns/op    32 B/op    1 allocs/op
+BenchmarkQueuePath/func=noAppend-16    48000000       27.16 ns/op    32 B/op    1 allocs/op
+BenchmarkQueuePath/func=noAppend-16    48000000       26.97 ns/op    32 B/op    1 allocs/op
+BenchmarkQueuePath/func=noAppend-16    48000000       26.59 ns/op    32 B/op    1 allocs/op
+BenchmarkQueuePath/func=noAppend-16    48000000       26.43 ns/op    32 B/op    1 allocs/op
+BenchmarkQueuePath/func=noAppend-16    48000000       26.19 ns/op    32 B/op    1 allocs/op
+BenchmarkQueuePath/func=noAppend-16    48000000       26.68 ns/op    32 B/op    1 allocs/op
+PASS
+ok      benchmark_example       38.390s
 ```
