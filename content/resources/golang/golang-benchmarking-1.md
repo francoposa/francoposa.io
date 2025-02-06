@@ -132,13 +132,20 @@ At the most basic, we just need the `-bench` flag:
 ...
 ```
 
+We also do *not* want to waste time running any non-benchmark tests.
+Like the `-bench` flag for benchmarks, the `-run` flag selects tests to run by regex,
+so we want a regex that will match no tests: `'^$'`.
+The `^` pattern matches the beginning of a line, and `$` matches the end of a line,
+so the full `^$` pattern will only match a completely empty line, not any test names.
+The regex pattern is wrapped in single quotes to avoid shell expansion.
+
 Flags for `go test` are also recognized when with the prefix `test`, where `-bench` becomes `-test.bench`.
 The `test` prefix is _required_ when running a pre-compiled test binary,
 so it is easiest to get in the habit of always using the prefix.
 
-From the root directory of our package, we run `go test -test.bench=.`:
+From the root directory of our package, we run `go test -test.run='^$' -test.bench=.`:
 ```shell
-[~/repos/benchmark-example] % go test -test.bench=.
+[~/repos/benchmark-example] % go test -test.run='^$' -test.bench=.
 goos: linux
 goarch: amd64
 pkg: benchmark_example
@@ -160,9 +167,9 @@ We can add this information to the benchmark output with the `-benchmem` flag:
     Allocations made in C or using C.malloc are not counted.
 ```
 
-This time, we run `go test -test.bench=. -test.benchmem`:
+This time, we run `go test -test.run='^$' -test.bench=. -test.benchmem`:
 ```shell
-[~/repos/benchmark-example] % go test -test.bench=. -test.benchmem
+[~/repos/benchmark-example] % go test -test.run='^$' -test.bench=. -test.benchmem
 goos: linux
 goarch: amd64
 pkg: benchmark_example
@@ -238,6 +245,7 @@ Since our benchmark is small and fast, it does not hurt to overshoot a bit itera
 Add the flag `-test.benchtime=48000000x` to our `go test` command:
 ```shell
 [~/repos/benchmark-example] % go test \
+  -test.run='^$' \
   -test.bench=. \
   -test.benchtime=64000000x \
   -test.benchmem
@@ -271,6 +279,7 @@ appends the new results to the file rather than overwriting any existing records
 The final piece is adding `-test.count` to give `benchstat` enough samples to work with:
 ```shell
 [~/repos/benchmark-example] % go test \
+  -test.run='^$' \
   -test.bench=. \
   -test.benchtime=48000000x \
   -test.count=10 \
