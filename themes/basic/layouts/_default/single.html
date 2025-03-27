@@ -1,9 +1,0 @@
-{{ define "main" }}
-<div class="container content my-2 px-8 py-4 bg-white">
-    <h1 class="mt-8 mb-1 text-4xl text-center">{{ .Title }}</h1>
-    <p class="mt-2 mb-1 text-center text-xl">{{ .Page.Summary }}</p>
-    <p class="mt-2 mb-1 text-center text-md">{{ .Site.Params.AuthorName }}</p>
-    <hr>
-    {{ .Content }}
-</div>
-{{ end }}
