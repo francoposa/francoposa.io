@@ -3,7 +3,7 @@ title: "Python Setup for MacOS Part 1: Pyenv + Virtualenvwrapper"
 slug: python-setup-macos-1
 summary: "Worry-free Python development environment setup for MacOS"
 date: 2020-02-24
-weight: 5
+weight: 6
 ---
 
 ## Our Choice of Tools: Pyenv & VirtualenvWrapper
@@ -145,6 +145,3 @@ Wipe out any virtualenvs you no longer need:
 %  rmvirtualenv temp368
 ```
 
-
-## Final Notes:
- You may notice that in the Github repo that the [Pyenv-Virtualenvwrapper](https://github.com/pyenv/pyenv-virtualenvwrapper) plugin has not been updated since 2017. It still works perfectly, but it may be a good small project to fork and/or maintain so that it does not get lost to the sands of time.
