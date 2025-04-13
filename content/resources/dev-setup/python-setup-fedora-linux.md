@@ -1,9 +1,9 @@
 ---
-title: "Python Setup for Fedora Linux with Pyenv"
-slug: python-setup-fedora-linux
+title: "Python Setup for Linux with Pyenv"
+slug: python-setup-linux
 summary: "Simple and Flexible Python Version and Virtualenv Management"
-description: "Fedora Development Libraries, Pyenv, and Virtualenvwrapper"
-date: 2025-04-14
+description: "Linux Development Libraries, Pyenv, and Virtualenvwrapper"
+date: 2025-04-13
 weight: 1
 ---
 
@@ -11,17 +11,19 @@ weight: 1
 
 We will:
 
-1. Install the compilers and libraries required to build Python from source on Fedora.
+1. Install the compilers and libraries required to build Python from source on Linux.
 2. Install Pyenv to manage and switch between multiple Python versions
 3. Install Virtualenvwrapper as a Pyenv plugin to create and manage virtual environments
 4. Try it Out!
 
 ## 0. Prerequisites
 
-### 0.1 A Current Version of Fedora (or other) Linux
+### 0.1 A Current Version of Linux
 
-These steps have been tested on Fedora 41 & 42, though Steps 2 & 3 are valid for any Linux distribution -
-you would just need to figure out the equivalent package names and package manager commands.
+The development package names for Step 1 are valid on Fedora Linux, tested on Fedora Workstation 41 & 42.
+For other distros, the equivalent names are easily found via a search of the package repositories.
+
+All other steps are distribution-agnostic.
 
 ## 1. Install Compilers & Development Libraries
 
@@ -213,7 +215,7 @@ Removing temp3-13-2...
 
 ## Conclusion
 With Pyenv configured and the standard C development libraries and tooling installed,
-we now have the ability to compile from source & install any available CPython version*.
+we now have the ability to compile from source & install any available CPython version.
 The versions are completely independent, scoped to our home directory, and can be switched between easily.
 
 With the addition of Virtualenvwrapper hooked up as a Pyenv plugin,
