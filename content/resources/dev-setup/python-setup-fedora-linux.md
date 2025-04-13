@@ -125,3 +125,100 @@ pyenv virtualenvwrapper
 # This is the default, but prefer explicit over implicit.
 export WORKON_HOME=$HOME/.virtualenvs
 ```
+
+## 4. Try it Out!
+
+### 4.1 Install Python versions
+
+Install some versions of Python we want to work with:
+
+```shell
+% pyenv install 3.12.8
+# ...
+% pyenv install 3.13.2
+# ...
+% pyenv versions
+  system
+  3.12.8
+* 3.13.2 (set by PYENV_VERSION environment variable)
+```
+
+### 4.2 Create a Virtual Environment With the Active Python Version
+Virtualenvwrapper's `mkvirtualenv` ("make virtual environment") command
+will use whichever Python version you have active:
+
+```shell
+% pyenv version
+3.13.2 (set by PYENV_VERSION environment variable)
+% mkvirtualenv temp3-13-2
+# ...
+(temp3-13-2) % which python
+/Users/franco/.virtualenvs/temp3-13-2/bin/python
+(temp3-13-2) %  python --version
+Python 3.13.2
+```
+
+### 4.3 Create a Virtual Environment With a Different Python Version
+We can also tell `virtualenvwrapper` which Python version a new virtualenv should be created with,
+without needing to mess with Pyenv directly or worry about the current environment:
+
+```shell
+(temp3-13-2) % pyenv version
+3.13.2 (set by PYENV_VERSION environment variable)
+(temp3-13-2) % mkvirtualenv temp3-12-8 --python ~/.pyenv/versions/3.12.8/bin/python
+# ...
+(temp3-12-8) % which python
+/Users/franco/.virtualenvs/temp3-12-8/bin/python
+(temp3-12-8) % python --version
+Python 3.12.8
+```
+
+### 4.4 List all Virtual Environments
+
+```shell
+(temp3-12-8) % lsvirtualenv -b  # -b for "brief", output takes up less space
+temp3-12-8
+temp3-13-2
+```
+
+### 4.5 Exit the Virtual Environment
+
+```shell
+(temp3-12-8) % deactivate
+# now we are back to normal, outside the virtualenvs
+% which python
+~/.pyenv/shims/python
+% python --version
+Python 3.13.2
+% pyenv versions
+  system
+  3.12.8
+* 3.13.2 (set by PYENV_VERSION environment variable)
+```
+
+```shell
+% lsvirtualenv -b  # -b for "brief", output takes up less space
+temp3-12-8
+temp3-13-2
+```
+
+### Clean Up
+Wipe out any virtualenvs you no longer need:
+
+```shell
+% rmvirtualenv temp3-12-8 temp3-13-2
+Removing temp3-12-8...
+Removing temp3-13-2...
+```
+
+## Conclusion
+With Pyenv configured and the standard C development libraries and tooling installed,
+we now have the ability to compile from source & install any available CPython version*.
+The versions are completely independent, scoped to our home directory, and can be switched between easily.
+
+With the addition of Virtualenvwrapper hooked up as a Pyenv plugin,
+we also have a slick interface for managing all of our virtual environments,
+each of which is isolated to its given Pyenv-managed Python version.
+
+While Python development has no shortage of tooling troubles and idiosyncrasies,
+this setup offers a tried and true and *mostly* pain-free basis from which to start.
