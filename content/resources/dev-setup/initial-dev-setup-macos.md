@@ -3,7 +3,7 @@ title: "Initial Dev Setup for MacOS"
 slug: initial-dev-setup-macos
 summary: "General development environment setup for MacOS: Zsh, Homebrew, Sublime Text, and VS Code"
 date: 2020-02-02
-weight: 2
+weight: 3
 ---
 ## The Very Basics
 This guide is meant to walk through the most basic components of a dev environment setup on MacOs (Catalina and newer) - the steps you would perform before writing your first lines of code on a new or factory-reset machine.
