@@ -2,7 +2,7 @@
 title: "Python Setup for Fedora Linux with Pyenv"
 slug: python-setup-fedora-linux
 summary: "Simple and Flexible Python Version and Virtualenv Management"
-description: "Fedora Development Libraries, Pyenv, and VirtualenvWrapper"
+description: "Fedora Development Libraries, Pyenv, and Virtualenvwrapper"
 date: 2025-04-14
 weight: 1
 ---
@@ -13,7 +13,7 @@ We will:
 
 1. Install the compilers and libraries required to build Python from source on Fedora.
 2. Install Pyenv to manage and switch between multiple Python versions
-3. Install VirtualenvWrapper as a Pyenv plugin to create and manage virtual environments
+3. Install Virtualenvwrapper as a Pyenv plugin to create and manage virtual environments
 4. Try it Out!
 
 ## 0. Prerequisites
@@ -24,6 +24,7 @@ These steps have been tested on Fedora 41 & 42, though Steps 2 & 3 are valid for
 you would just need to figure out the equivalent package names and package manager commands.
 
 ## 1. Install Compilers & Development Libraries
+
 Our tool of choice for Python version installation & management is [Pyenv](https://github.com/pyenv/pyenv).
 While not everyone will need to manage multiple Python versions or interpreter implementations,
 Pyenv is the de facto standard for those that do, and has a host of advantages and conveniences.
@@ -33,12 +34,14 @@ Each of the standard C-based Python versions must be built from source when it i
 For this, we need a C compiler like `gcc` and its standard library interface `glibc`,
 as well as standard system libraries in C that Python will link to: `bzip2`, `readline`, `libcurl`, `openssl`, etc.
 
+### 1.1 Option 1: Install With Fedora Package Groups
+
 Fedora bundles these common dependencies into two package groups: `c-development` and `development-libs`.
 Installing only `development-libs` will also pull in the libraries we need from `c-development` dependencies,
 but we can explicitly list both in the installation command for a more informative `dnf` history:
 
 ```shell
-sudo dnf group install -y c-development development-libs
+% sudo dnf group install -y c-development development-libs
 ```
 
 Finally, we can optionally install two more libraries:
@@ -48,7 +51,23 @@ Without them, the Python build will still succeed, but it will complain and spit
 To set our minds at ease, we can install both before moving on:
 
 ```shell
-sudo dnf install -y sqlite-devel tk-devel
+% sudo dnf install -y sqlite-devel tk-devel
+```
+
+### 1.2 Option 2: Install Individual Fedora Packages
+
+For those that prefer to keep the system as slim as possible,
+we can skip the convenience of package groups and install only the required individual packages.
+
+The absolute minimal package set to build Python without errors is `gcc`, `openssl-devel`, and `zlib-devel`.
+The install will succeed, but it will have a lot of complaints about packages it cannot find and link to.
+We can infer the extra packages it wants from the warnings at the end of the build output:
+`bzip2-devel`, `libffi-devel`, `ncurses-devel`, `readline-devel`, `sqlite-devel`, `tk-devel`, and `xz-devel`.
+
+So all in, to support a Python install built from source:
+
+```shell
+% sudo dnf install -y bzip2-devel gcc libffi-devel ncurses-devel openssl-devel readline-devel sqlite-devel tk-devel xz-devel zlib-devel
 ```
 
 ## 2. Install and Set Up Pyenv
@@ -58,14 +77,14 @@ sudo dnf install -y sqlite-devel tk-devel
 We can use the official installer:
 
 ```shell
-curl -fsSL https://pyenv.run | bash
+% curl -fsSL https://pyenv.run | bash
 ```
 
 That's it - sort of.
 
 ### 2.2 Set Up Pyenv
 The installer will spit out instructions about adding Pyenv initialization to the shell rc files.
-We can do a slightly improved version - here is what is in my `.zshrc`:
+We can do a slightly improved version :
 
 ```shell
 # PYENV
@@ -82,3 +101,27 @@ The `PYENV_VERSION` variable sets our default Python version to use each time we
 The version is not installed yet - we will get there shortly.
 
 Open a new terminal window or tab or source the shell files for the changes to take effect.
+
+## 3. Install and Set Up Virtualenvwrapper as a Pyenv Plugin
+
+### 3.1 Install Pyenv-Virtualenvwrapper
+
+Following the [official instructions](https://github.com/pyenv/pyenv-virtualenvwrapper),
+clone the management scripts into the Pyenv plugins directory:
+
+```shell
+% git clone https://github.com/pyenv/pyenv-virtualenvwrapper.git $(pyenv root)/plugins/pyenv-virtualenvwrapper
+```
+
+This step alone does not install Virtualenvwrapper - it only enables the `pyenv virtualenvwrapper` subcommand.
+Each time we start working with a new Python version managed by Pyenv,
+we need to run `pyenv virtualenvwrapper` to install and initialize it.
+We can handle this is by adding command to our shell rc files, after the Pyenv init steps:
+
+```shell
+# PYENV-VIRTUALENVWRAPPER
+# Initalize virtualenvwrapper so commands are available.
+pyenv virtualenvwrapper
+# This is the default, but prefer explicit over implicit.
+export WORKON_HOME=$HOME/.virtualenvs
+```
