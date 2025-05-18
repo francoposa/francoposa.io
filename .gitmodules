@@ -1,6 +1,10 @@
 [submodule "themes/hypo"]
 	path = themes/hypo
 	url = https://github.com/francoposa/hypo.git
+	branch = main
+	update = rebase
 [submodule "themes/typo"]
 	path = themes/typo
 	url = https://github.com/tomfran/typo.git
+	branch = main
+	update = rebase
