@@ -8,3 +8,6 @@
 	url = https://github.com/tomfran/typo.git
 	branch = main
 	update = rebase
+[submodule "themes/hugo-basic-starter-template"]
+	path = themes/hugo-basic-starter-template
+	url = https://github.com/inflite-dev/hugo-basic-starter-template.git
