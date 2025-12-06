@@ -1,0 +1,22 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+
+{{- if .IsHome -}}
+    <meta name="title" content="{{ site.Params.Title }}" />
+    <meta name="description" content="{{ site.Params.Description }}" />
+{{- else -}}
+<meta name="description" content="{{ .Params.Description }}" />
+{{- end }}
+
+<title>
+    {{ if .IsHome }}
+    {{ site.Title }}
+    {{ else }}
+    {{ printf "%s | %s" .Title site.Title }}
+    {{ end }}
+</title>
+
+<link rel="canonical" href="{{ .Permalink }}" />
+
+{{ partialCached "head/css.html" . }}
+<script defer src="https://cloud.umami.is/script.js" data-website-id="975f32e6-4e15-47b7-b4aa-0772b62271e6"></script>
