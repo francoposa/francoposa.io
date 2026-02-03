@@ -5,6 +5,10 @@ summary: "Simple and Flexible Python Version and Virtualenv Management"
 description: "Linux Development Libraries, Pyenv, and Virtualenvwrapper"
 date: 2025-04-13
 weight: 1
+
+
+type: redirect
+target: https://scratchbuffer.net/topics/python/python-setup-linux/
 ---
 
 ## Goals
