@@ -4,6 +4,9 @@ slug: python-setup-macos-1
 summary: "Worry-free Python development environment setup for MacOS"
 date: 2020-02-24
 weight: 6
+
+type: redirect
+target: https://scratchbuffer.net/topics/python/python-setup-macos/
 ---
 
 ## Our Choice of Tools: Pyenv & VirtualenvWrapper
