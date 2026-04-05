@@ -49,13 +49,6 @@ but it may take a few hard refreshes for the browser to display them.
     Exposing a Service to the Public Internet
 
 
-### [Dev Tools](https://francoposa.io/resources/dev-tools/)
-
-*   #### [Git Good, Part 1: Configuration, Creating Repositories, and Committing Changes](https://francoposa.io/resources/dev-tools/git-basics-1/)
-
-    Git Config, Init, Add, and Commit
-
-
 ### [Golang](https://francoposa.io/resources/golang/)
 
 *   #### [Containerizing a Golang Application with Dockerfile and Makefile](https://francoposa.io/resources/golang/golang-containerizing-dockerfile-makefile/)
@@ -65,5 +58,21 @@ but it may take a few hard refreshes for the browser to display them.
 *   #### [Golang Templates, Part 1: Concepts and Composition](https://francoposa.io/resources/golang/golang-templates-1/)
 
     Understanding Golang Template Nesting and Hierarchy With Simple Text Templates
+
+### [Rust](https://francoposa.io/resources/rust/)
+
+*   #### [Create a Vector of Owned Strings from &str Collection in Rust](https://francoposa.io/resources/rust/rust-string-vec-from-str-refs/)
+
+    Concise One-Liners for `Vec<String>` from `[&str, n]`
+
+### [Web Development](https://francoposa.io/resources/web-development/)
+
+*   #### [Modern TypeScript Project Setup with NPM, Part 1](https://francoposa.io/resources/web-development/typescript-npm-setup-part-1/)
+
+    Write, Run, and Compile Node.js with TypeScript
+
+*   #### [Modern TypeScript Project Setup with NPM, Part 2](https://francoposa.io/resources/web-development/typescript-npm-setup-part-2/)
+
+    Lint and Format TypeScript with JavaScript Standard Style
 
 * * *
